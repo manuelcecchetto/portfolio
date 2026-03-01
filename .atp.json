@@ -1,0 +1,416 @@
+{
+  "meta": {
+    "project_name": "Astro Portfolio + Blog",
+    "version": "1.3",
+    "project_status": "ACTIVE"
+  },
+  "nodes": {
+    "n02_astro_v5_scaffold": {
+      "title": "Scaffold Astro v5 project baseline and developer workflow",
+      "instruction": "Goal: initialize a clean Astro project aligned with current docs and ready for implementation. In-scope: create project with `npm create astro@latest`, set TypeScript strictness, configure scripts (`dev`, `build`, `preview`, `astro check`), and commit baseline structure. Out-of-scope: feature pages, production styling, or content modeling. Verification: run `npm install && npm run astro check && npm run build` successfully. Artifacts: `package.json`, `astro.config.mjs`, `tsconfig.json`, `src/`, `.editorconfig`, `.gitignore`.",
+      "context": "Reference: https://docs.astro.build/en/install-and-setup/ (Node prerequisite and create command). Version sanity check target: `astro@5.18.0`.",
+      "dependencies": [],
+      "status": "COMPLETED",
+      "reasoning_effort": "low",
+      "started_at": "2026-03-01T11:21:13.895446+00:00",
+      "lease_expires_at": null,
+      "report": "Revalidated and completed Astro baseline scaffold after the transient npm network blocker cleared. Confirmed scaffold files (package.json, astro.config.mjs, tsconfig.json, src/env.d.ts, src/pages/index.astro), ran npm install successfully, added @astrojs/check for non-interactive diagnostics, and verified npm run check (0 errors/warnings) plus npm run build (successful static build to dist/). Note: engine warnings remain because current Node is v20.17.0 while some deps request >=20.19.0, but checks and build pass.",
+      "artifacts": [
+        "package.json",
+        "astro.config.mjs",
+        "tsconfig.json",
+        "src/env.d.ts",
+        "src/pages/index.astro",
+        "package-lock.json"
+      ],
+      "completed_at": "2026-03-01T11:32:32Z"
+    },
+    "n03_design_tokens_and_base_layout": {
+      "title": "Implement global design system and base layout from inspiration",
+      "instruction": "Goal: establish reusable visual primitives so all pages inherit the same handcrafted romantic-yet-professional look. In-scope: CSS variables for colors/spacing/radius/shadows, typography pairing, textured background treatment, reusable paper-card wrappers, and motion primitives with reduced-motion fallbacks. Out-of-scope: final page-specific content and dynamic data rendering. Verification: run `npm run dev`, open a style playground route, and manually confirm tokens/motion/contrast on desktop + mobile. Artifacts: `src/styles/tokens.css`, `src/styles/global.css`, `src/layouts/BaseLayout.astro`, `src/components/ui/*`.",
+      "dependencies": [
+        "n02_astro_v5_scaffold"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T11:34:20.916690+00:00",
+      "lease_expires_at": null,
+      "report": "Completed the global design system and base layout foundation for a romantic-yet-professional visual direction.\n\nImplemented code changes:\n1) Tokens and global styling\n- Added `src/styles/tokens.css` with reusable variables for color palette, typography pairing, spacing scale, radii, shadows, motion durations/easing, and z-index.\n- Added `src/styles/global.css` importing tokens and defining:\n  - base/reset styles,\n  - textured atmospheric background treatment,\n  - typography hierarchy,\n  - utility layout classes (`site-shell`, `stack`, `cluster`),\n  - reusable surface primitives (`paper-card*`, `paper-deck`, `pill`),\n  - motion primitives (`motion-reveal` variants and `motion-stagger`),\n  - reduced-motion fallback via `@media (prefers-reduced-motion: reduce)`.\n\n2) Base layout\n- Added `src/layouts/BaseLayout.astro`:\n  - imports global styles,\n  - centralizes shared HTML/head/meta/font loading,\n  - provides reusable shell with skip-link, ambient background elements, and content slot.\n\n3) Reusable UI components\n- Added `src/components/ui/PaperCard.astro` (variant/padding/lift wrapper).\n- Added `src/components/ui/PaperDeck.astro` (responsive card-grid wrapper).\n- Added `src/components/ui/MotionReveal.astro` (single-element reveal with `kind` and `delay`).\n- Added `src/components/ui/StaggerGroup.astro` (staggered entrance container with configurable step).\n- Exported `Props` interfaces in Astro components to satisfy strict diagnostics.\n\n4) Route wiring and playground\n- Replaced `src/pages/index.astro` to consume the new layout + primitives and point to playground.\n- Added `src/pages/style-playground.astro` for manual validation of tokens, card variants, and motion behavior.\n\nMemory updates (required governance):\n- `docs/memory/decision-log.md`: added DEC-001 for token-first visual foundation decision.\n- `docs/memory/contracts.md`: added CON-001 internal interface contract for layout/style/component primitives.\n- `docs/memory/risk-register.md`: added RISK-002 closure record confirming prior npm-registry blocker is now closed in practice.\n- `docs/memory/evidence-index.md`: added EVD-002 with verification evidence and results.\n- `docs/memory/changelog.md`: added CHG-002 with full changed-file inventory.\n\nLint/typecheck/build verification:\n- Ran `npm run check` (initial run failed with ts(6196) unused `Props` in three Astro components; fixed by exporting interfaces).\n- Reran `npm run check` -> PASS (0 errors/warnings/hints).\n- Ran `npm run typecheck` -> PASS (0 errors/warnings/hints).\n- Ran `npm run build` -> PASS; generated static routes `/` and `/style-playground/`.\n\nCommit requirement handling:\n- Files changed and commit was attempted as required by policy, but blocked because workspace is not a git repository.\n- Evidence: `git rev-parse --is-inside-work-tree` returned `fatal: not a git repository (or any of the parent directories): .git`.\n- Per governance rule, node is not failed solely for this commit blocker.\n\nManual verification guidance:\n- Run `npm run dev`, open `/style-playground`, and verify:\n  - token consistency across cards/text,\n  - hover elevation behavior,\n  - reduced-motion behavior by toggling OS/browser setting,\n  - visual contrast and spacing on desktop + mobile viewport sizes.",
+      "artifacts": [
+        "src/styles/tokens.css",
+        "src/styles/global.css",
+        "src/layouts/BaseLayout.astro",
+        "src/components/ui/PaperCard.astro",
+        "src/components/ui/PaperDeck.astro",
+        "src/components/ui/MotionReveal.astro",
+        "src/components/ui/StaggerGroup.astro",
+        "src/pages/index.astro",
+        "src/pages/style-playground.astro",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T11:39:20.594050+00:00"
+    },
+    "n04_content_collections_schema": {
+      "title": "Model portfolio and blog content with Astro Content Layer API",
+      "instruction": "Goal: define typed collections that support projects and blog posts with validation. In-scope: configure collections for `projects` and `blog` using `defineCollection`, `glob` loaders, and Zod schema (title, slug, dates, tags, summary, cover image, draft flags). Out-of-scope: final page rendering and SEO metadata wiring. Verification: run `npm run astro check` and confirm collection queries compile with no type errors. Artifacts: `src/content.config.ts`, `src/data/projects/*`, `src/data/blog/*`, shared content types/helpers.",
+      "context": "Reference: https://docs.astro.build/en/guides/content-collections/ (v5 Content Layer API and `src/content.config.ts`).",
+      "dependencies": [
+        "n02_astro_v5_scaffold"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T11:39:43.711577+00:00",
+      "lease_expires_at": null,
+      "report": "Implemented Astro v5 Content Layer collections and typed schemas for `projects` and `blog`.\n\nWhat changed\n- Added `src/content.config.ts` defining two collections with `defineCollection` and `glob` loaders:\n  - `projects` loader base: `./src/data/projects`, pattern: `**/*.{md,mdx}`\n  - `blog` loader base: `./src/data/blog`, pattern: `**/*.{md,mdx}`\n- Added shared schema module `src/content/schemas.ts` with reusable validation for:\n  - `title`, `slug`, `summary`, `publishedAt`, `updatedAt`, `tags`, `coverImage`, `draft`\n  - blog-specific `readingTimeMinutes`\n  - project-specific `featured`, `repositoryUrl`, `demoUrl`\n- Added shared query/type helpers in `src/lib/content.ts`:\n  - `ProjectEntry`, `BlogEntry` type aliases from `CollectionEntry`\n  - `getPublishedProjects()` and `getPublishedBlogPosts()` filtered on `!draft` and sorted by most recent `updatedAt || publishedAt`\n- Added seed content entries:\n  - `src/data/projects/atelier-scheduler.md`\n  - `src/data/projects/letterpress-notes.md`\n  - `src/data/blog/astro-content-layer-in-practice.md`\n  - `src/data/blog/tuning-page-motion-with-respect.md`\n\nMemory governance updates\n- Updated `docs/memory/contracts.md` with `[CON-002] Astro Content Layer Collections Contract`.\n- Updated `docs/memory/evidence-index.md` with `[EVD-003] Content Collections Schema Verification`.\n- Updated `docs/memory/changelog.md` with `[CHG-003] Content Layer Collections and Seed Data`.\n- All added memory entries include NodeID, Date, Author, Change, and Status.\n\nLint/typecheck and verification\n- Lint: no dedicated lint script is configured in `package.json` for this repo scope.\n- Type/content checks run:\n  1) `npm run astro check` initially failed once with Astro datastore ENOENT while checks were started in parallel (`rename ... node_modules/.astro/data-store.json.tmp -> .../data-store.json`).\n  2) `npm run typecheck` initially failed on `src/lib/content.ts` generic typing around `updatedAt` optionality.\n  3) Fixed helper type in `src/lib/content.ts` (`updatedAt?: Date | undefined`).\n  4) Re-ran sequentially:\n     - `npm run astro check` -> pass (0 errors, 0 warnings, 0 hints)\n     - `npm run typecheck` -> pass (0 errors, 0 warnings, 0 hints)\n\nCommit requirement status\n- Attempted to create the required single commit, but workspace is not a git repository.\n- Command run: `git rev-parse --is-inside-work-tree`\n- Result: `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance, node is not failed solely for this commit blocker.\n\nManual verification\n- Run `npm run astro check` and `npm run typecheck` from repo root.\n- Query functions can be imported from `src/lib/content.ts` to consume typed published entries from both collections.",
+      "artifacts": [
+        "src/content.config.ts",
+        "src/content/schemas.ts",
+        "src/lib/content.ts",
+        "src/data/projects/atelier-scheduler.md",
+        "src/data/projects/letterpress-notes.md",
+        "src/data/blog/astro-content-layer-in-practice.md",
+        "src/data/blog/tuning-page-motion-with-respect.md",
+        "docs/memory/contracts.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T11:42:56.520477+00:00"
+    },
+    "n05_initial_content_seed": {
+      "title": "Seed first-pass portfolio and blog content",
+      "instruction": "Goal: create enough real content to drive final IA, visual fidelity, and launch readiness. In-scope: extract professional profile inputs from LinkedIn/CV, map inspiration motifs from `inspo/*.html` into portfolio-safe copy/image direction, add Manuel profile/about data, at least 3 project entries, and at least 2 blog draft posts with frontmatter matching schemas; normalize external links and media placeholders. Out-of-scope: full editorial refinement or external CMS integration. Verification: run `npm run astro check` and manually verify all entries load via collection queries without fallback content. Artifacts: `src/data/projects/*.md`, `src/data/blog/*.md|*.mdx`, `src/data/profile.json` (or equivalent), `docs/content-sourcing-notes.md`.",
+      "dependencies": [
+        "n04_content_collections_schema"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T11:43:16.203833+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n05_initial_content_seed` by seeding first-pass portfolio/profile/blog content and documenting sourcing direction.\n\nWhat I changed\n- Seeded profile/about payload:\n  - `src/data/profile.json`\n  - Added canonical first-pass fields: `name`, `headline`, `location`, `timezone`, `aboutShort`, `aboutLong`, `focusAreas`, `contact`, `social`, `availability`.\n- Expanded project content (>= 3 entries total achieved: now 4):\n  - Updated `src/data/projects/atelier-scheduler.md` (removed sample-domain demo URL and refined body copy).\n  - Updated `src/data/projects/letterpress-notes.md` (`updatedAt` + promoted to `draft: false` + richer body copy).\n  - Added `src/data/projects/field-journal-cms.md`.\n  - Added `src/data/projects/signalboard-analytics.md`.\n- Expanded blog draft content (>= 2 draft posts achieved):\n  - Added `src/data/blog/from-scrapbook-motifs-to-portfolio-language.md` (`draft: true`).\n  - Existing `src/data/blog/tuning-page-motion-with-respect.md` remains `draft: true`.\n- Added sourcing and motif translation doc:\n  - `docs/content-sourcing-notes.md`\n  - Included mapping from `inspo/*.html` motifs to portfolio-safe copy/image direction, plus link/media normalization rules.\n\nRationale\n- Node goal was to provide enough real content to drive IA/visual fidelity and launch readiness without full editorial polish.\n- Content was aligned to existing collection schemas (`projects` + `blog`) and normalized to avoid sample-domain placeholders.\n- Added profile data so downstream page implementation can consume a stable, explicit about/profile source.\n\nMemory governance updates\n- Updated `docs/memory/contracts.md` with:\n  - `[CON-003] Profile Seed and Content Baseline Contract`\n- Updated `docs/memory/evidence-index.md` with:\n  - `[EVD-004] Initial Portfolio and Blog Content Seed Verification`\n- Updated `docs/memory/changelog.md` with:\n  - `[CHG-004] Initial Portfolio Content and Profile Seed`\n- All new entries include NodeID, Date, Author, Change, and Status.\n\nLint/typecheck and verification\n- Lint:\n  - No dedicated lint script is configured in this repo scope (`npm run` lists `dev`, `build`, `preview`, `astro`, `check`, `typecheck` only).\n- Type/content checks run:\n  1) `npm run check` -> pass (0 errors, 0 warnings, 0 hints)\n  2) `npm run typecheck` -> pass (0 errors, 0 warnings, 0 hints)\n  3) Re-ran `npm run check` after edits finalization -> pass (0 errors, 0 warnings, 0 hints)\n- Additional verification:\n  - `npm run build` -> pass\n  - Content quality scan: `(rg -n \"example\\.com|TODO|TBD|lorem ipsum|placeholder\" src/data docs/content-sourcing-notes.md && echo matches_found) || echo no_placeholder_matches` -> `no_placeholder_matches`\n  - Content volume checks:\n    - `projects=4`\n    - `blog=3`\n    - `blog_drafts=2`\n\nManual verification notes\n- Collection schemas validate all newly added/edited entries during Astro checks.\n- Seeded files are ready for collection-driven rendering and avoid fallback/sample content markers.\n\nCommit requirement status\n- Attempted to validate git workspace for required node commit.\n- Command: `git rev-parse --is-inside-work-tree`\n- Result: `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance, task is not failed solely for this commit blocker.\n\nKnown follow-up\n- `docs/content-sourcing-notes.md` flags final editorial verification of profile copy against the latest external LinkedIn/CV source of truth before public launch.",
+      "artifacts": [
+        "src/data/profile.json",
+        "src/data/projects/atelier-scheduler.md",
+        "src/data/projects/letterpress-notes.md",
+        "src/data/projects/field-journal-cms.md",
+        "src/data/projects/signalboard-analytics.md",
+        "src/data/blog/from-scrapbook-motifs-to-portfolio-language.md",
+        "docs/content-sourcing-notes.md",
+        "docs/memory/contracts.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T11:47:43.499787+00:00"
+    },
+    "n06_site_shell_navigation": {
+      "title": "Build responsive site shell and navigation system",
+      "instruction": "Goal: provide cohesive routing and consistent chrome for all sections. In-scope: header/nav/footer, active-route states, mobile menu, skip-link, and shared page layout slots. Out-of-scope: detailed content sections for home/projects/blog pages. Verification: run `npm run dev` and manually verify navigation, keyboard focus order, and mobile behavior across core routes. Artifacts: `src/components/layout/Header.astro`, `src/components/layout/Footer.astro`, `src/components/layout/Nav.astro`, layout wiring updates.",
+      "dependencies": [
+        "n03_design_tokens_and_base_layout"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "low",
+      "started_at": "2026-03-01T11:47:56.997779+00:00",
+      "lease_expires_at": null,
+      "report": "Implemented node `n06_site_shell_navigation` as a single coherent shell/navigation integration across shared layout, styling, and route scaffolds.\n\nWhat changed\n1) New shared layout components\n- Added `src/components/layout/Nav.astro`:\n  - Centralized primary nav items (`/`, `/about`, `/projects`, `/blog`, `/contact`).\n  - Computes active route state from `currentPath` with prefix-aware matching for section paths.\n  - Applies `aria-current=\"page\"` to the active link.\n  - Provides responsive mobile collapse behavior using semantic `<details>/<summary>`.\n- Added `src/components/layout/Header.astro`:\n  - Brand link + tagline + `Nav` wiring.\n- Added `src/components/layout/Footer.astro`:\n  - Shared footer copy and key links.\n\n2) Base layout shell wiring\n- Updated `src/layouts/BaseLayout.astro`:\n  - Imports and renders shared `Header` and `Footer` around all page content.\n  - Uses `Astro.url.pathname` to pass current path into nav.\n  - Preserves skip-link and maps it to `#main-content`.\n  - Introduces page layout slots: named `hero` slot and default content slot container.\n\n3) Global styling for responsive shell/navigation\n- Updated `src/styles/global.css` with:\n  - Shell/frame structure (`site-frame`, `site-main`, `site-main__inner`, `site-main__content`).\n  - Sticky translucent header, navigation link states, mobile nav panel, and footer styling.\n  - Focus-visible treatment for links/summary controls.\n  - Mobile breakpoints for nav/menu behavior and shell spacing.\n\n4) Route wiring updates and core scaffolds\n- Updated existing routes to use hero slot:\n  - `src/pages/index.astro`\n  - `src/pages/style-playground.astro`\n- Added minimal scaffold routes (navigation/layout verification only, no detailed content):\n  - `src/pages/about.astro`\n  - `src/pages/contact.astro`\n  - `src/pages/projects/index.astro`\n  - `src/pages/blog/index.astro`\n\nMemory governance updates\n- Updated `docs/memory/decision-log.md` with DEC-002.\n- Updated `docs/memory/contracts.md` with CON-004.\n- Updated `docs/memory/evidence-index.md` with EVD-005.\n- Updated `docs/memory/changelog.md` with CHG-005.\n- All new memory entries include NodeID, Date, Author, Change, Status.\n\nLint/typecheck verification (required)\n- Ran: `npm run check` -> PASS (0 errors, 0 warnings, 0 hints).\n- Ran: `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints).\n- Reran both commands after final edits/memory updates to confirm no regressions; both remained PASS.\n\nCommit requirement handling\n- Attempted required single commit (`node(n06_site_shell_navigation): build responsive shell and navigation`) but repository commit operations are blocked because workspace is not a git repository.\n- Evidence commands/results:\n  - `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`\n  - `git add ... && git commit ...` -> same fatal error.\n- Per governance rule, node is not failed solely due this environment-level commit blocker.\n\nManual verification steps\n1. Run `npm run dev`.\n2. Visit `/`, `/about`, `/projects`, `/blog`, `/contact`, and `/style-playground`.\n3. Verify:\n   - header/footer persist across routes,\n   - active nav state updates correctly,\n   - keyboard focus order includes skip-link then primary nav,\n   - mobile menu collapses/expands via summary toggle,\n   - skip-link lands at `#main-content`.",
+      "artifacts": [
+        "src/components/layout/Header.astro",
+        "src/components/layout/Nav.astro",
+        "src/components/layout/Footer.astro",
+        "src/layouts/BaseLayout.astro",
+        "src/styles/global.css",
+        "src/pages/index.astro",
+        "src/pages/style-playground.astro",
+        "src/pages/about.astro",
+        "src/pages/contact.astro",
+        "src/pages/projects/index.astro",
+        "src/pages/blog/index.astro",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T11:52:59.396460+00:00"
+    },
+    "n07_home_about_contact_pages": {
+      "title": "Implement Home, About, and Contact pages using real content",
+      "instruction": "Goal: ship the core personal-brand pages that communicate identity and conversion points. In-scope: homepage hero/story/highlights, about narrative, and contact section with mail/social links and clear CTA hierarchy; preserve inspiration aesthetics in a professional portfolio framing. Out-of-scope: projects listing details and blog index/post routing. Verification: run `npm run dev` and manually validate copy hierarchy, responsive layout, and CTA accessibility at mobile/tablet/desktop sizes. Artifacts: `src/pages/index.astro`, `src/pages/about.astro`, `src/pages/contact.astro`, page-specific components.",
+      "dependencies": [
+        "n05_initial_content_seed",
+        "n06_site_shell_navigation"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T11:53:21.554607+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n07_home_about_contact_pages` by replacing route scaffolds with real-content implementations for home/about/contact and introducing dedicated page components aligned to the existing editorial shell.\n\nWhat I changed\n1) Homepage implementation (`src/pages/index.astro`)\n- Replaced the scaffold content with a data-backed page composition.\n- Integrated canonical profile content from `src/data/profile.json`.\n- Integrated collection signals via `getPublishedProjects()` and `getPublishedBlogPosts()`.\n- Added fallback-safe highlight generation and wired new page sections:\n  - `HomeHero` (hero + primary/secondary CTAs + featured highlights)\n  - `HomeStory` (narrative + focus areas + availability)\n  - `HomeHighlights` (projects/blog metrics and directional CTAs)\n\n2) About page implementation (`src/pages/about.astro`)\n- Replaced placeholder copy with real narrative and collaboration framing.\n- Wired page-specific components:\n  - `AboutHero` (positioning + location/timezone context)\n  - `AboutNarrative` (long-form narrative, focus areas, operating-principles timeline)\n- Added a dedicated CTA section driving users to `/contact`.\n\n3) Contact page implementation (`src/pages/contact.astro`)\n- Replaced placeholder route with conversion-focused contact structure.\n- Wired page-specific components:\n  - `ContactHero` (intro framing)\n  - `ContactChannels` (clear CTA hierarchy)\n- Implemented explicit action priority:\n  - Primary CTA: email inquiry (`mailto:`)\n  - Secondary CTAs: LinkedIn and GitHub\n- Added guidance card for what information to include in outreach.\n\n4) New page-specific components added\n- `src/components/pages/home/HomeHero.astro`\n- `src/components/pages/home/HomeStory.astro`\n- `src/components/pages/home/HomeHighlights.astro`\n- `src/components/pages/about/AboutHero.astro`\n- `src/components/pages/about/AboutNarrative.astro`\n- `src/components/pages/contact/ContactHero.astro`\n- `src/components/pages/contact/ContactChannels.astro`\n\nRationale\n- The node required production-ready core pages with real content and strong CTA hierarchy while preserving the established handcrafted/editorial aesthetic.\n- Splitting sections into page-specific components keeps route files clean, supports future iteration, and avoids reintroducing scaffold duplication.\n- Contact page hierarchy was designed to make conversion intent explicit and accessible.\n\nMemory governance updates\n- Updated `docs/memory/contracts.md` with:\n  - `[CON-005] Core Page Content and CTA Hierarchy Contract`\n- Updated `docs/memory/evidence-index.md` with:\n  - `[EVD-006] Home/About/Contact Content Page Verification`\n- Updated `docs/memory/changelog.md` with:\n  - `[CHG-006] Real Content for Home, About, and Contact Pages`\n- Each entry includes NodeID, Date, Author, Change, and Status.\n\nLint/typecheck verification (required)\n- Lint command availability:\n  - No dedicated `lint` script exists in this repo scope (`package.json` scripts are `dev`, `build`, `preview`, `astro`, `check`, `typecheck`).\n- Commands run:\n  1) `npm run check` -> initially failed with 2 TypeScript diagnostics in `src/pages/index.astro` (undefined guard and exact optional props).\n  2) Applied fix in `src/pages/index.astro` (guarded fallback project access and provided explicit fallback strings).\n  3) `npm run check` -> pass (0 errors, 0 warnings, 0 hints).\n  4) `npm run typecheck` -> pass (0 errors, 0 warnings, 0 hints).\n  5) Additional confidence check: `npm run build` -> pass; static routes generated including `/`, `/about`, `/contact`.\n\nManual verification steps\n1. Run `npm run dev`.\n2. Open `/`, `/about`, `/contact`.\n3. Validate:\n- Home has hero/story/highlights with real data and clear CTA sequence.\n- About has narrative + focus areas + operating-principles timeline.\n- Contact has primary email CTA and secondary social links.\n- Layout remains responsive across mobile/tablet/desktop widths.\n- Keyboard focus flow and link targets are accessible.\n\nCommit requirement status\n- Attempted required single node commit: `node(n07_home_about_contact_pages): implement home about contact content pages`.\n- Blocked by workspace git state:\n  - `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`\n  - `git add ... && git commit ...` -> same fatal error.\n- Per governance rule, node is not failed solely due this environment-level commit blocker.\n\nOut-of-scope preserved\n- Projects listing details and blog index/post routing were not expanded beyond node scope; homepage highlights link to `/projects` and `/blog` section indexes only.",
+      "artifacts": [
+        "src/pages/index.astro",
+        "src/pages/about.astro",
+        "src/pages/contact.astro",
+        "src/components/pages/home/HomeHero.astro",
+        "src/components/pages/home/HomeStory.astro",
+        "src/components/pages/home/HomeHighlights.astro",
+        "src/components/pages/about/AboutHero.astro",
+        "src/components/pages/about/AboutNarrative.astro",
+        "src/components/pages/contact/ContactHero.astro",
+        "src/components/pages/contact/ContactChannels.astro",
+        "docs/memory/contracts.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T11:58:03.109575+00:00"
+    },
+    "n08_projects_index_and_detail": {
+      "title": "Build projects listing and dynamic project detail pages",
+      "instruction": "Goal: present portfolio work with clear outcomes, stack, and narrative depth. In-scope: projects archive page, dynamic detail route generation from collections, reusable project card/details blocks, and graceful handling for missing optional fields. Out-of-scope: blog routes and RSS generation. Verification: run `npm run build` and manually open generated project routes in preview to confirm all entries render and links resolve. Artifacts: `src/pages/projects/index.astro`, `src/pages/projects/[slug].astro`, `src/components/projects/*`.",
+      "dependencies": [
+        "n05_initial_content_seed",
+        "n06_site_shell_navigation"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T11:58:28.304643+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n08_projects_index_and_detail` by replacing the projects scaffold with a collection-driven archive and adding dynamic static detail routes, plus reusable project presentation components.\n\nWhat I changed\n1) Implemented reusable projects UI blocks\n- Added `src/components/projects/ProjectCard.astro`:\n  - Reusable card used on archive and related-project sections.\n  - Handles optional fields gracefully:\n    - `coverImage` missing -> gradient placeholder media block.\n    - `updatedAt` missing -> omitted from card meta row.\n    - `repositoryUrl`/`demoUrl` missing -> only render available links.\n  - Includes project title/summary/tags/date metadata and links to `/projects/<slug>/`.\n- Added `src/components/projects/ProjectDetailsPanel.astro`:\n  - Reusable details block for project metadata on detail pages.\n  - Handles optional fields gracefully:\n    - `updatedAt` missing -> displays `Not provided`.\n    - no external links -> explicit fallback note.\n\n2) Built projects archive page from content collection\n- Updated `src/pages/projects/index.astro`:\n  - Replaced scaffold copy with production archive.\n  - Uses `getPublishedProjects()` for data source.\n  - Adds summary hero with published/featured counts.\n  - Renders all projects using `ProjectCard` in a staggered responsive grid.\n  - Includes explicit empty-state fallback if no published projects are present.\n\n3) Added dynamic project detail route generation\n- Added `src/pages/projects/[slug].astro`:\n  - Implements `getStaticPaths()` from `getPublishedProjects()` using `project.data.slug`.\n  - Uses `render(project)` from `astro:content` to render markdown narrative body.\n  - Adds detail hero + tags + back link to `/projects`.\n  - Uses `ProjectDetailsPanel` for metadata/links.\n  - Adds related-project section reusing `ProjectCard`.\n\nRationale\n- This keeps the projects archive and detail routes fully synchronized with typed collection content.\n- Reusable `src/components/projects/*` blocks reduce duplication and establish a stable UI contract for future content expansion.\n- Optional-field fallbacks avoid runtime/content rendering gaps when metadata is partially omitted.\n\nMemory governance updates\n- Updated `docs/memory/decision-log.md`:\n  - Added `[DEC-003] Collection-Driven Projects Routes with Shared Card/Detail Blocks`.\n- Updated `docs/memory/contracts.md`:\n  - Added `[CON-006] Projects Archive and Dynamic Detail Route Contract`.\n- Updated `docs/memory/evidence-index.md`:\n  - Added `[EVD-007] Projects Archive and Dynamic Detail Routes Verification`.\n- Updated `docs/memory/changelog.md`:\n  - Added `[CHG-007] Projects Index and Dynamic Detail Route Implementation`.\n- All entries include NodeID, Date, Author, Change, Status.\n\nLint/typecheck/build verification (required)\n- Ran `npm run check` (initial run):\n  - Found 2 Astro/TS errors in `[slug].astro` (`project.render()` mismatch and unused `Props`).\n- Applied in-scope fix:\n  - Switched to `render(project)` via `astro:content`.\n  - Typed props usage via `Astro.props as Props`.\n- Re-ran `npm run check`: PASS (0 errors, 0 warnings, 0 hints).\n- Ran `npm run typecheck`: PASS (0 errors, 0 warnings, 0 hints).\n- Re-ran both after memory updates:\n  - `npm run check`: PASS.\n  - `npm run typecheck`: PASS.\n- Ran acceptance build command:\n  - `npm run build`: PASS.\n  - Build generated `/projects/index.html` and all dynamic detail pages:\n    - `/projects/atelier-scheduler/`\n    - `/projects/field-journal-cms/`\n    - `/projects/letterpress-notes/`\n    - `/projects/signalboard-analytics/`\n\nManual/preview verification notes\n- Attempted `npm run preview -- --host 127.0.0.1 --port 4322` for route open checks, but sandbox blocked port bind with `listen EPERM`.\n- Fallback verification performed via generated artifacts:\n  - confirmed route files exist under `dist/projects/*/index.html`.\n  - confirmed archive links resolve to all slug routes and detail pages include expected navigation/details sections and external links where present.\n\nCommit requirement status\n- Attempted git workspace validation for mandatory node commit.\n- Command: `git rev-parse --is-inside-work-tree`\n- Result: `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance, node not failed solely for this environment-level commit blocker.\n\nKnown limitations/follow-up\n- Manual browser-open verification in `astro preview` must be performed in an environment that permits local port binding; implementation and static artifact validation are complete.",
+      "artifacts": [
+        "src/pages/projects/index.astro",
+        "src/pages/projects/[slug].astro",
+        "src/components/projects/ProjectCard.astro",
+        "src/components/projects/ProjectDetailsPanel.astro",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T12:03:00.205290+00:00"
+    },
+    "n09_blog_index_post_and_tags": {
+      "title": "Build blog index, post pages, and tag navigation",
+      "instruction": "Goal: deliver a full blog section where Manuel can publish and browse writing. In-scope: blog index with sorting/pagination strategy, individual post route rendering from collection content, tag taxonomy pages, and draft filtering behavior for production builds. Out-of-scope: RSS endpoint and sitemap integration. Verification: run `npm run build && npm run preview` and manually verify post routes, tag routes, and draft exclusion in production output. Artifacts: `src/pages/blog/index.astro`, `src/pages/blog/[slug].astro`, `src/pages/blog/tags/[tag].astro`, blog components/utilities.",
+      "dependencies": [
+        "n05_initial_content_seed",
+        "n06_site_shell_navigation"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T12:03:23.320301+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n09_blog_index_post_and_tags` by replacing the blog scaffold with a full collection-driven blog section (index, post detail, tag taxonomy, and pagination routes) plus production-safe draft filtering behavior.\n\nWhat I changed\n1) Blog content utilities (`src/lib/content.ts`)\n- Added `getBlogPosts({ includeDrafts? })` that defaults to environment-aware behavior (`!import.meta.env.PROD`), so drafts are included during non-production preview workflows and excluded in production builds.\n- Added `getBlogTagSummaries()` to aggregate/sort tags and generate canonical tag-route hrefs.\n- Added `BLOG_PAGE_SIZE` and generic `paginateEntries()` to enforce deterministic pagination metadata/hrefs for blog archives.\n- Kept existing project/blog published helper compatibility.\n\n2) New reusable blog components\n- Added `src/components/blog/BlogCard.astro`:\n  - Standardized post preview card (cover fallback, publish/update/read-time meta, draft badge, tag chips linking to tag routes).\n- Added `src/components/blog/BlogPagination.astro`:\n  - Reusable prev/next controls with page status output.\n\n3) Blog routes implementation\n- Updated `src/pages/blog/index.astro`:\n  - Replaced placeholder scaffold with real index listing.\n  - Added newest-first archive rendering, tag taxonomy section, and page-1 pagination controls.\n  - Included explicit pagination strategy signal (`BLOG_PAGE_SIZE`) and environment draft visibility indicator.\n- Added `src/pages/blog/[slug].astro`:\n  - Dynamic static path generation from blog collection entries.\n  - Markdown rendering for full post body with hero metadata and tag links.\n  - Related-post section based on overlapping tags.\n- Added `src/pages/blog/tags/[tag].astro`:\n  - Dynamic tag archive route generation from discovered tags.\n  - Per-tag listing with sibling tag navigation.\n- Added `src/pages/blog/page/[page].astro`:\n  - Static paginated archive route generation for pages > 1.\n  - Uses shared card and pagination components for consistency.\n\nRationale\n- The node required a complete writing section with collection-backed routing and taxonomy.\n- Centralizing routing helpers in `src/lib/content.ts` keeps index/detail/tag/pagination routes in sync and avoids divergent draft/filter logic.\n- Environment-aware draft behavior satisfies the requirement to exclude drafts in production output while preserving editorial visibility during non-production work.\n\nMemory governance updates\n- `docs/memory/decision-log.md`: appended `[DEC-004] Environment-Aware Blog Route Generation with Shared Entry Components`.\n- `docs/memory/contracts.md`: appended `[CON-007] Blog Index, Post, Tag, and Pagination Route Contract`.\n- `docs/memory/evidence-index.md`: appended `[EVD-008] Blog Index/Post/Tag Route Verification`.\n- `docs/memory/changelog.md`: appended `[CHG-008] Blog Index, Post, Tag, and Pagination Route Implementation`.\n- All entries include NodeID, Date, Author, Change, and Status.\n\nLint/typecheck/build verification (required)\n- Lint command availability:\n  - No dedicated lint script is configured in this repo scope (`npm run` exposes `check` and `typecheck`, both mapping to `astro check`).\n- Commands run:\n  1) `npm run check` -> initially failed with exact optional property typing issues in pagination props; fixed type contracts in `src/lib/content.ts`, `src/components/blog/BlogPagination.astro`, and `src/pages/blog/page/[page].astro`.\n  2) `npm run check` (rerun) -> PASS (0 errors, 0 warnings, 0 hints).\n  3) `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints).\n  4) `npm run build` -> PASS; generated blog routes include published post/tag pages.\n  5) Post-memory-update reruns: `npm run check` PASS and `npm run typecheck` PASS.\n\nVerification of acceptance behavior\n- Attempted runtime preview per node verification:\n  - `npm run preview -- --host 127.0.0.1 --port 4322` -> failed in sandbox with `listen EPERM` (port bind not permitted).\n- Static artifact fallback verification (production output):\n  - `test -f dist/blog/astro-content-layer-in-practice/index.html` -> pass.\n  - `test -f dist/blog/tags/astro/index.html` -> pass.\n  - `test ! -e dist/blog/tuning-page-motion-with-respect/index.html` -> pass (draft post excluded).\n  - `test ! -e dist/blog/tags/accessibility/index.html` -> pass (draft-only tag excluded).\n\nCommit requirement status\n- Required single commit could not be created because workspace is not a git repository.\n- Evidence command:\n  - `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance rule, node is not failed solely due this environment-level commit blocker.\n\nManual verification steps\n1) Run `npm run build`.\n2) If environment permits local binding, run `npm run preview` and open:\n   - `/blog`\n   - `/blog/astro-content-layer-in-practice/`\n   - `/blog/tags/astro/`\n3) Confirm draft entries are absent in production build output (no route for `/blog/tuning-page-motion-with-respect/`).",
+      "artifacts": [
+        "src/lib/content.ts",
+        "src/components/blog/BlogCard.astro",
+        "src/components/blog/BlogPagination.astro",
+        "src/pages/blog/index.astro",
+        "src/pages/blog/[slug].astro",
+        "src/pages/blog/tags/[tag].astro",
+        "src/pages/blog/page/[page].astro",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T12:09:16.956360+00:00"
+    },
+    "n10_mdx_authoring_workflow": {
+      "title": "Enable MDX authoring and reusable blog content components",
+      "instruction": "Goal: make long-form writing flexible so blog posts can include richer components when needed. In-scope: install/configure `@astrojs/mdx`, ensure collections loader includes `.mdx`, create a small set of reusable prose components (callout, image figure, code note), and add one MDX sample post. Out-of-scope: introducing external CMS or visual editor tooling. Verification: run `npm run astro check && npm run build` and confirm sample MDX post renders with custom components. Artifacts: `astro.config.mjs`, `src/content.config.ts`, `src/components/prose/*`, one `.mdx` post.",
+      "context": "Reference: https://docs.astro.build/en/guides/integrations-guide/mdx/ (installation and collection loader for `**/*.{md,mdx}`).",
+      "dependencies": [
+        "n04_content_collections_schema",
+        "n09_blog_index_post_and_tags"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "high",
+      "started_at": "2026-03-01T12:19:53.712863+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n10_mdx_authoring_workflow` by enabling Astro MDX, adding reusable prose components, wiring MDX component rendering for blog posts, and adding a published sample `.mdx` entry.\n\nWhat changed\n1) MDX integration setup\n- Updated `astro.config.mjs` to include `@astrojs/mdx` integration via `integrations: [mdx()]`.\n\n2) Reusable prose component set\n- Added `src/components/prose/Callout.astro` with tone variants (`warm`, `cool`, `caution`) and title/body slot structure.\n- Added `src/components/prose/ImageFigure.astro` for consistent figure/caption rendering.\n- Added `src/components/prose/CodeNote.astro` for structured code-callout blocks with language/title props.\n\n3) Blog rendering integration\n- Updated `src/pages/blog/[slug].astro` to import `Callout`, `ImageFigure`, and `CodeNote`.\n- Added shared mapping object `const proseComponents = { Callout, ImageFigure, CodeNote };`.\n- Render call changed to `<Content components={proseComponents} />` so MDX posts can use custom components directly.\n\n4) Sample MDX post\n- Added `src/data/blog/mdx-authoring-with-shared-prose-components.mdx` (published, non-draft) demonstrating all three components in one long-form post.\n\nRationale\n- Keeps blog authoring flexible for long-form writing while preserving visual consistency through shared, reusable prose blocks.\n- Component mapping at route-render level avoids one-off component setup per post and keeps `.mdx` author experience simple.\n\nMemory governance updates\n- `docs/memory/decision-log.md`: appended `[DEC-005]`.\n- `docs/memory/contracts.md`: appended `[CON-008]`.\n- `docs/memory/risk-register.md`: appended `[RISK-005]` closure record for the MDX blocker in this node scope.\n- `docs/memory/evidence-index.md`: appended `[EVD-011]`.\n- `docs/memory/changelog.md`: appended `[CHG-011]`.\n- All appended entries include NodeID, Date, Author, Change, and Status.\n\nLint/typecheck/build and verification\n- Lint availability check: `npm run` (no dedicated lint script present in this repo).\n- Required lint/typecheck equivalents executed:\n  - `npm run astro check` -> PASS (0 errors, 0 warnings, 0 hints)\n  - `npm run check` -> PASS (0 errors, 0 warnings, 0 hints)\n  - `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints)\n- Build verification:\n  - `npm run build` -> PASS\n  - Generated route includes sample MDX post: `/blog/mdx-authoring-with-shared-prose-components/`\n- Custom component render confirmation:\n  - `rg -n \"prose-callout|prose-figure|prose-code-note\" dist/blog/mdx-authoring-with-shared-prose-components/index.html` -> PASS, all three component markers found in built HTML.\n\nExternal docs consulted (accessed 2026-03-01)\n- https://docs.astro.build/en/guides/integrations-guide/mdx/\n- https://docs.astro.build/en/guides/markdown-content/#passing-components-to-mdx-content\n\nCommit requirement status\n- Required single commit could not be created because this workspace is not a git repository.\n- Evidence command: `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance rule, task was not failed solely due this environment-level commit blocker.\n\nManual verification steps\n1) Run `npm run astro check && npm run build`.\n2) Open generated output for `/blog/mdx-authoring-with-shared-prose-components/`.\n3) Confirm `Callout`, `ImageFigure`, and `CodeNote` blocks render in the post body.",
+      "artifacts": [
+        "astro.config.mjs",
+        "src/pages/blog/[slug].astro",
+        "src/components/prose/Callout.astro",
+        "src/components/prose/ImageFigure.astro",
+        "src/components/prose/CodeNote.astro",
+        "src/data/blog/mdx-authoring-with-shared-prose-components.mdx",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T12:24:26.717493+00:00"
+    },
+    "n11_seo_rss_sitemap_metadata": {
+      "title": "Implement SEO baseline, RSS feed, and sitemap",
+      "instruction": "Goal: ensure discoverability and subscription support for portfolio and blog content. In-scope: set `site` URL in Astro config, canonical/meta/OpenGraph defaults, add RSS endpoint via `@astrojs/rss`, wire feed autodiscovery link, and add `@astrojs/sitemap` integration. Out-of-scope: advanced analytics dashboards or search indexing tooling. Verification: run `npm run build` and confirm output includes `rss.xml`, `sitemap-index.xml`, and valid metadata on key pages. Artifacts: `astro.config.mjs`, `src/pages/rss.xml.js|ts`, shared SEO component(s), layout head updates.",
+      "context": "References: https://docs.astro.build/en/recipes/rss/ and https://docs.astro.build/en/guides/integrations-guide/sitemap/.",
+      "dependencies": [
+        "n07_home_about_contact_pages",
+        "n08_projects_index_and_detail",
+        "n09_blog_index_post_and_tags"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "low",
+      "started_at": "2026-03-01T12:24:48.968394+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n11_seo_rss_sitemap_metadata` by implementing SEO baseline metadata defaults, RSS feed generation, and sitemap integration.\n\nImplementation summary\n1) Astro site + sitemap integration\n- Updated `astro.config.mjs`:\n  - Added `site: \"https://manuelcecchetto.it\"`.\n  - Added `@astrojs/sitemap` integration (`sitemap()`) alongside existing `mdx()`.\n\n2) Shared SEO metadata defaults and discovery links\n- Updated `src/layouts/BaseLayout.astro`:\n  - Added typed SEO props: `ogType`, `image`, `noindex`.\n  - Added canonical URL generation from `Astro.url.pathname` + `Astro.site` fallback.\n  - Added baseline head metadata: `description`, `robots`, `og:title`, `og:description`, `og:type`, `og:url`, `og:site_name`, `twitter:card`, `twitter:title`, `twitter:description`.\n  - Added optional image enrichment for OG/Twitter when `image` is provided.\n  - Added feed autodiscovery link: `<link rel=\"alternate\" type=\"application/rss+xml\" ... href=\".../rss.xml\">`.\n  - Added sitemap discovery link: `<link rel=\"sitemap\" href=\".../sitemap-index.xml\">`.\n\n3) RSS endpoint\n- Added `src/pages/rss.xml.ts`:\n  - Implemented `GET` endpoint using `@astrojs/rss`.\n  - Feed source: `getBlogPosts({ includeDrafts: false })`.\n  - Items map to `/blog/<slug>/` with title/summary/publish date.\n  - Added `<language>en-us</language>` feed metadata.\n\n4) Page-level OG type/image wiring on detail routes\n- Updated `src/pages/blog/[slug].astro`: pass `ogType=\"article\"` and `image={post.data.coverImage}`.\n- Updated `src/pages/projects/[slug].astro`: pass `ogType=\"article\"` and `image={project.data.coverImage}`.\n\nRationale\n- Centralizing metadata defaults in `BaseLayout` prevents route-by-route SEO drift.\n- Setting `site` in config ensures canonical and sitemap generation resolve to the production origin.\n- Generating RSS from published blog entries provides subscription support without exposing drafts.\n\nMemory governance updates\n- `docs/memory/decision-log.md`: appended `[DEC-006] Site-Level SEO Baseline via Shared Head Metadata and Discovery Endpoints`.\n- `docs/memory/contracts.md`: appended `[CON-009] SEO Metadata, RSS Feed, and Sitemap Output Contract`.\n- `docs/memory/risk-register.md`: appended `[RISK-006] RSS/Sitemap Dependency Blocker Closed for Node Scope`.\n- `docs/memory/evidence-index.md`: appended `[EVD-012] SEO Baseline, RSS, and Sitemap Verification`.\n- `docs/memory/changelog.md`: appended `[CHG-012] SEO Metadata Baseline, RSS Feed, and Sitemap Integration`.\n- Each entry includes NodeID, Date, Author, Change, and Status.\n\nRequired lint/typecheck/build verification\n- `npm run check` -> PASS (0 errors, 0 warnings, 0 hints).\n- `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints).\n- `npm run build` -> PASS.\n  - Build output includes route generation for `src/pages/rss.xml.ts` (`/rss.xml`).\n  - `@astrojs/sitemap` generated `dist/sitemap-index.xml`.\n- Additional assertions:\n  - `ls -1 dist | rg 'rss.xml|sitemap'` -> `rss.xml`, `sitemap-0.xml`, `sitemap-index.xml`.\n  - `rg -n \"canonical|og:title|application/rss\\+xml|rel=\\\"sitemap\\\"\" dist/index.html` confirms metadata + discovery tags are present in rendered head.\n\nExternal docs consulted (fast-changing SDK/docs requirement)\n- https://docs.astro.build/en/recipes/rss/ (accessed 2026-03-01)\n- https://docs.astro.build/en/guides/integrations-guide/sitemap/ (accessed 2026-03-01)\n\nManual verification steps\n1) Run `npm run build`.\n2) Confirm build logs show `/rss.xml` route and sitemap creation.\n3) Inspect `dist/rss.xml` and `dist/sitemap-index.xml`.\n4) Inspect any built page head (e.g., `dist/index.html`) for canonical/OG/twitter/feed/sitemap tags.\n\nCommit requirement status\n- Attempted required single node commit: `node(n11_seo_rss_sitemap_metadata): implement seo rss sitemap baseline`.\n- Blocked by environment git state:\n  - `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance, node is not failed solely for this environment-level commit blocker.",
+      "artifacts": [
+        "astro.config.mjs",
+        "src/layouts/BaseLayout.astro",
+        "src/pages/rss.xml.ts",
+        "src/pages/blog/[slug].astro",
+        "src/pages/projects/[slug].astro",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T12:28:45.788038+00:00"
+    },
+    "n12_performance_and_accessibility_pass": {
+      "title": "Run performance and accessibility hardening pass",
+      "instruction": "Goal: elevate production quality before release. In-scope: optimize image loading strategy, audit font loading, enforce reduced-motion behavior, improve contrast/focus states, and reduce layout shift in core templates. Out-of-scope: redesigning IA or changing core visual identity. Verification: run `npm run build && npm run preview`, perform manual keyboard/screen-reader smoke test, and record Lighthouse checks for Home, Project detail, and Blog post pages. Artifacts: updated page/components/styles plus `docs/qa/perf-a11y-report.md`.",
+      "dependencies": [
+        "n07_home_about_contact_pages",
+        "n08_projects_index_and_detail",
+        "n09_blog_index_post_and_tags",
+        "n11_seo_rss_sitemap_metadata"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "medium",
+      "started_at": "2026-03-01T12:29:07.556578+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n12_performance_and_accessibility_pass` with a focused performance/a11y hardening pass across core templates and shared styling.\n\nWhat I changed\n1) Image loading strategy + CLS reduction\n- Updated reusable media components with explicit dimensions/sizes and loading priority hints:\n  - `src/components/blog/BlogCard.astro`\n  - `src/components/projects/ProjectCard.astro`\n  - `src/components/prose/ImageFigure.astro`\n- Added `decoding=\"async\"` and `fetchpriority` policy:\n  - card/prose media: `loading=\"lazy\"`, `fetchpriority=\"low\"`\n- Stabilized card media layout by replacing `min-height` with fixed `aspect-ratio: 16 / 10` in blog/project cards.\n- Updated detail template hero covers in:\n  - `src/pages/blog/[slug].astro`\n  - `src/pages/projects/[slug].astro`\n  - Added `loading=\"eager\"`, `fetchpriority=\"high\"`, explicit width/height, and `sizes` hints.\n  - Added per-page `<link rel=\"preload\" as=\"image\" ...>` via `slot=\"head\"` for detail hero covers.\n\n2) Font loading audit and optimization\n- Updated `src/layouts/BaseLayout.astro`:\n  - centralized Google Fonts URL in a constant\n  - added `dns-prefetch` hints for font origins\n  - retained `preconnect`\n  - added stylesheet `preload` for earlier discovery\n\n3) Reduced-motion hardening\n- Updated `src/styles/global.css` reduced-motion block to explicitly disable hover transforms for:\n  - lifted cards\n  - CTA hover lift\n  - blog/project media hover zoom\n- Disabled ambient decorative blobs under reduced-motion mode.\n\n4) Contrast/focus improvements\n- Updated tokens in `src/styles/tokens.css`:\n  - darkened `--color-text-muted` for better contrast\n  - added `--color-focus-ring` and `--color-focus-glow`\n- Updated global focus styling in `src/styles/global.css`:\n  - thicker, higher-contrast `:focus-visible` outline + glow halo\n  - increased underline thickness for links\n  - improved footer link contrast\n  - added font metric stabilization via `font-size-adjust` for body/headings to reduce perceived swap shift\n- Updated `src/components/pages/home/HomeHero.astro`:\n  - CTA hover movement restricted to fine pointers (`@media (hover: hover) and (pointer: fine)`)\n  - CTA `:focus-visible` border reinforcement\n\n5) QA artifact\n- Added `docs/qa/perf-a11y-report.md` documenting:\n  - scope and implementation details\n  - command results\n  - preview/Lighthouse blockers\n  - manual follow-up checklist for keyboard/screen-reader and Lighthouse checks\n\nMemory governance updates\n- `docs/memory/decision-log.md`: appended `[DEC-007] Core Template Media Priority and Motion/Focus Hardening Policy`.\n- `docs/memory/contracts.md`: appended `[CON-010] Core Template Performance and Accessibility Hardening Contract`.\n- `docs/memory/risk-register.md`: appended `[RISK-007] Sandbox Limits Prevent Full Runtime A11y/Perf Audits`.\n- `docs/memory/evidence-index.md`: appended `[EVD-013] Performance and Accessibility Hardening Verification`.\n- `docs/memory/changelog.md`: appended `[CHG-013] Performance and Accessibility Hardening Pass`.\n- Each appended entry includes NodeID, Date, Author, Change, and Status.\n\nRequired lint/typecheck/build verification (run after edits)\n- `npm run check` -> PASS (0 errors, 0 warnings, 0 hints).\n- `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints).\n- `npm run build` -> PASS; static routes generated successfully.\n\nNode-required preview/Lighthouse verification status\n- `npm run preview -- --host 127.0.0.1 --port 4322` -> blocked by sandbox: `listen EPERM: operation not permitted 127.0.0.1:4322`.\n- Lighthouse attempt (`npx --yes lighthouse --version`) -> blocked by DNS/network: `getaddrinfo ENOTFOUND registry.npmjs.org`.\n- Fallback evidence captured via built artifacts and selector checks in `dist/**` and documented in `docs/qa/perf-a11y-report.md`.\n\nManual verification guidance\n1. In an unrestricted environment, run `npm run build && npm run preview`.\n2. Validate keyboard and screen-reader smoke checks on:\n   - `/`\n   - `/projects/atelier-scheduler/`\n   - `/blog/astro-content-layer-in-practice/`\n3. Run Lighthouse (mobile + desktop) for those routes and attach resulting scores.\n\nCommit requirement status\n- Attempted required single node commit:\n  - `git add ... && git commit -m \"node(n12_performance_and_accessibility_pass): performance and accessibility hardening pass\"`\n- Blocked by workspace state:\n  - `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance, node was not failed solely for this environment-level commit blocker.",
+      "artifacts": [
+        "src/layouts/BaseLayout.astro",
+        "src/styles/tokens.css",
+        "src/styles/global.css",
+        "src/pages/blog/[slug].astro",
+        "src/pages/projects/[slug].astro",
+        "src/components/blog/BlogCard.astro",
+        "src/components/projects/ProjectCard.astro",
+        "src/components/prose/ImageFigure.astro",
+        "src/components/pages/home/HomeHero.astro",
+        "docs/qa/perf-a11y-report.md",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T12:35:56.447618+00:00"
+    },
+    "n14_deploy_and_editorial_docs": {
+      "title": "Final documentation wrap-up and handoff",
+      "instruction": "Goal: close the project with complete, accurate documentation and operational handoff notes, without performing deployment. In-scope: consolidate setup/run instructions, document content authoring workflow for blog/projects, summarize QA outcomes and known limitations, and capture next-step backlog recommendations. Out-of-scope: publishing to production, domain/DNS changes, hosting configuration, or post-deploy smoke checks. Verification: follow docs end-to-end on a clean checkout and confirm `npm install`, `npm run check`, and `npm run build` succeed using documented steps; manual check that all referenced docs paths exist and are internally consistent. Artifacts: `README.md` updates, `docs/content-workflow.md`, `docs/qa/release-checklist.md`, `docs/handoff.md` (or equivalent final wrap-up doc).",
+      "dependencies": [
+        "n13c_qa_run_and_blocker_fixes"
+      ],
+      "status": "COMPLETED",
+      "reasoning_effort": "low",
+      "started_at": "2026-03-01T12:49:29.996084+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n14_deploy_and_editorial_docs` by delivering the final documentation wrap-up and handoff set (no deployment actions performed).\n\nWhat changed\n1) Consolidated setup/run/validation documentation\n- Added `README.md` at repository root with:\n  - environment requirements\n  - local setup (`npm install`, `npm run dev`)\n  - validation/build sequence (`npm run check`, `npm run typecheck`, `npm run build`)\n  - canonical quality gate (`npm run quality:gate`)\n  - links to editorial, QA, and handoff docs.\n\n2) Documented editorial workflow for blog/projects\n- Added `docs/content-workflow.md` covering:\n  - content collection paths and schema surfaces\n  - required/optional frontmatter fields for blog/projects\n  - draft/publish behavior\n  - media asset resolution contract (`public/images/**`)\n  - MDX authoring component usage\n  - required validation commands after content edits.\n\n3) Updated QA checklist with current release-state snapshot\n- Updated `docs/qa/release-checklist.md` to include:\n  - latest execution report reference (`docs/qa/release-checklist-execution-2026-03-01.md`)\n  - current QA outcome summary\n  - known runtime limitation (preview bind `EPERM` in sandbox)\n  - explicit follow-up checks required in unrestricted environment.\n\n4) Added final operational handoff doc\n- Added `docs/handoff.md` containing:\n  - scope closure + explicit out-of-scope boundaries\n  - clean checkout verification sequence\n  - QA outcome summary and known limitations\n  - documentation map\n  - recommended next-step backlog.\n\nMemory governance updates (append-only)\n- `docs/memory/decision-log.md` -> `[DEC-011]`\n- `docs/memory/contracts.md` -> `[CON-014]`\n- `docs/memory/risk-register.md` -> `[RISK-011]`\n- `docs/memory/evidence-index.md` -> `[EVD-017]`\n- `docs/memory/changelog.md` -> `[CHG-017]`\n\nLint/typecheck/build and verification commands run\n- `npm install` -> PASS (`added 98 packages in 534ms`)\n- docs existence consistency check:\n  - `test -f README.md && test -f docs/content-workflow.md && test -f docs/handoff.md && test -f docs/qa/release-checklist.md && test -f docs/qa/release-checklist-execution-2026-03-01.md`\n  - Result: PASS (`All referenced handoff docs exist.`)\n- required diagnostics/build:\n  - `npm run check` -> PASS (0 errors, 0 warnings, 0 hints)\n  - `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints)\n  - `npm run build` -> PASS (static build complete; routes generated)\n\nAutofix handling\n- No lint/typecheck failures occurred; no autofix step required.\n\nManual verification guidance\n1. Follow `README.md` from a fresh environment:\n   - `npm install`\n   - `npm run check`\n   - `npm run typecheck`\n   - `npm run build`\n2. Review `docs/content-workflow.md` and ensure content updates follow frontmatter/media rules.\n3. Use `docs/qa/release-checklist.md` + execution report to run final runtime-only checks in unrestricted staging/local preview.\n\nCommit requirement status\n- Required single commit could not be created because this workspace is not a git repository.\n- Evidence: `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`.\n- Per governance, node is not failed solely for this environment-level commit blocker.",
+      "artifacts": [
+        "README.md",
+        "docs/content-workflow.md",
+        "docs/qa/release-checklist.md",
+        "docs/handoff.md",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "completed_at": "2026-03-01T12:52:08.702285+00:00"
+    },
+    "n13a_quality_gate_commands": {
+      "title": "Add scoped automated quality gate commands",
+      "instruction": "Goal: implement a single documented command sequence that validates type/content/build quality and any targeted tests available in-repo. In-scope: package scripts and minimal test/config wiring needed to run the agreed checks locally and in CI; docs update that declares the exact command(s). Out-of-scope: introducing a full new e2e framework or broad browser matrix. Verification: run the final command sequence successfully in this workspace and capture results. Expected artifacts: package.json and any minimal test/config files/docs touched.",
+      "dependencies": [
+        "n10_mdx_authoring_workflow",
+        "n12_performance_and_accessibility_pass"
+      ],
+      "status": "COMPLETED",
+      "artifacts": [
+        "package.json",
+        "scripts/verify-quality-gate.mjs",
+        "docs/qa/quality-gate.md",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "context": "Parent node requires repeatable quality gate for future changes. Prior completed nodes introduced MDX authoring and performance/a11y hardening; checks must cover those pathways without overengineering.",
+      "started_at": "2026-03-01T12:37:02.572225+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n13a_quality_gate_commands` by implementing a single documented quality-gate command sequence and minimal targeted QA wiring.\n\nWhat changed\n1) Package scripts\n- Updated `package.json` to add:\n  - `quality:test`: `node scripts/verify-quality-gate.mjs`\n  - `quality:gate`: `npm run check && npm run typecheck && npm run build && npm run quality:test`\n  - `ci:quality`: `npm run quality:gate`\n- This provides one canonical command for local and CI validation.\n\n2) Targeted regression checks\n- Added `scripts/verify-quality-gate.mjs`.\n- The script fails on missing/invalid key build outputs and verifies:\n  - required artifacts exist (`dist/index.html`, `dist/blog/index.html`, `dist/blog/mdx-authoring-with-shared-prose-components/index.html`, `dist/projects/index.html`, `dist/rss.xml`, `dist/sitemap-index.xml`)\n  - key SEO head markers exist in `dist/index.html`\n  - MDX prose component output markers exist in built MDX blog detail HTML\n\n3) Documentation\n- Added `docs/qa/quality-gate.md` documenting the exact single command (`npm run quality:gate`), command sequence, and what targeted assertions are covered.\n\n4) Shared memory governance updates\n- Appended memory entries with NodeID/date/author/change/status:\n  - `docs/memory/decision-log.md` -> `[DEC-008]`\n  - `docs/memory/contracts.md` -> `[CON-011]`\n  - `docs/memory/risk-register.md` -> `[RISK-008]`\n  - `docs/memory/evidence-index.md` -> `[EVD-014]`\n  - `docs/memory/changelog.md` -> `[CHG-014]`\n\nRationale\n- Standardizes release-quality checks into one repeatable command for contributors and CI.\n- Keeps scope minimal and aligned with node constraints by avoiding a new heavyweight e2e stack.\n- Adds practical regression assertions for existing MDX + SEO output contracts introduced by upstream nodes.\n\nVerification commands and results\n- Lint availability check:\n  - `npm run` -> PASS; no dedicated `lint` script exists in this repository.\n- Required type/content checks:\n  - `npm run check` -> PASS (0 errors, 0 warnings, 0 hints)\n  - `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints)\n- Node acceptance command sequence:\n  - `npm run quality:gate` -> PASS\n    - includes `check` + `typecheck` + `build` + `quality:test`\n    - `quality:test` output: `Quality gate artifact checks passed.`\n\nAutofix handling\n- No lint/typecheck failures occurred, so no autofix step was needed.\n\nManual verification\n1) Run `npm run quality:gate`.\n2) Confirm command exits 0.\n3) (Optional) Review `docs/qa/quality-gate.md` for CI integration details.\n\nCommit requirement status\n- Required single commit could not be created because workspace is not a git repository.\n- Evidence command: `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`.\n- Per governance rule, node was not failed solely for this environment-level commit blocker.",
+      "completed_at": "2026-03-01T12:40:18.215825+00:00"
+    },
+    "n13b_release_regression_checklist": {
+      "title": "Create release regression checklist for key routes",
+      "instruction": "Goal: provide a concise manual release checklist for core user flows. In-scope: define pass/fail checklist entries for primary routes and recent high-risk areas (content rendering, media loading, accessibility basics, navigation, and performance sanity checks). Out-of-scope: exhaustive cross-browser/version matrix and enterprise test management workflows. Verification: checklist file exists, is actionable, and includes explicit pass/fail capture fields plus route coverage. Expected artifacts: docs/qa/release-checklist.md and related references if needed.",
+      "dependencies": [
+        "n10_mdx_authoring_workflow",
+        "n12_performance_and_accessibility_pass"
+      ],
+      "status": "COMPLETED",
+      "artifacts": [
+        "docs/qa/release-checklist.md",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "context": "Use dependency context from n10 and n12 to include MDX rendering and perf/a11y regressions in checklist scope.",
+      "started_at": "2026-03-01T12:40:41.707898+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n13b_release_regression_checklist` by creating a concise, actionable manual release checklist with explicit result-capture fields and route coverage aligned to recent high-risk areas from `n10` (MDX rendering) and `n12` (media loading, accessibility, performance sanity).\n\nWhat changed\n1) Added release regression checklist artifact\n- Created `docs/qa/release-checklist.md`.\n- Included explicit PASS/FAIL/BLOCKED capture fields for every route and cross-route section.\n- Included required evidence + notes capture fields for each section.\n- Added route coverage for core user flows and representative dynamic routes:\n  - `/`\n  - `/about/`\n  - `/projects/`\n  - `/projects/atelier-scheduler/` (representative detail)\n  - `/blog/`\n  - `/blog/astro-content-layer-in-practice/` (markdown)\n  - `/blog/mdx-authoring-with-shared-prose-components/` (MDX)\n  - `/blog/tags/astro/` (tag archive)\n  - `/contact/`\n- Added cross-route high-risk checks for:\n  - navigation/routing\n  - accessibility basics\n  - media loading/rendering\n  - performance sanity\n- Added preflight gate section referencing the existing scripted quality gate (`npm run quality:gate`).\n\n2) Memory governance updates (append-only)\n- `docs/memory/decision-log.md`: appended `[DEC-009]`.\n- `docs/memory/contracts.md`: appended `[CON-012]`.\n- `docs/memory/risk-register.md`: appended `[RISK-009]`.\n- `docs/memory/evidence-index.md`: appended `[EVD-015]`.\n- `docs/memory/changelog.md`: appended `[CHG-015]`.\n- Each appended entry includes NodeID, Date (2026-03-01), Author (`codex_agent_1`), Change summary, and Status.\n\nRationale\n- The checklist adds a lightweight but enforceable manual release gate for route-level regressions that scripted checks do not fully capture (especially visual/content/navigation/accessibility behavior).\n- Scope intentionally avoids exhaustive browser/version matrices, staying concise and release-focused.\n\nLint/typecheck commands run (required)\n- `npm run check` -> PASS (0 errors, 0 warnings, 0 hints).\n- `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints).\n\nAdditional artifact sanity check\n- `test -f docs/qa/release-checklist.md && rg -n \"Result:|/blog/mdx-authoring-with-shared-prose-components/|/projects/atelier-scheduler/|C02 Accessibility Basics|C04 Performance Sanity\" docs/qa/release-checklist.md` -> PASS (required markers present).\n\nCommit requirement status\n- Attempted required single node commit:\n  - `git rev-parse --is-inside-work-tree && git add ... && git commit -m \"node(n13b_release_regression_checklist): create release regression checklist\"`\n- Blocked by workspace state:\n  - `fatal: not a git repository (or any of the parent directories): .git`\n- Per governance rule, node is not failed solely due this environment-level commit blocker.\n\nManual verification steps\n1. Open `docs/qa/release-checklist.md`.\n2. Confirm each route section contains explicit result/evidence/notes fields.\n3. Confirm representative MDX route and performance/a11y cross-route sections are present.\n4. For release candidate validation, run `npm run quality:gate` then execute the checklist in a production-like environment and capture evidence per section.",
+      "completed_at": "2026-03-01T12:43:10.304375+00:00"
+    },
+    "n13c_qa_run_and_blocker_fixes": {
+      "title": "Execute QA gate and fix release-blocking defects",
+      "instruction": "Goal: produce a release-ready result by executing the new automated checks and manual regression checklist, then remediating blockers. In-scope: run defined commands, perform checklist verification on primary routes, implement focused fixes for release-blocking defects found, and record evidence/results. Out-of-scope: non-blocking cosmetic improvements and broad refactors. Verification: quality-gate commands pass, checklist is completed with outcomes, and blocker fixes are validated. Expected artifacts: code/docs fixes as needed plus QA evidence updates in docs/memory files per governance.",
+      "dependencies": [
+        "n13a_quality_gate_commands",
+        "n13b_release_regression_checklist"
+      ],
+      "status": "COMPLETED",
+      "artifacts": [
+        "docs/qa/release-checklist-execution-2026-03-01.md",
+        "src/data/blog/astro-content-layer-in-practice.md",
+        "src/data/blog/tuning-page-motion-with-respect.md",
+        "src/data/blog/from-scrapbook-motifs-to-portfolio-language.md",
+        "src/data/blog/mdx-authoring-with-shared-prose-components.mdx",
+        "src/data/projects/atelier-scheduler.md",
+        "src/data/projects/field-journal-cms.md",
+        "src/data/projects/letterpress-notes.md",
+        "src/data/projects/signalboard-analytics.md",
+        "public/images/blog/astro-content-layer-in-practice.svg",
+        "public/images/blog/tuning-page-motion-with-respect.svg",
+        "public/images/blog/from-scrapbook-motifs-to-portfolio-language.svg",
+        "public/images/blog/mdx-authoring-workflow.svg",
+        "public/images/projects/atelier-scheduler-cover.svg",
+        "public/images/projects/field-journal-cms-cover.svg",
+        "public/images/projects/letterpress-notes-cover.svg",
+        "public/images/projects/signalboard-analytics-cover.svg",
+        "docs/memory/decision-log.md",
+        "docs/memory/contracts.md",
+        "docs/memory/risk-register.md",
+        "docs/memory/evidence-index.md",
+        "docs/memory/changelog.md"
+      ],
+      "context": "Must follow shared memory governance updates and include lint/typecheck/build evidence in completion report.",
+      "started_at": "2026-03-01T12:43:29.231484+00:00",
+      "lease_expires_at": null,
+      "report": "Completed `n13c_qa_run_and_blocker_fixes` by executing the scripted quality gate, running the manual release checklist against primary routes via static artifact evidence, remediating a release-blocking defect, and recording full evidence/memory updates.\n\nWhat I changed\n1) Executed QA gate and checklist run\n- Ran `npm run quality:gate` successfully (check + typecheck + build + quality:test all passed).\n- Attempted runtime preview verification via `npm run preview -- --host 127.0.0.1 --port 4322`, which failed due sandbox restriction: `listen EPERM`.\n- Performed route-by-route checklist validation from generated `dist/**` artifacts and CSS contracts, then documented outcomes in:\n  - `docs/qa/release-checklist-execution-2026-03-01.md`\n\n2) Found and fixed a release-blocking defect\n- Defect: published route HTML referenced `/images/...` assets that did not exist in repo/build output (`public/images` and `dist/images` absent), causing broken media on core routes.\n- Fix implemented:\n  - Added concrete placeholder assets under `public/images/blog/*.svg` and `public/images/projects/*.svg`.\n  - Updated all published content `coverImage` paths to existing `.svg` assets:\n    - `src/data/blog/{astro-content-layer-in-practice,tuning-page-motion-with-respect,from-scrapbook-motifs-to-portfolio-language}.md`\n    - `src/data/projects/{atelier-scheduler,field-journal-cms,letterpress-notes,signalboard-analytics}.md`\n  - Updated MDX inline figure path:\n    - `src/data/blog/mdx-authoring-with-shared-prose-components.mdx`\n\n3) Added validation evidence for blocker remediation\n- Rebuilt output and ran an internal reference integrity sweep across all `dist/**/*.html` `href/src` links.\n- Result: `All internal href/src references resolve within dist.`\n\nMemory governance updates (append-only, NodeID/date/author/status included)\n- `docs/memory/decision-log.md` -> `[DEC-010]`\n- `docs/memory/contracts.md` -> `[CON-013]`\n- `docs/memory/risk-register.md` -> `[RISK-010]`\n- `docs/memory/evidence-index.md` -> `[EVD-016]`\n- `docs/memory/changelog.md` -> `[CHG-016]`\n\nLint/typecheck (required) and related checks run\n- `npm run quality:gate` -> PASS\n  - includes `npm run check` -> PASS (0 errors, 0 warnings, 0 hints)\n  - includes `npm run typecheck` -> PASS (0 errors, 0 warnings, 0 hints)\n  - includes `npm run build` -> PASS\n  - includes `npm run quality:test` -> PASS\n- Final required diagnostics after all edits:\n  - `npm run check && npm run typecheck` -> PASS (both 0 errors, 0 warnings, 0 hints)\n- Additional QA command:\n  - `npm run preview -- --host 127.0.0.1 --port 4322` -> BLOCKED by sandbox (`listen EPERM`)\n\nAutofix handling\n- No lint/typecheck failures occurred; no autofix step required.\n\nManual verification guidance\n1. Run `npm run quality:gate`.\n2. Open `docs/qa/release-checklist-execution-2026-03-01.md` for the completed checklist and route outcomes.\n3. In an unrestricted environment, run preview and complete remaining runtime checks (keyboard back/forward behavior and performance sanity) noted as blocked by sandbox constraints.\n\nCommit requirement status\n- Required single commit could not be created because this workspace is not a git repository.\n- Evidence: `git rev-parse --is-inside-work-tree` -> `fatal: not a git repository (or any of the parent directories): .git`.\n- Per governance, node is not failed solely due this environment-level commit blocker.",
+      "completed_at": "2026-03-01T12:49:14.166677+00:00"
+    }
+  }
+}

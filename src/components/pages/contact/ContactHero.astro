@@ -1,0 +1,53 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import ImagePlaceholder from "../../ui/ImagePlaceholder.astro";
+import { getCopy, resolveLocale } from "../../../lib/i18n";
+
+export interface Props {
+  headline: string;
+}
+
+const { headline } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<MotionReveal as="section" kind="soft-zoom" class="page-hero contact-hero">
+  <span class="eyebrow">{t.contactHero.eyebrow}</span>
+
+  <div class="contact-hero__layout">
+    <div class="stack contact-hero__content">
+      <h1>{t.contactHero.title}</h1>
+      <p>{headline}</p>
+    </div>
+
+    <ImagePlaceholder label="Collaboration Placeholder" hint="Workshop or remote call photo" ratio="landscape" />
+  </div>
+</MotionReveal>
+
+<style>
+  .contact-hero__layout {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .contact-hero__content {
+    gap: var(--space-5);
+  }
+
+  .contact-hero h1 {
+    max-width: 15ch;
+  }
+
+  @media (max-width: 56rem) {
+    .contact-hero__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-hero h1 {
+      max-width: 100%;
+    }
+  }
+</style>

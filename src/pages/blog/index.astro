@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MotionReveal from "../../components/ui/MotionReveal.astro";
+import StaggerGroup from "../../components/ui/StaggerGroup.astro";
+import PaperCard from "../../components/ui/PaperCard.astro";
+import BlogCard from "../../components/blog/BlogCard.astro";
+import BlogPagination from "../../components/blog/BlogPagination.astro";
+import { BLOG_PAGE_SIZE, getBlogTagSummaries, getLocalizedBlogPosts, paginateEntries } from "../../lib/content";
+import { getCopy, resolveLocale } from "../../lib/i18n";
+
+const locale = resolveLocale(Astro.currentLocale);
+const posts = await getLocalizedBlogPosts(locale);
+const t = getCopy(locale);
+const tagSummaries = getBlogTagSummaries(posts, locale);
+const draftCount = posts.filter((post) => post.data.draft).length;
+const pagination = paginateEntries(posts, 1, BLOG_PAGE_SIZE, "/blog", locale);
+---
+
+<BaseLayout
+  title={t.seo.blogTitle}
+  description={t.seo.blogDescription}
+>
+  <MotionReveal as="section" kind="soft-zoom" class="page-hero blog-hero" slot="hero">
+    <span class="eyebrow">{t.blogPage.eyebrow}</span>
+    <h1>{t.blogPage.heroTitle}</h1>
+    <p>{t.blogPage.heroText}</p>
+
+    <div class="blog-hero__meta" role="list" aria-label={t.blogPage.archiveSummaryAria}>
+      <span class="pill" role="listitem">{posts.length} {t.blogPage.entriesLabel}</span>
+      <span class="pill" role="listitem">{tagSummaries.length} {t.blogPage.activeTagsLabel}</span>
+      <span class="pill" role="listitem">{BLOG_PAGE_SIZE} {t.blogPage.postsPerPageLabel}</span>
+      {draftCount > 0 && <span class="pill" role="listitem">{draftCount} {t.blogPage.draftsVisibleLabel}</span>}
+    </div>
+  </MotionReveal>
+
+  {
+    posts.length === 0 ? (
+      <PaperCard as="section" variant="outline" padded="md" lift={false}>
+        <p class="text-muted">{t.blogPage.emptyState}</p>
+      </PaperCard>
+    ) : (
+      <>
+        {tagSummaries.length > 0 && (
+          <section class="stack blog-tags" aria-labelledby="blog-tags-title">
+            <MotionReveal as="div" kind="slide-in" delay={100}>
+              <h2 id="blog-tags-title">{t.blogPage.browseByTagTitle}</h2>
+              <p class="text-muted">{t.blogPage.browseByTagText}</p>
+            </MotionReveal>
+
+            <div class="blog-tags__list" role="list" aria-label={t.blogPage.tagsAria}>
+              {tagSummaries.map((tagSummary) => (
+                <a class="pill blog-tags__pill" role="listitem" href={tagSummary.href}>
+                  {tagSummary.tag}
+                  <span>{tagSummary.count}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section class="stack blog-list" aria-labelledby="blog-list-title">
+          <MotionReveal as="div" kind="slide-in" delay={120}>
+            <h2 id="blog-list-title">{t.blogPage.latestPostsTitle}</h2>
+            <p class="text-muted">{t.blogPage.latestPostsText}</p>
+          </MotionReveal>
+
+          <StaggerGroup as="ul" class="blog-list__grid" step={80}>
+            {pagination.items.map((post) => (
+              <li>
+                <BlogCard post={post} />
+              </li>
+            ))}
+          </StaggerGroup>
+
+          <BlogPagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            previousPageHref={pagination.previousPageHref}
+            nextPageHref={pagination.nextPageHref}
+          />
+        </section>
+      </>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .blog-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .blog-tags {
+    margin-top: var(--space-3);
+  }
+
+  .blog-tags__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .blog-tags__pill {
+    gap: 0.45rem;
+  }
+
+  .blog-tags__pill span {
+    border-radius: var(--radius-pill);
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-accent-soft);
+    color: var(--color-text-strong);
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+  }
+
+  .blog-list {
+    margin-top: var(--space-4);
+  }
+
+  .blog-list__grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+</style>

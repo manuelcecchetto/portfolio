@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HomeHero from "../components/pages/home/HomeHero.astro";
+import HomeStory from "../components/pages/home/HomeStory.astro";
+import HomeHighlights from "../components/pages/home/HomeHighlights.astro";
+import { getPublishedBlogPosts, getPublishedProjects } from "../lib/content";
+import { getCopy, localizePath, resolveLocale } from "../lib/i18n";
+
+const [projects, blogPosts] = await Promise.all([getPublishedProjects(), getPublishedBlogPosts()]);
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+
+const featuredProjects = projects.filter((entry) => entry.data.featured).slice(0, 2);
+const heroHighlights = featuredProjects.map((entry) => ({
+  title: entry.data.title,
+  href: localizePath(locale, "/projects"),
+  meta: entry.data.tags.slice(0, 2).join(" · "),
+}));
+
+const fallbackProject = projects[0];
+
+if (heroHighlights.length === 0 && fallbackProject) {
+  heroHighlights.push({
+    title: fallbackProject.data.title,
+    href: localizePath(locale, "/projects"),
+    meta: t.homeHero.fallbackLatestProjectMeta,
+  });
+}
+
+const latestProjectTitle = projects[0]?.data.title;
+const latestBlogTitle = blogPosts[0]?.data.title;
+---
+
+<BaseLayout
+  title={t.seo.homeTitle}
+  description={t.seo.homeDescription}
+>
+  <HomeHero
+    slot="hero"
+    headline={t.profile.headline}
+    summary={t.profile.aboutShort}
+    location={t.profile.location}
+    availability={t.profile.availability}
+    highlights={heroHighlights}
+  />
+
+  <HomeStory aboutLong={t.profile.aboutLong} focusAreas={t.profile.focusAreas} availability={t.profile.availability} />
+
+  <HomeHighlights
+    projectCount={projects.length}
+    publishedPostCount={blogPosts.length}
+    latestProjectTitle={latestProjectTitle ?? t.homeHighlights.fallbackLatestProjectTitle}
+    latestBlogTitle={latestBlogTitle ?? t.homeHighlights.fallbackLatestBlogTitle}
+  />
+</BaseLayout>

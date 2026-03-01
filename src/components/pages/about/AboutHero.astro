@@ -1,0 +1,73 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import ImagePlaceholder from "../../ui/ImagePlaceholder.astro";
+import { getCopy, resolveLocale } from "../../../lib/i18n";
+
+export interface Props {
+  aboutShort: string;
+  location: string;
+  timezone: string;
+}
+
+const { aboutShort, location, timezone } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<MotionReveal as="section" kind="soft-zoom" class="page-hero about-hero">
+  <span class="eyebrow">{t.aboutHero.eyebrow}</span>
+
+  <div class="about-hero__layout">
+    <div class="stack about-hero__content">
+      <h1>
+        {t.aboutHero.titleLine1}<br />
+        {t.aboutHero.titleLine2}
+      </h1>
+      <p>{aboutShort}</p>
+
+      <div class="about-hero__meta" role="list" aria-label={t.aboutHero.workingContextAria}>
+        <span class="pill" role="listitem">{location}</span>
+        <span class="pill" role="listitem">{t.common.timezonePrefix}: {timezone}</span>
+      </div>
+    </div>
+
+    <ImagePlaceholder label="Profile Portrait Placeholder" hint="Founder headshot" ratio="portrait" />
+  </div>
+</MotionReveal>
+
+<style>
+  .about-hero {
+    gap: var(--space-5);
+  }
+
+  .about-hero__layout {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: minmax(0, 1.4fr) minmax(14rem, 0.8fr);
+    align-items: start;
+  }
+
+  .about-hero__content {
+    gap: var(--space-5);
+  }
+
+  .about-hero h1 {
+    max-width: 16ch;
+  }
+
+  .about-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 56rem) {
+    .about-hero__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .about-hero h1 {
+      max-width: 100%;
+    }
+  }
+</style>

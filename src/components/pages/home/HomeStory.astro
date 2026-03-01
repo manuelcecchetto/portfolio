@@ -1,0 +1,89 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import PaperCard from "../../ui/PaperCard.astro";
+import PaperDeck from "../../ui/PaperDeck.astro";
+import ImagePlaceholder from "../../ui/ImagePlaceholder.astro";
+import { getCopy, resolveLocale } from "../../../lib/i18n";
+
+export interface Props {
+  aboutLong: string;
+  focusAreas: string[];
+  availability: string;
+}
+
+const { aboutLong, focusAreas = [], availability } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<section class="stack home-story" aria-labelledby="home-story-title">
+  <MotionReveal as="div" kind="slide-in" delay={90}>
+    <span class="eyebrow">{t.homeStory.eyebrow}</span>
+    <h2 id="home-story-title">{t.homeStory.title}</h2>
+  </MotionReveal>
+
+  <PaperDeck>
+    <PaperCard as="article" variant="outline" padded="lg">
+      <p>{aboutLong}</p>
+      <ImagePlaceholder class="home-story__placeholder" label="Workshop Session Placeholder" hint="Team strategy workshop image" ratio="wide" />
+    </PaperCard>
+
+    <PaperCard as="aside" variant="default" padded="lg">
+      <h3>{t.homeStory.currentFocus}</h3>
+      <ul class="home-story__list" role="list">
+        {focusAreas.map((area) => (
+          <li>{area}</li>
+        ))}
+      </ul>
+      <p class="home-story__availability">{availability}</p>
+    </PaperCard>
+  </PaperDeck>
+</section>
+
+<style>
+  .home-story {
+    margin-top: var(--space-2);
+  }
+
+  .home-story__placeholder {
+    margin-top: var(--space-6);
+  }
+
+  .home-story__list {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .home-story__list li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: var(--color-text-body);
+    border-bottom: var(--line-soft);
+    padding-bottom: 0.55rem;
+  }
+
+  .home-story__list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .home-story__availability {
+    margin-top: var(--space-5);
+    border-top: var(--line-soft);
+    padding-top: var(--space-4);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+</style>

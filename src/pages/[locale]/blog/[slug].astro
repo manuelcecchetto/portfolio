@@ -1,0 +1,20 @@
+---
+import BlogPostPage, { getStaticPaths as getDefaultBlogPostPaths } from "../../blog/[slug].astro";
+import { NON_DEFAULT_LOCALES } from "../../../lib/i18n";
+
+export async function getStaticPaths() {
+  const basePaths = await getDefaultBlogPostPaths();
+
+  return NON_DEFAULT_LOCALES.flatMap((locale) =>
+    basePaths.map((entry) => ({
+      params: {
+        ...entry.params,
+        locale,
+      },
+      props: entry.props,
+    })),
+  );
+}
+---
+
+<BlogPostPage {...Astro.props} />

@@ -1,0 +1,292 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">Index — Oddity</title>
+    <style vid="5">
+        :root {
+            --bg-bone: #EAE8E4;
+            --ink-black: #111111;
+            --stroke-width: 1.5px;
+            --spacing-unit: 8px;
+            --font-main: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-bone);
+            color: var(--ink-black);
+            font-family: var(--font-main);
+            width: 400px;
+            height: 867px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            cursor: crosshair;
+            position: relative;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            background: linear-gradient(to bottom, var(--bg-bone) 60%, transparent);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--ink-black);
+        }
+
+        .nav-link {
+            font-size: 1rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--ink-black);
+        }
+
+        main {
+            padding: 24px;
+            padding-top: 100px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .index-title {
+            font-size: 3.5rem;
+            font-weight: 500;
+            margin-bottom: 40px;
+            letter-spacing: -0.04em;
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .project-item {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .project-thumbnail {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: var(--stroke-width) solid var(--ink-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-item:hover .project-thumbnail {
+            transform: translate(4px, -4px);
+            box-shadow: -4px 4px 0px var(--ink-black);
+        }
+
+        .doodle-svg {
+            width: 60px;
+            height: 60px;
+            stroke: var(--ink-black);
+            stroke-width: var(--stroke-width);
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .project-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .project-name {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .project-desc {
+            font-size: 1rem;
+            opacity: 0.8;
+            line-height: 1.3;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        #surprise-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        footer {
+            padding: 40px 24px;
+            border-top: var(--stroke-width) solid var(--ink-black);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body vid="6">
+
+    <canvas id="surprise-canvas" vid="7"></canvas>
+
+    <header vid="8">
+        <a href="index.html" class="logo" vid="9">oddity.</a>
+        <a href="#" class="nav-link" vid="10">Close</a>
+    </header>
+
+    <main vid="11">
+        <h1 class="index-title" vid="12">Index</h1>
+
+        <div class="project-list" vid="13">
+            
+            <a href="#" class="project-item" vid="14">
+                <div class="project-thumbnail" vid="15">
+                    <svg viewBox="0 0 100 100" class="doodle-svg animate-float" vid="16">
+                        <path d="M30,50 Q50,20 70,50 Q50,80 30,50" vid="17"></path>
+                        <circle cx="50" cy="50" r="8" vid="18"></circle>
+                        <path d="M20,20 L30,30 M80,80 L70,70" vid="19"></path>
+                    </svg>
+                </div>
+                <div class="project-info" vid="20">
+                    <span class="tag" vid="21">Toy 01</span>
+                    <span class="project-name" vid="22">Logic Stretcher</span>
+                    <p class="project-desc" vid="23">A calculator that only works when you're being nice to it.</p>
+                </div>
+            </a>
+
+            <a href="#" class="project-item" vid="24">
+                <div class="project-thumbnail" vid="25">
+                    <svg viewBox="0 0 100 100" class="doodle-svg animate-float" style="animation-delay: -1s" vid="26">
+                        <rect x="30" y="30" width="40" height="40" vid="27"></rect>
+                        <path d="M30,30 L20,20 M70,30 L80,20 M30,70 L20,80 M70,70 L80,80" vid="28"></path>
+                        <path d="M45,45 L55,55 M55,45 L45,55" vid="29"></path>
+                    </svg>
+                </div>
+                <div class="project-info" vid="30">
+                    <span class="tag" vid="31">Interface 04</span>
+                    <span class="project-name" vid="32">The Shy Button</span>
+                    <p class="project-desc" vid="33">An interface element that hides whenever the cursor approaches.</p>
+                </div>
+            </a>
+
+            <a href="#" class="project-item" vid="34">
+                <div class="project-thumbnail" vid="35">
+                    <svg viewBox="0 0 100 100" class="doodle-svg animate-float" style="animation-delay: -2.5s" vid="36">
+                        <path d="M50,15 L50,85 M15,50 L85,50" vid="37"></path>
+                        <path d="M30,30 C40,40 60,40 70,30" vid="38"></path>
+                        <path d="M30,70 C40,60 60,60 70,70" vid="39"></path>
+                    </svg>
+                </div>
+                <div class="project-info" vid="40">
+                    <span class="tag" vid="41">Object 12</span>
+                    <span class="project-name" vid="42">Mundane Dismantler</span>
+                    <p class="project-desc" vid="43">Software that turns your spreadsheet data into abstract poetry.</p>
+                </div>
+            </a>
+
+            <a href="#" class="project-item" vid="44">
+                <div class="project-thumbnail" vid="45">
+                    <svg viewBox="0 0 100 100" class="doodle-svg animate-float" style="animation-delay: -0.5s" vid="46">
+                        <circle cx="50" cy="50" r="25" vid="47"></circle>
+                        <path d="M50,25 V35 M50,65 V75 M25,50 H35 M65,50 H75" vid="48"></path>
+                        <path d="M40,50 Q50,40 60,50" vid="49"></path>
+                    </svg>
+                </div>
+                <div class="project-info" vid="50">
+                    <span class="tag" vid="51">System 09</span>
+                    <span class="project-name" vid="52">Utility Useless</span>
+                    <p class="project-desc" vid="53">A clock that measures time in cups of coffee drank globally.</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <footer vid="54">
+        <div vid="55">© 2024 Oddity</div>
+        <div vid="56">Keep scrolling.</div>
+    </footer>
+
+    <script vid="57">
+        const canvas = document.getElementById('surprise-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = 400;
+        let height = 867;
+
+        canvas.width = width;
+        canvas.height = height;
+
+        let lastX = 0;
+        let lastY = 0;
+
+        function drawDoodle(x, y) {
+            ctx.strokeStyle = '#111111'; 
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            const r = Math.random();
+            if (r < 0.5) {
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+            } else {
+                ctx.moveTo(x-2, y-2);
+                ctx.lineTo(x+2, y+2);
+                ctx.moveTo(x+2, y-2);
+                ctx.lineTo(x-2, y+2);
+            }
+            ctx.stroke();
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const dist = Math.hypot(x - lastX, y - lastY);
+            if (dist > 25) {
+                drawDoodle(x, y);
+                lastX = x;
+                lastY = y;
+            }
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,239 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MotionReveal from "../../components/ui/MotionReveal.astro";
+import StaggerGroup from "../../components/ui/StaggerGroup.astro";
+import BlogCard from "../../components/blog/BlogCard.astro";
+import Callout from "../../components/prose/Callout.astro";
+import ImageFigure from "../../components/prose/ImageFigure.astro";
+import CodeNote from "../../components/prose/CodeNote.astro";
+import ImagePlaceholder from "../../components/ui/ImagePlaceholder.astro";
+import { getBlogRouteSlugs, getLocalizedBlogPostBySlug, getLocalizedBlogPosts, type BlogEntry } from "../../lib/content";
+import { getCopy, localizePath, resolveLocale, toIntlLocale } from "../../lib/i18n";
+
+export async function getStaticPaths() {
+  const slugs = await getBlogRouteSlugs({ includeDrafts: !import.meta.env.PROD });
+  return slugs.map((slug) => ({ params: { slug }, props: { slug } }));
+}
+
+interface Props {
+  slug: string;
+}
+
+const { slug: slugFromProps } = Astro.props as Props;
+const slug = slugFromProps ?? Astro.params.slug;
+const locale = resolveLocale(Astro.currentLocale);
+if (!slug) {
+  throw new Error("Missing blog slug param.");
+}
+
+const post = await getLocalizedBlogPostBySlug(slug, locale);
+if (!post) {
+  throw new Error(`Unable to resolve localized blog post for slug '${slug}' in locale '${locale}'.`);
+}
+const localePosts = await getLocalizedBlogPosts(locale);
+const tagSet = new Set(post.data.tags);
+const relatedPosts = localePosts
+  .filter((candidate: BlogEntry) => candidate.data.translationGroup !== post.data.translationGroup)
+  .sort((a: BlogEntry, b: BlogEntry) => {
+    const overlapA = a.data.tags.filter((tag) => tagSet.has(tag)).length;
+    const overlapB = b.data.tags.filter((tag) => tagSet.has(tag)).length;
+    return overlapB - overlapA;
+  })
+  .slice(0, 2);
+const t = getCopy(locale);
+const { Content } = await render(post);
+const proseComponents = { Callout, ImageFigure, CodeNote };
+const dateFormatter = new Intl.DateTimeFormat(toIntlLocale(locale), {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+const publishedLabel = dateFormatter.format(post.data.publishedAt);
+const updatedLabel = post.data.updatedAt ? dateFormatter.format(post.data.updatedAt) : undefined;
+---
+
+<BaseLayout
+  title={`${post.data.title} | ${t.seo.blogDetailSuffix}`}
+  description={post.data.summary}
+  ogType="article"
+  image={post.data.coverImage}
+>
+  <article class="blog-post-content">
+    <header class="blog-post-header">
+      <a class="blog-post-header__back" href={localizePath(locale, "/blog")}>{t.blogPost.backToAll}</a>
+      <h1>{post.data.title}</h1>
+
+      <p class="blog-post-header__meta">
+        <span>{t.common.publishedPrefix} {publishedLabel}</span>
+        {updatedLabel && <span>{t.common.updatedPrefix} {updatedLabel}</span>}
+        {post.data.readingTimeMinutes && <span>{post.data.readingTimeMinutes} {t.common.minReadSuffix}</span>}
+        {post.data.draft && <span class="blog-post-header__draft">{t.blogPost.draftEntry}</span>}
+      </p>
+
+      {
+        post.data.tags.length > 0 && (
+          <div class="blog-post-header__tags" role="list" aria-label={t.blogPost.tagsAria}>
+            {post.data.tags.map((tag) => (
+              <a class="pill" role="listitem" href={localizePath(locale, `/blog/tags/${encodeURIComponent(tag)}/`)}>
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    {
+      post.data.coverImage ? (
+        <img
+          class="blog-post-header__cover"
+          src={post.data.coverImage}
+          alt={`${t.blogPost.coverAltPrefix} ${post.data.title}`}
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <ImagePlaceholder label={`${post.data.title} Cover Placeholder`} hint="Article cover image" ratio="wide" />
+      )
+    }
+
+    <div class="blog-post-content__body">
+      <Content components={proseComponents} />
+    </div>
+  </article>
+
+  {
+    relatedPosts.length > 0 && (
+      <section class="stack blog-post-related" aria-labelledby="blog-post-related-title">
+        <MotionReveal as="div" kind="slide-in" delay={120}>
+          <h2 id="blog-post-related-title">{t.blogPost.continueReadingTitle}</h2>
+          <p class="text-muted">{t.blogPost.continueReadingText}</p>
+        </MotionReveal>
+
+        <StaggerGroup as="ul" class="blog-post-related__grid" step={90}>
+          {relatedPosts.map((relatedPost) => (
+            <li>
+              <BlogCard post={relatedPost} />
+            </li>
+          ))}
+        </StaggerGroup>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .blog-post-content {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .blog-post-header {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .blog-post-header__cover {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background: hsl(0 0% 100% / 0.72);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .blog-post-header h1 {
+    font-size: clamp(1.9rem, 4vw, 3.2rem);
+    max-width: 18ch;
+  }
+
+  .blog-post-header__back {
+    width: fit-content;
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-strong);
+  }
+
+  .blog-post-header__back::before {
+    content: "<-";
+    margin-right: 0.45rem;
+    color: var(--color-accent);
+  }
+
+  .blog-post-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--color-text-muted);
+  }
+
+  .blog-post-header__draft {
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-accent-soft);
+    color: var(--color-text-strong);
+    padding: 0.16rem 0.54rem;
+  }
+
+  .blog-post-header__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .blog-post-content__body {
+    border-radius: var(--radius-lg);
+    border: var(--line-soft);
+    background: var(--color-surface-strong);
+    box-shadow: var(--shadow-soft), var(--shadow-inset);
+    padding: clamp(var(--space-5), 4vw, var(--space-8));
+  }
+
+  .blog-post-content__body :global(p + p) {
+    margin-top: var(--space-4);
+  }
+
+  .blog-post-content__body :global(h2),
+  .blog-post-content__body :global(h3) {
+    margin-top: var(--space-6);
+    line-height: 1.18;
+  }
+
+  .blog-post-content__body :global(h2) {
+    font-size: clamp(1.5rem, 2.4vw, 2.15rem);
+  }
+
+  .blog-post-content__body :global(h3) {
+    font-size: clamp(1.16rem, 1.6vw, 1.45rem);
+  }
+
+  .blog-post-content__body :global(ul),
+  .blog-post-content__body :global(ol) {
+    margin-top: var(--space-4);
+    padding-left: 1.2rem;
+  }
+
+  .blog-post-related {
+    margin-top: var(--space-5);
+  }
+
+  .blog-post-related__grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+</style>

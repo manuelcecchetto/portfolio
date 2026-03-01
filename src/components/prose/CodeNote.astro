@@ -1,0 +1,47 @@
+---
+interface Props {
+  title?: string;
+  language?: string;
+  code: string;
+}
+
+const { title = "Code note", language = "txt", code } = Astro.props as Props;
+---
+
+<aside class="prose-code-note" aria-label={title}>
+  <p class="prose-code-note__title">{title}</p>
+  <pre><code class={`language-${language}`}>{code}</code></pre>
+</aside>
+
+<style>
+  .prose-code-note {
+    margin-block: var(--space-5);
+    border-radius: var(--radius-md);
+    border: 1px solid hsl(214 26% 36% / 0.46);
+    background: linear-gradient(160deg, hsl(220 28% 14%), hsl(216 30% 11%));
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+  }
+
+  .prose-code-note__title {
+    margin: 0;
+    padding: 0.72rem 1rem;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: hsl(194 42% 84%);
+    border-bottom: 1px solid hsl(197 40% 58% / 0.24);
+    background: hsl(215 36% 18% / 0.82);
+  }
+
+  .prose-code-note pre {
+    margin: 0;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: hsl(45 48% 89%);
+  }
+</style>

@@ -1,0 +1,20 @@
+---
+import BlogTagPage, { getStaticPaths as getDefaultTagPaths } from "../../../blog/tags/[tag].astro";
+import { NON_DEFAULT_LOCALES } from "../../../../lib/i18n";
+
+export async function getStaticPaths() {
+  const basePaths = await getDefaultTagPaths();
+
+  return NON_DEFAULT_LOCALES.flatMap((locale) =>
+    basePaths.map((entry) => ({
+      params: {
+        ...entry.params,
+        locale,
+      },
+      props: entry.props,
+    })),
+  );
+}
+---
+
+<BlogTagPage {...Astro.props} />

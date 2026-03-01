@@ -1,0 +1,98 @@
+---
+import Footer from "../components/layout/Footer.astro";
+import Header from "../components/layout/Header.astro";
+import {
+  DEFAULT_LOCALE,
+  SUPPORTED_LOCALES,
+  getCopy,
+  localizePath,
+  resolveLocale,
+  stripLocaleFromPath,
+} from "../lib/i18n";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+  image?: string | undefined;
+  noindex?: boolean;
+}
+
+const {
+  title = "manuelcecchetto.it",
+  ogType = "website",
+  image,
+  noindex = false,
+} = Astro.props;
+
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+const description = Astro.props.description ?? t.seo.defaultDescription;
+const currentPath = Astro.url.pathname;
+const pathWithoutLocale = stripLocaleFromPath(currentPath);
+const siteOrigin = Astro.site ?? new URL("https://manuelcecchetto.it");
+const canonicalUrl = new URL(currentPath, siteOrigin).href;
+const feedUrl = new URL("/rss.xml", siteOrigin).href;
+const sitemapUrl = new URL("/sitemap-index.xml", siteOrigin).href;
+const localeAlternates = SUPPORTED_LOCALES.map((entryLocale) => ({
+  locale: entryLocale,
+  href: new URL(localizePath(entryLocale, pathWithoutLocale), siteOrigin).href,
+}));
+const defaultAlternateHref = new URL(localizePath(DEFAULT_LOCALE, pathWithoutLocale), siteOrigin).href;
+const resolvedImage = image ? new URL(image, siteOrigin).href : undefined;
+const twitterCardType = resolvedImage ? "summary_large_image" : "summary";
+const robots = noindex ? "noindex, nofollow" : "index, follow";
+const googleFontsHref =
+  "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap";
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{title}</title>
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="manuelcecchetto.it" />
+    <meta name="twitter:card" content={twitterCardType} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {resolvedImage && <meta property="og:image" content={resolvedImage} />}
+    {resolvedImage && <meta name="twitter:image" content={resolvedImage} />}
+    <link rel="alternate" type="application/rss+xml" title={t.layout.rssTitle} href={feedUrl} />
+    {localeAlternates.map((alternate) => <link rel="alternate" hreflang={alternate.locale} href={alternate.href} />)}
+    <link rel="alternate" hreflang="x-default" href={defaultAlternateHref} />
+    <link rel="sitemap" href={sitemapUrl} />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link rel="preload" as="style" href={googleFontsHref} />
+    <link href={googleFontsHref} rel="stylesheet" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">{t.layout.skipToContent}</a>
+    <div class="ambient ambient--left" aria-hidden="true"></div>
+    <div class="ambient ambient--right" aria-hidden="true"></div>
+    <div class="site-frame">
+      <Header currentPath={currentPath} locale={locale} />
+      <main id="main-content" class="site-main">
+        <div class="site-shell site-main__inner">
+          <slot name="hero" />
+          <section class="site-main__content">
+            <slot />
+          </section>
+        </div>
+      </main>
+      <Footer locale={locale} />
+    </div>
+  </body>
+</html>

@@ -1,0 +1,287 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">Oddity - Collaborate</title>
+    <style vid="5">
+        :root {
+            --bg-bone: #EAE8E4;
+            --ink-black: #111111;
+            --stroke-width: 1.5px;
+            --font-main: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-bone);
+            color: var(--ink-black);
+            font-family: var(--font-main);
+            width: 400px;
+            height: 867px;
+            overflow: hidden;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            font-size: 1rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--ink-black);
+        }
+
+        main {
+            padding: 24px;
+            padding-top: 100px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mascot-area {
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #mascot-svg {
+            width: 120px;
+            height: 120px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .mascot-path {
+            fill: none;
+            stroke: var(--ink-black);
+            stroke-width: var(--stroke-width);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 500;
+            line-height: 0.95;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .doodle-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: 1.2rem;
+            padding: 10px 4px;
+            color: var(--ink-black);
+            outline: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .input-bg path {
+            fill: none;
+            stroke: var(--ink-black);
+            stroke-width: 1.5px;
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 0;
+        }
+
+        textarea.doodle-input {
+            height: 80px;
+            resize: none;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateX(10px) skewX(-5deg);
+        }
+
+        .submit-btn svg {
+            width: 40px;
+            height: 20px;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .eye {
+            transform-origin: center;
+            animation: blink 4s infinite;
+        }
+
+        .mouth-neutral { display: block; }
+        .mouth-surprised { display: none; }
+        .mouth-happy { display: none; }
+
+        body[data-state="typing"] .mouth-neutral { display: none; }
+        body[data-state="typing"] .mouth-surprised { display: block; }
+        
+        body[data-state="success"] .mouth-neutral { display: none; }
+        body[data-state="success"] .mouth-happy { display: block; }
+
+    </style>
+</head>
+<body vid="6">
+
+    <header vid="7">
+        <div class="logo" vid="8">oddity.</div>
+        <a href="#" class="nav-link" vid="9">Home</a>
+    </header>
+
+    <main vid="10">
+        <div class="mascot-area" vid="11">
+            <svg id="mascot-svg" viewBox="0 0 100 100" class="mascot-path" vid="12">
+                
+                <path d="M30,75 C15,75 10,60 10,45 C10,20 30,5 50,5 C70,5 90,20 90,45 C90,60 85,75 70,75" vid="13"></path>
+                
+                <path d="M50,5 Q50,-5 40,-8" vid="14"></path>
+                <circle cx="40" cy="-8" r="2" vid="15"></circle>
+                
+                <circle class="eye" cx="35" cy="40" r="2.5" fill="black" stroke="none" vid="16"></circle>
+                <circle class="eye" cx="65" cy="40" r="2.5" fill="black" stroke="none" vid="17"></circle>
+                
+                <path class="mouth-neutral" d="M45,58 Q50,62 55,58" vid="18"></path>
+                <circle class="mouth-surprised" cx="50" cy="60" r="4" vid="19"></circle>
+                <path class="mouth-happy" d="M40,55 Q50,70 60,55" vid="20"></path>
+                
+                <path d="M35,75 L30,95 M65,75 L70,95" vid="21"></path>
+            </svg>
+        </div>
+
+        <h1 class="title" vid="22">Let’s break<br vid="23">things.</h1>
+
+        <form class="form-container" id="collab-form" vid="24">
+            <div class="input-group" vid="25">
+                <label vid="26">Who are you?</label>
+                <input type="text" class="doodle-input" placeholder="Name or alias" vid="27">
+                <svg class="input-bg" preserveAspectRatio="none" viewBox="0 0 300 40" vid="28">
+                    <path d="M2,35 Q150,38 298,35 M5,37 Q150,40 295,37" vid="29"></path>
+                </svg>
+            </div>
+
+            <div class="input-group" vid="30">
+                <label vid="31">The Idea</label>
+                <textarea class="doodle-input" placeholder="Something weird..." vid="32"></textarea>
+                <svg class="input-bg" preserveAspectRatio="none" viewBox="0 0 300 80" vid="33">
+                    <path d="M2,2 L298,5 L295,78 L5,75 Z" vid="34"></path>
+                    <path d="M10,76 L290,79" vid="35"></path>
+                </svg>
+            </div>
+
+            <button type="submit" class="submit-btn" vid="36">
+                Send it
+                <svg viewBox="0 0 40 20" fill="none" stroke="currentColor" stroke-width="1.5" vid="37">
+                    <path d="M0,10 L35,10 M25,2 L35,10 L25,18" vid="38"></path>
+                </svg>
+            </button>
+        </form>
+    </main>
+
+    <script vid="39">
+        const body = document.body;
+        const inputs = document.querySelectorAll('.doodle-input');
+        const form = document.getElementById('collab-form');
+        const mascot = document.getElementById('mascot-svg');
+
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                body.setAttribute('data-state', 'typing');
+                mascot.style.transform = 'scale(1.1) rotate(5deg)';
+            });
+
+            input.addEventListener('blur', () => {
+                if(body.getAttribute('data-state') !== 'success') {
+                    body.removeAttribute('data-state');
+                    mascot.style.transform = 'scale(1) rotate(0deg)';
+                }
+            });
+
+            input.addEventListener('input', (e) => {
+                
+                const intensity = Math.random() * 4 - 2;
+                mascot.style.transform = `scale(1.1) rotate(${5 + intensity}deg) translateY(${intensity}px)`;
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            body.setAttribute('data-state', 'success');
+            mascot.style.transform = 'scale(1.3) translateY(-20px)';
+            
+            const btn = document.querySelector('.submit-btn');
+            btn.innerHTML = 'Sent! <span style="font-size:1rem; margin-left:10px;">(probably)</span>';
+            
+            
+        });
+    </script>
+
+
+</body></html>

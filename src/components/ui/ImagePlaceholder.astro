@@ -1,0 +1,94 @@
+---
+export interface Props {
+  label: string;
+  hint?: string;
+  ratio?: "wide" | "landscape" | "portrait" | "square";
+  class?: string;
+}
+
+const { label, hint = "Image pending", ratio = "landscape", class: className = "" } = Astro.props;
+---
+
+<figure class:list={["image-placeholder", `image-placeholder--${ratio}`, className]} aria-label={label}>
+  <div class="image-placeholder__grid" aria-hidden="true"></div>
+  <figcaption>
+    <span class="image-placeholder__label">{label}</span>
+    <span class="image-placeholder__hint">{hint}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .image-placeholder {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    align-content: end;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background:
+      linear-gradient(140deg, hsl(210 20% 97%), hsl(210 20% 93%)),
+      repeating-linear-gradient(0deg, transparent, transparent 1.3rem, hsl(210 12% 85% / 0.4) 1.3rem, hsl(210 12% 85% / 0.4) 1.35rem),
+      repeating-linear-gradient(90deg, transparent, transparent 1.3rem, hsl(210 12% 85% / 0.36) 1.3rem, hsl(210 12% 85% / 0.36) 1.35rem);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .image-placeholder::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(125deg, hsl(206 74% 52% / 0.12), transparent 55%);
+    pointer-events: none;
+  }
+
+  .image-placeholder--wide {
+    aspect-ratio: 21 / 9;
+  }
+
+  .image-placeholder--landscape {
+    aspect-ratio: 16 / 10;
+  }
+
+  .image-placeholder--portrait {
+    aspect-ratio: 4 / 5;
+  }
+
+  .image-placeholder--square {
+    aspect-ratio: 1;
+  }
+
+  .image-placeholder__grid {
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 2.1rem, hsl(210 12% 84% / 0.5) 2.1rem, hsl(210 12% 84% / 0.5) 2.15rem),
+      repeating-linear-gradient(90deg, transparent, transparent 2.1rem, hsl(210 12% 84% / 0.5) 2.1rem, hsl(210 12% 84% / 0.5) 2.15rem);
+    opacity: 0.6;
+  }
+
+  .image-placeholder figcaption {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.25rem;
+    padding: var(--space-4);
+    background: hsl(212 24% 15% / 0.88);
+    border-top: 1px solid hsl(210 20% 88% / 0.42);
+    color: hsl(210 28% 97%);
+  }
+
+  .image-placeholder__label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+  }
+
+  .image-placeholder__hint {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: hsl(206 80% 74%);
+  }
+</style>

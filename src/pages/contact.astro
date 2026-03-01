@@ -1,0 +1,74 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import MotionReveal from "../components/ui/MotionReveal.astro";
+import PaperCard from "../components/ui/PaperCard.astro";
+import ContactHero from "../components/pages/contact/ContactHero.astro";
+import ContactChannels from "../components/pages/contact/ContactChannels.astro";
+import profile from "../data/profile.json";
+import { getCopy, resolveLocale } from "../lib/i18n";
+
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<BaseLayout
+  title={t.seo.contactTitle}
+  description={t.seo.contactDescription}
+>
+  <ContactHero slot="hero" headline={t.profile.aboutShort} />
+
+  <ContactChannels
+    email={profile.contact.email}
+    github={profile.social.github}
+    linkedin={profile.social.linkedin}
+    availability={t.profile.availability}
+    timezone={profile.timezone}
+  />
+
+  <section class="stack contact-details" aria-labelledby="contact-details-title">
+    <MotionReveal as="div" kind="slide-in" delay={140}>
+      <h2 id="contact-details-title">{t.contactPage.includeTitle}</h2>
+    </MotionReveal>
+
+    <PaperCard as="section" variant="glass" padded="md" lift={false}>
+      <ul role="list" class="contact-details__list">
+        <li>{t.contactPage.bullet1}</li>
+        <li>{t.contactPage.bullet2}</li>
+        <li>{t.contactPage.bullet3}</li>
+      </ul>
+    </PaperCard>
+  </section>
+
+  <style>
+    .contact-details {
+      margin-top: var(--space-3);
+    }
+
+    .contact-details__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .contact-details__list li {
+      position: relative;
+      padding-left: 1.1rem;
+      color: var(--color-text-body);
+      border-bottom: var(--line-soft);
+      padding-bottom: 0.55rem;
+    }
+
+    .contact-details__list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.63rem;
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: var(--color-accent);
+    }
+  </style>
+</BaseLayout>

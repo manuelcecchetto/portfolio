@@ -1,0 +1,10 @@
+---
+import ContactPage from "../contact.astro";
+import { getNonDefaultLocaleStaticPaths } from "../../lib/locale-static-paths";
+
+export function getStaticPaths() {
+  return getNonDefaultLocaleStaticPaths();
+}
+---
+
+<ContactPage />

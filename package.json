@@ -1,0 +1,27 @@
+{
+  "name": "manuelcecchetto.it",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "typecheck": "astro check",
+    "quality:test": "node scripts/verify-quality-gate.mjs",
+    "quality:gate": "npm run check && npm run typecheck && npm run build && npm run quality:test",
+    "ci:quality": "npm run quality:gate"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/rss": "^4.0.15",
+    "@astrojs/sitemap": "^3.7.0",
+    "astro": "5.18.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "typescript": "^5.9.2"
+  }
+}

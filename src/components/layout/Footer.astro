@@ -1,0 +1,22 @@
+---
+import { getCopy, type SiteLocale } from "../../lib/i18n";
+
+export interface Props {
+  locale: SiteLocale;
+}
+
+const { locale } = Astro.props;
+const t = getCopy(locale);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-shell site-footer__inner">
+    <p class="site-footer__copy">© {year} Manuel Cecchetto. {t.footer.craftedWith}</p>
+    <div class="site-footer__links">
+      <a href="mailto:manuel.cecchetto@gmail.com">{t.footer.email}</a>
+      <a href="https://github.com/manuelcecchetto">{t.footer.github}</a>
+      <a href="https://www.linkedin.com/in/manuelcecchetto">{t.footer.linkedin}</a>
+    </div>
+  </div>
+</footer>

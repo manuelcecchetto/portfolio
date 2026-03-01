@@ -1,0 +1,10 @@
+---
+import BlogIndexPage from "../../blog/index.astro";
+import { getNonDefaultLocaleStaticPaths } from "../../../lib/locale-static-paths";
+
+export function getStaticPaths() {
+  return getNonDefaultLocaleStaticPaths();
+}
+---
+
+<BlogIndexPage />

@@ -1,0 +1,10 @@
+---
+import AboutPage from "../about.astro";
+import { getNonDefaultLocaleStaticPaths } from "../../lib/locale-static-paths";
+
+export function getStaticPaths() {
+  return getNonDefaultLocaleStaticPaths();
+}
+---
+
+<AboutPage />

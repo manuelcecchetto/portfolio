@@ -1,0 +1,19 @@
+---
+export interface Props {
+  as?: "div" | "section" | "ul";
+  class?: string;
+  step?: number;
+}
+
+const {
+  as: Tag = "div",
+  class: className = "",
+  step = 90
+} = Astro.props;
+
+const stepStyle = `--stagger-step: ${Math.max(step, 0)}ms;`;
+---
+
+<Tag class:list={["motion-stagger", className]} style={stepStyle}>
+  <slot />
+</Tag>

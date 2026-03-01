@@ -1,0 +1,85 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import PaperCard from "../../ui/PaperCard.astro";
+import PaperDeck from "../../ui/PaperDeck.astro";
+import ImagePlaceholder from "../../ui/ImagePlaceholder.astro";
+import { getCopy, resolveLocale } from "../../../lib/i18n";
+
+export interface Props {
+  email: string;
+  github: string;
+  linkedin: string;
+  availability: string;
+  timezone: string;
+}
+
+const { email, github, linkedin, availability, timezone } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<section class="stack contact-channels" aria-labelledby="contact-actions-title">
+  <MotionReveal as="div" kind="slide-in" delay={100}>
+    <h2 id="contact-actions-title">{t.contactChannels.title}</h2>
+    <p class="text-muted">{t.contactChannels.intro}</p>
+  </MotionReveal>
+
+  <PaperDeck>
+    <PaperCard as="section" variant="outline" padded="lg">
+      <p class="contact-channels__label">{t.contactChannels.primaryLabel}</p>
+      <h3>{t.contactChannels.primaryTitle}</h3>
+      <p>{t.contactChannels.primaryText}</p>
+      <a class="cta cta--primary contact-channels__primary-cta" href={`mailto:${email}`}>{t.contactChannels.primaryCtaPrefix} {email}</a>
+    </PaperCard>
+
+    <PaperCard as="section" variant="default" padded="lg">
+      <p class="contact-channels__label">{t.contactChannels.secondaryLabel}</p>
+      <h3>{t.contactChannels.secondaryTitle}</h3>
+      <div class="contact-channels__links">
+        <a class="cta cta--secondary" href={linkedin}>{t.contactChannels.secondaryLinkedin}</a>
+        <a class="cta cta--ghost" href={github}>{t.contactChannels.secondaryGithub}</a>
+      </div>
+      <p class="contact-channels__meta">{availability}</p>
+      <p class="contact-channels__meta">{t.common.timezonePrefix}: {timezone}</p>
+      <ImagePlaceholder class="contact-channels__placeholder" label="Meeting Snapshot Placeholder" hint="Team or conference photo" ratio="wide" />
+    </PaperCard>
+  </PaperDeck>
+</section>
+
+<style>
+  .contact-channels {
+    margin-top: var(--space-3);
+  }
+
+  .contact-channels__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+  }
+
+  .contact-channels__primary-cta {
+    margin-top: var(--space-5);
+    width: fit-content;
+  }
+
+  .contact-channels__links {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .contact-channels__meta {
+    margin-top: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: 0.84rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .contact-channels__placeholder {
+    margin-top: var(--space-5);
+  }
+</style>

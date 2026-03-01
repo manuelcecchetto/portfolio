@@ -1,0 +1,177 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import ImagePlaceholder from "../../ui/ImagePlaceholder.astro";
+import { getCopy, localizePath, resolveLocale } from "../../../lib/i18n";
+
+interface HighlightItem {
+  title: string;
+  href: string;
+  meta: string;
+}
+
+export interface Props {
+  headline: string;
+  summary: string;
+  location: string;
+  availability: string;
+  highlights: HighlightItem[];
+}
+
+const { headline, summary, location, availability, highlights = [] } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<MotionReveal as="section" kind="soft-zoom" class="page-hero home-hero">
+  <span class="eyebrow">{t.homeHero.eyebrow}</span>
+
+  <div class="home-hero__layout">
+    <div class="home-hero__content stack">
+      <h1>
+        {t.homeHero.titlePrefix} <span class="home-hero__highlight">{t.homeHero.titleHighlight}</span><br />
+        {t.homeHero.titleSuffix}
+      </h1>
+
+      <p>{summary}</p>
+
+      <p class="home-hero__headline">{headline}</p>
+
+      <div class="home-hero__meta" role="list" aria-label={t.homeHero.snapshotAria}>
+        <span class="pill" role="listitem">{location}</span>
+        <span class="pill" role="listitem">{availability}</span>
+      </div>
+
+      <div class="home-hero__actions">
+        <a class="cta cta--primary" href={localizePath(locale, "/contact")}>{t.homeHero.ctaPrimary}</a>
+        <a class="cta cta--secondary" href={localizePath(locale, "/projects")}>{t.homeHero.ctaSecondary}</a>
+      </div>
+
+      {
+        highlights.length > 0 && (
+          <ul class="home-hero__highlights" role="list" aria-label={t.homeHero.highlightsAria}>
+            {highlights.map((item) => (
+              <li>
+                <a href={item.href}>
+                  <strong>{item.title}</strong>
+                  <span>{item.meta}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    <div class="home-hero__visual">
+      <ImagePlaceholder label="Portrait Placeholder" hint="Professional profile image" ratio="portrait" />
+      <ImagePlaceholder label="Architecture Diagram Placeholder" hint="LLM + data-flow visual" ratio="wide" />
+    </div>
+  </div>
+</MotionReveal>
+
+<style>
+  .home-hero {
+    gap: var(--space-5);
+  }
+
+  .home-hero__layout {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr);
+    align-items: start;
+  }
+
+  .home-hero__content {
+    gap: var(--space-5);
+  }
+
+  .home-hero h1 {
+    max-width: 15ch;
+  }
+
+  .home-hero__highlight {
+    color: var(--color-accent);
+  }
+
+  .home-hero__headline {
+    max-width: fit-content;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    padding: 0.45rem 0.76rem;
+    background: hsl(0 0% 100% / 0.72);
+    color: var(--color-text-strong);
+  }
+
+  .home-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .home-hero__highlights {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-2);
+    border-top: var(--line-soft);
+    padding-top: var(--space-4);
+  }
+
+  .home-hero__highlights a {
+    display: grid;
+    gap: 0.2rem;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    padding: 0.5rem 0.65rem;
+    transition:
+      border-color var(--duration-fast) var(--ease-out-soft),
+      background-color var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .home-hero__highlights a:hover {
+    border-color: var(--color-border-soft);
+    background: hsl(0 0% 100% / 0.65);
+  }
+
+  .home-hero__highlights strong {
+    color: var(--color-text-strong);
+    font-size: 1rem;
+    font-family: var(--font-display);
+  }
+
+  .home-hero__highlights span {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .home-hero__visual {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  @media (max-width: 56rem) {
+    .home-hero__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .home-hero h1 {
+      max-width: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,101 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import PaperCard from "../../ui/PaperCard.astro";
+import PaperDeck from "../../ui/PaperDeck.astro";
+import { getCopy, localizePath, resolveLocale } from "../../../lib/i18n";
+
+export interface Props {
+  projectCount: number;
+  publishedPostCount: number;
+  latestProjectTitle?: string;
+  latestBlogTitle?: string;
+}
+
+const {
+  projectCount,
+  publishedPostCount,
+  latestProjectTitle = "Work showcase in progress",
+  latestBlogTitle = "Writing archive in progress"
+} = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<section class="stack home-highlights" aria-labelledby="home-highlights-title">
+  <MotionReveal as="div" kind="slide-in" delay={120}>
+    <span class="eyebrow">{t.homeHighlights.eyebrow}</span>
+    <h2 id="home-highlights-title">{t.homeHighlights.title}</h2>
+  </MotionReveal>
+
+  <PaperDeck>
+    <PaperCard as="section" padded="md" variant="default">
+      <p class="metric-label">{t.homeHighlights.publishedProjects}</p>
+      <p class="metric-value">{projectCount}</p>
+      <p class="metric-note">{t.common.latestPrefix}: {latestProjectTitle}</p>
+      <a class="metric-link" href={localizePath(locale, "/projects")}>{t.homeHighlights.openProjectsIndex}</a>
+    </PaperCard>
+
+    <PaperCard as="section" padded="md" variant="default">
+      <p class="metric-label">{t.homeHighlights.publishedArticles}</p>
+      <p class="metric-value">{publishedPostCount}</p>
+      <p class="metric-note">{t.common.latestPrefix}: {latestBlogTitle}</p>
+      <a class="metric-link" href={localizePath(locale, "/blog")}>{t.homeHighlights.openBlogIndex}</a>
+    </PaperCard>
+
+    <PaperCard as="section" padded="md" variant="outline">
+      <p class="metric-label">{t.homeHighlights.collaborationFlow}</p>
+      <p class="metric-value metric-value--small">{t.homeHighlights.collaborationFlowValue}</p>
+      <p class="metric-note">{t.homeHighlights.collaborationFlowNote}</p>
+      <a class="metric-link" href={localizePath(locale, "/about")}>{t.homeHighlights.readFullApproach}</a>
+    </PaperCard>
+  </PaperDeck>
+</section>
+
+<style>
+  .home-highlights {
+    margin-top: var(--space-4);
+  }
+
+  .metric-label {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+  }
+
+  .metric-value {
+    margin-top: var(--space-3);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    color: var(--color-text-strong);
+  }
+
+  .metric-value--small {
+    font-size: clamp(1.25rem, 2.8vw, 1.9rem);
+    line-height: 1.2;
+  }
+
+  .metric-note {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .metric-link {
+    margin-top: var(--space-5);
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-strong);
+  }
+
+  .metric-link:hover {
+    color: var(--color-accent);
+  }
+</style>

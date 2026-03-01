@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# Astro build/cache output
+dist/
+.astro/
+
+# Cloudflare/Wrangler local state
+.wrangler/
+
+# environment files
+.env
+.env.*
+!.env.example
+
+# local overrides and caches
+*.local
+*.tsbuildinfo
+coverage/
+.nyc_output/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editors and OS files
+.DS_Store
+.idea/
+.vscode/

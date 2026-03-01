@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import MotionReveal from "../components/ui/MotionReveal.astro";
+import PaperCard from "../components/ui/PaperCard.astro";
+import AboutHero from "../components/pages/about/AboutHero.astro";
+import AboutNarrative from "../components/pages/about/AboutNarrative.astro";
+import profile from "../data/profile.json";
+import { getCopy, localizePath, resolveLocale } from "../lib/i18n";
+
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<BaseLayout
+  title={t.seo.aboutTitle}
+  description={t.seo.aboutDescription}
+>
+  <AboutHero slot="hero" aboutShort={t.profile.aboutShort} location={t.profile.location} timezone={profile.timezone} />
+
+  <AboutNarrative
+    aboutLong={t.profile.aboutLong}
+    focusAreas={t.profile.focusAreas}
+    availability={t.profile.availability}
+  />
+
+  <section class="stack about-cta" aria-labelledby="about-cta-title">
+    <MotionReveal as="div" kind="slide-in" delay={130}>
+      <h2 id="about-cta-title">{t.aboutPage.ctaTitle}</h2>
+      <p class="text-muted">{t.aboutPage.ctaText}</p>
+    </MotionReveal>
+
+    <PaperCard as="section" variant="outline" padded="md">
+      <p>
+        {t.profile.availability}
+      </p>
+      <a class="about-cta__link" href={localizePath(locale, "/contact")}>{t.aboutPage.ctaLink}</a>
+    </PaperCard>
+  </section>
+
+  <style>
+    .about-cta {
+      margin-top: var(--space-3);
+    }
+
+    .about-cta__link {
+      margin-top: var(--space-5);
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      font-size: 0.73rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--color-text-strong);
+    }
+
+    .about-cta__link:hover {
+      color: var(--color-accent);
+    }
+  </style>
+</BaseLayout>

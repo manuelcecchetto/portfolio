@@ -1,0 +1,48 @@
+---
+import ImagePlaceholder from "../ui/ImagePlaceholder.astro";
+
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props as Props;
+---
+
+<figure class="prose-figure">
+  {
+    src ? (
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    ) : (
+      <ImagePlaceholder label={alt} hint="Inline figure placeholder" ratio="wide" />
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .prose-figure {
+    margin: var(--space-6) 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .prose-figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-md);
+    border: var(--line-soft);
+    box-shadow: var(--shadow-soft);
+    background: hsl(0 0% 100% / 0.78);
+  }
+
+  .prose-figure figcaption {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+</style>

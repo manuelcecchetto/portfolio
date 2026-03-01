@@ -1,0 +1,53 @@
+---
+interface Props {
+  title?: string;
+  tone?: "warm" | "cool" | "caution";
+}
+
+const { title = "Note", tone = "warm" } = Astro.props as Props;
+---
+
+<aside class={`prose-callout prose-callout--${tone}`} aria-label={title}>
+  <p class="prose-callout__title">{title}</p>
+  <div class="prose-callout__body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .prose-callout {
+    margin-block: var(--space-5);
+    border-radius: var(--radius-md);
+    border: var(--line-soft);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-soft), var(--shadow-inset);
+  }
+
+  .prose-callout__title {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--color-text-strong);
+    margin-bottom: var(--space-2);
+  }
+
+  .prose-callout__body :global(p + p) {
+    margin-top: var(--space-2);
+  }
+
+  .prose-callout--warm {
+    background: linear-gradient(145deg, hsl(0 0% 100% / 0.94), hsl(210 20% 95% / 0.82));
+  }
+
+  .prose-callout--cool {
+    border-color: hsl(206 44% 60% / 0.38);
+    background: linear-gradient(145deg, hsl(204 76% 98% / 0.92), hsl(198 56% 93% / 0.86));
+  }
+
+  .prose-callout--caution {
+    border-color: hsl(35 80% 46% / 0.35);
+    background: linear-gradient(145deg, hsl(48 100% 98% / 0.96), hsl(46 82% 92% / 0.9));
+  }
+</style>

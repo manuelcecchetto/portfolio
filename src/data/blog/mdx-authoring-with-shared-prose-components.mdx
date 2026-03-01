@@ -1,0 +1,49 @@
+---
+title: "MDX Authoring With Shared Prose Components"
+slug: "mdx-authoring-with-shared-prose-components"
+locale: "en"
+translationGroup: "blog:mdx-authoring-with-shared-prose-components"
+summary: "A practical pattern for mixing editorial writing with reusable callouts, figure blocks, and structured code notes."
+publishedAt: 2026-02-28
+tags:
+  - MDX
+  - Astro
+  - Editorial Workflow
+coverImage: "/images/blog/mdx-authoring-workflow.svg"
+draft: false
+readingTimeMinutes: 7
+---
+
+MDX becomes most useful when writing teams can stay in narrative flow while still
+dropping in reusable visual components with predictable styling.
+
+<Callout title="When to reach for MDX" tone="cool">
+  Use MDX for long-form posts that need explanatory components. Keep simpler updates
+  as plain Markdown to preserve writing speed.
+</Callout>
+
+Instead of hard-coding a one-off image style in every article, a shared figure
+component keeps rhythm and caption treatment consistent.
+
+<ImageFigure
+  src="/images/blog/mdx-authoring-workflow.svg"
+  alt="Notebook page and wireframe cards used to plan reusable prose components."
+  caption="Sample editorial figure rendered through a reusable MDX component."
+/>
+
+The same approach also works for short implementation references.
+
+<CodeNote
+  title="Collection loader pattern"
+  language="ts"
+  code={`const blog = defineCollection({
+  loader: glob({
+    base: "./src/data/blog",
+    pattern: "**/*.{md,mdx}",
+  }),
+  schema: blogEntrySchema,
+});`}
+/>
+
+With this setup, posts stay expressive without fragmenting the visual language of
+the site.

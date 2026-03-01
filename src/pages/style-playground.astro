@@ -1,0 +1,114 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import MotionReveal from "../components/ui/MotionReveal.astro";
+import PaperCard from "../components/ui/PaperCard.astro";
+import PaperDeck from "../components/ui/PaperDeck.astro";
+import StaggerGroup from "../components/ui/StaggerGroup.astro";
+---
+
+<BaseLayout
+  title="Style Playground | manuelcecchetto.it"
+  description="Playground for validating global tokens, card wrappers, and motion primitives."
+>
+  <MotionReveal as="section" kind="soft-zoom" class="page-hero" slot="hero">
+    <span class="eyebrow">Style playground</span>
+    <h1>Global visual primitives in one route.</h1>
+    <p>
+      Use this page to validate token consistency, paper-card variants, and motion behavior across viewport sizes.
+    </p>
+  </MotionReveal>
+
+  <section class="stack section-block">
+    <MotionReveal as="div" kind="slide-in" delay={80}>
+      <h2>Paper Card Wrappers</h2>
+      <p class="text-muted">
+        Same component, different surface modes. Hover cards with lift enabled to check elevation treatment.
+      </p>
+    </MotionReveal>
+
+    <PaperDeck>
+      <PaperCard variant="default" padded="lg">
+        <h3>Default Surface</h3>
+        <p>Balanced translucency and soft borders for narrative or editorial sections.</p>
+      </PaperCard>
+      <PaperCard variant="outline" padded="lg">
+        <h3>Outline Surface</h3>
+        <p>Sharper framing for critical copy, metrics, and hierarchy transitions.</p>
+      </PaperCard>
+      <PaperCard variant="glass" padded="lg">
+        <h3>Glass Surface</h3>
+        <p>Higher atmosphere for spotlight modules while preserving text contrast.</p>
+      </PaperCard>
+    </PaperDeck>
+  </section>
+
+  <section class="stack section-block">
+    <MotionReveal as="div" kind="slide-in" delay={120}>
+      <h2>Motion Primitives</h2>
+      <p class="text-muted">
+        Sequential card reveal driven by `StaggerGroup`; reduced-motion users receive static content with no drift.
+      </p>
+    </MotionReveal>
+
+    <StaggerGroup as="div" class="paper-deck" step={110}>
+      <PaperCard as="section" variant="outline" padded="md" lift={false}>
+        <span class="pill">fade-up</span>
+        <p>Initial opacity and upward translation settle over base duration.</p>
+      </PaperCard>
+      <PaperCard as="section" variant="outline" padded="md" lift={false}>
+        <span class="pill">soft-zoom</span>
+        <p>Scaled entrance variant available through `MotionReveal kind=\"soft-zoom\"`.</p>
+      </PaperCard>
+      <PaperCard as="section" variant="outline" padded="md" lift={false}>
+        <span class="pill">slide-in</span>
+        <p>Horizontal entry pattern for section labels and side content.</p>
+      </PaperCard>
+    </StaggerGroup>
+  </section>
+
+  <section class="stack section-block">
+    <MotionReveal as="div" kind="slide-in" delay={160}>
+      <h2>Token Snapshot</h2>
+    </MotionReveal>
+
+    <div class="token-grid">
+      <PaperCard as="section" padded="sm" lift={false}>
+        <small class="text-muted">Accent</small>
+        <strong class="token-swatch" style="--swatch:hsl(26 90% 42%)">#cc6511</strong>
+      </PaperCard>
+      <PaperCard as="section" padded="sm" lift={false}>
+        <small class="text-muted">Canvas</small>
+        <strong class="token-swatch" style="--swatch:hsl(42 91% 92%)">#fdf1d7</strong>
+      </PaperCard>
+      <PaperCard as="section" padded="sm" lift={false}>
+        <small class="text-muted">Highlight</small>
+        <strong class="token-swatch" style="--swatch:hsl(38 96% 62%)">#fbc645</strong>
+      </PaperCard>
+      <PaperCard as="section" padded="sm" lift={false}>
+        <small class="text-muted">Body text</small>
+        <strong class="token-swatch" style="--swatch:hsl(29 31% 22%)">#4a3627</strong>
+      </PaperCard>
+    </div>
+  </section>
+
+  <style>
+    .section-block {
+      margin-top: var(--space-12);
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+      gap: var(--space-4);
+    }
+
+    .token-swatch {
+      display: block;
+      margin-top: var(--space-2);
+      color: var(--swatch);
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</BaseLayout>

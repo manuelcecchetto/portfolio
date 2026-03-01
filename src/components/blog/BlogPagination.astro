@@ -1,0 +1,64 @@
+---
+import { getCopy, resolveLocale } from "../../lib/i18n";
+
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  previousPageHref: string | undefined;
+  nextPageHref: string | undefined;
+}
+
+const { currentPage, totalPages, previousPageHref, nextPageHref } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+
+if (totalPages < 1) {
+  throw new Error("BlogPagination requires totalPages >= 1.");
+}
+---
+
+<nav class="blog-pagination" aria-label={t.blogPagination.aria}>
+  {previousPageHref ? <a href={previousPageHref}>{t.blogPagination.newerPosts}</a> : <span aria-hidden="true">{t.blogPagination.newerPosts}</span>}
+
+  <p class="blog-pagination__status">{t.blogPagination.pageLabel} {currentPage} / {totalPages}</p>
+
+  {nextPageHref ? <a href={nextPageHref}>{t.blogPagination.olderPosts}</a> : <span aria-hidden="true">{t.blogPagination.olderPosts}</span>}
+</nav>
+
+<style>
+  .blog-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    border-radius: var(--radius-md);
+    border: var(--line-soft);
+    padding: var(--space-3) var(--space-4);
+    background: hsl(0 0% 100% / 0.72);
+    box-shadow: var(--shadow-soft), var(--shadow-inset);
+  }
+
+  .blog-pagination a,
+  .blog-pagination span {
+    font-size: 0.73rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    text-decoration: none;
+    color: var(--color-text-muted);
+  }
+
+  .blog-pagination a {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .blog-pagination__status {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--color-text-muted);
+  }
+</style>

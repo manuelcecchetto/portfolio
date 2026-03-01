@@ -1,0 +1,120 @@
+---
+import MotionReveal from "../../ui/MotionReveal.astro";
+import PaperCard from "../../ui/PaperCard.astro";
+import PaperDeck from "../../ui/PaperDeck.astro";
+import ImagePlaceholder from "../../ui/ImagePlaceholder.astro";
+import { getCopy, resolveLocale } from "../../../lib/i18n";
+
+export interface Props {
+  aboutLong: string;
+  focusAreas: string[];
+  availability: string;
+}
+
+const { aboutLong, focusAreas = [], availability } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+---
+
+<section class="stack about-narrative" aria-labelledby="about-narrative-title">
+  <MotionReveal as="div" kind="slide-in" delay={90}>
+    <h2 id="about-narrative-title">{t.aboutNarrative.title}</h2>
+    <p class="text-muted">{t.aboutNarrative.subtitle}</p>
+  </MotionReveal>
+
+  <PaperCard as="article" variant="outline" padded="lg">
+    <p>{aboutLong}</p>
+    <ImagePlaceholder class="about-narrative__placeholder" label="Delivery Timeline Placeholder" hint="Roadmap snapshot or milestone board" ratio="wide" />
+  </PaperCard>
+
+  <PaperDeck>
+    <PaperCard as="section" variant="default" padded="md">
+      <h3>{t.aboutNarrative.focusAreas}</h3>
+      <ul class="about-narrative__list" role="list">
+        {focusAreas.map((area) => (
+          <li>{area}</li>
+        ))}
+      </ul>
+    </PaperCard>
+
+    <PaperCard as="section" variant="glass" padded="md">
+      <h3>{t.aboutNarrative.operatingPrinciples}</h3>
+      <ol class="about-narrative__timeline" aria-label={t.aboutNarrative.workingPrinciplesAria}>
+        <li>
+          <strong>{t.aboutNarrative.principle1Title}</strong>
+          <span>{t.aboutNarrative.principle1Text}</span>
+        </li>
+        <li>
+          <strong>{t.aboutNarrative.principle2Title}</strong>
+          <span>{t.aboutNarrative.principle2Text}</span>
+        </li>
+        <li>
+          <strong>{t.aboutNarrative.principle3Title}</strong>
+          <span>{t.aboutNarrative.principle3Text}</span>
+        </li>
+      </ol>
+      <p class="about-narrative__availability">{availability}</p>
+    </PaperCard>
+  </PaperDeck>
+</section>
+
+<style>
+  .about-narrative {
+    margin-top: var(--space-3);
+  }
+
+  .about-narrative__placeholder {
+    margin-top: var(--space-6);
+  }
+
+  .about-narrative__list {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .about-narrative__list li {
+    border-bottom: var(--line-soft);
+    padding-bottom: var(--space-2);
+    color: var(--color-text-body);
+  }
+
+  .about-narrative__timeline {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .about-narrative__timeline li {
+    display: grid;
+    gap: 0.3rem;
+    padding-left: var(--space-4);
+    border-left: 2px solid hsl(206 72% 58% / 0.55);
+  }
+
+  .about-narrative__timeline strong {
+    font-size: 0.93rem;
+    color: var(--color-text-strong);
+    letter-spacing: 0.01em;
+  }
+
+  .about-narrative__timeline span {
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+  }
+
+  .about-narrative__availability {
+    margin-top: var(--space-5);
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    border-top: var(--line-soft);
+    padding-top: var(--space-4);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+</style>

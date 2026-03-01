@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import MotionReveal from "../../../components/ui/MotionReveal.astro";
+import StaggerGroup from "../../../components/ui/StaggerGroup.astro";
+import BlogCard from "../../../components/blog/BlogCard.astro";
+import BlogPagination from "../../../components/blog/BlogPagination.astro";
+import { BLOG_PAGE_SIZE, getLocalizedBlogPosts, paginateEntries } from "../../../lib/content";
+import { DEFAULT_LOCALE, getCopy, localizePath, resolveLocale } from "../../../lib/i18n";
+
+export async function getStaticPaths() {
+  const posts = await getLocalizedBlogPosts(DEFAULT_LOCALE, { includeDrafts: !import.meta.env.PROD });
+  const totalPages = Math.max(1, Math.ceil(posts.length / BLOG_PAGE_SIZE));
+
+  if (totalPages <= 1) {
+    return [];
+  }
+
+  return Array.from({ length: totalPages - 1 }, (_, index) => {
+    const page = index + 2;
+    return {
+      params: { page: String(page) },
+      props: { page },
+    };
+  });
+}
+
+const locale = resolveLocale(Astro.currentLocale);
+interface Props {
+  page: number;
+}
+
+const { page: pageFromProps } = Astro.props as Props;
+const currentPage = pageFromProps ?? Number(Astro.params.page);
+if (!Number.isFinite(currentPage)) {
+  throw new Error(`Invalid blog page param: ${Astro.params.page ?? "undefined"}`);
+}
+const posts = await getLocalizedBlogPosts(locale);
+const pagination = paginateEntries(posts, currentPage, BLOG_PAGE_SIZE, "/blog", locale);
+const t = getCopy(locale);
+---
+
+<BaseLayout
+  title={`${t.seo.blogArchivePageLabel} ${pagination.page} | Manuel Cecchetto`}
+  description={`${t.seo.blogArchivePageLabel} ${pagination.page} / ${pagination.totalPages}.`}
+>
+  <MotionReveal as="section" kind="soft-zoom" class="page-hero blog-page-hero" slot="hero">
+    <a class="blog-page-hero__back" href={localizePath(locale, "/blog")}>{t.blogArchivePage.backToLatest}</a>
+    <span class="eyebrow">{t.blogArchivePage.eyebrow}</span>
+    <h1>{t.blogArchivePage.titlePrefix} {pagination.page}</h1>
+    <p>{t.blogArchivePage.subtitle.replace("{count}", String(BLOG_PAGE_SIZE))}</p>
+  </MotionReveal>
+
+  <section class="stack blog-page-list" aria-labelledby="blog-page-list-title">
+    <MotionReveal as="div" kind="slide-in" delay={100}>
+      <h2 id="blog-page-list-title">{t.blogArchivePage.postsOnPageTitle}</h2>
+    </MotionReveal>
+
+    <StaggerGroup as="ul" class="blog-page-list__grid" step={80}>
+      {pagination.items.map((post) => (
+        <li>
+          <BlogCard post={post} />
+        </li>
+      ))}
+    </StaggerGroup>
+
+    <BlogPagination
+      currentPage={pagination.page}
+      totalPages={pagination.totalPages}
+      previousPageHref={pagination.previousPageHref}
+      nextPageHref={pagination.nextPageHref}
+    />
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-page-hero__back {
+    width: fit-content;
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-strong);
+  }
+
+  .blog-page-hero__back::before {
+    content: "<-";
+    margin-right: 0.45rem;
+    color: var(--color-accent);
+  }
+
+  .blog-page-list {
+    margin-top: var(--space-4);
+  }
+
+  .blog-page-list__grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+</style>

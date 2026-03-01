@@ -1,0 +1,165 @@
+---
+import PaperCard from "../ui/PaperCard.astro";
+import type { ProjectEntry } from "../../lib/content";
+import { getCopy, localizePath, resolveLocale, toIntlLocale } from "../../lib/i18n";
+
+export interface Props {
+  project: ProjectEntry;
+}
+
+const { project } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getCopy(locale);
+
+const dateFormatter = new Intl.DateTimeFormat(toIntlLocale(locale), {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
+const publishedLabel = dateFormatter.format(project.data.publishedAt);
+const updatedLabel = project.data.updatedAt ? dateFormatter.format(project.data.updatedAt) : t.common.notProvided;
+const tags = project.data.tags.length > 0 ? project.data.tags : ["case-study"];
+const routeLabel = localizePath(locale, `/projects/${project.data.slug}/`);
+---
+
+<PaperCard as="aside" variant="glass" padded="md" class="project-details-panel">
+  <h2 class="project-details-panel__title">{t.projectDetailsPanel.title}</h2>
+
+  <dl class="project-details-panel__list">
+    <div>
+      <dt>{t.common.publishedPrefix}</dt>
+      <dd>{publishedLabel}</dd>
+    </div>
+    <div>
+      <dt>{t.projectDetailsPanel.lastUpdate}</dt>
+      <dd>{updatedLabel}</dd>
+    </div>
+    <div>
+      <dt>{t.projectDetailsPanel.route}</dt>
+      <dd>
+        <code>{routeLabel}</code>
+      </dd>
+    </div>
+  </dl>
+
+  <div class="project-details-panel__group">
+    <h3>{t.projectDetailsPanel.stackAndThemes}</h3>
+    <ul class="project-details-panel__tags" role="list">
+      {tags.map((tag) => (
+        <li>{tag}</li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="project-details-panel__group">
+    <h3>{t.projectDetailsPanel.externalLinks}</h3>
+    <div class="project-details-panel__links">
+      {project.data.repositoryUrl && (
+        <a href={project.data.repositoryUrl} target="_blank" rel="noreferrer">
+          {t.projectDetailsPanel.viewRepository}
+        </a>
+      )}
+      {project.data.demoUrl && (
+        <a href={project.data.demoUrl} target="_blank" rel="noreferrer">
+          {t.projectDetailsPanel.openLiveDemo}
+        </a>
+      )}
+      {!project.data.repositoryUrl && !project.data.demoUrl && (
+        <p class="text-muted">{t.projectDetailsPanel.noExternalLinks}</p>
+      )}
+    </div>
+  </div>
+</PaperCard>
+
+<style>
+  .project-details-panel {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .project-details-panel__title {
+    font-size: 1.25rem;
+  }
+
+  .project-details-panel__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .project-details-panel__list div {
+    border-bottom: var(--line-soft);
+    padding-bottom: var(--space-2);
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .project-details-panel__list dt {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .project-details-panel__list dd {
+    margin: 0;
+    color: var(--color-text-body);
+    font-size: 0.95rem;
+  }
+
+  .project-details-panel__list code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+  }
+
+  .project-details-panel__group {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .project-details-panel__group h3 {
+    font-size: 1.05rem;
+  }
+
+  .project-details-panel__tags {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .project-details-panel__tags li {
+    border-radius: var(--radius-pill);
+    border: var(--line-soft);
+    background: hsl(0 0% 100% / 0.76);
+    padding: 0.26rem 0.58rem;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+
+  .project-details-panel__links {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .project-details-panel__links a {
+    width: fit-content;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--color-text-strong);
+  }
+
+  .project-details-panel__links a:hover {
+    color: var(--color-accent);
+  }
+</style>

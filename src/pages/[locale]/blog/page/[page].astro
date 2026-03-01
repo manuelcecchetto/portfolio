@@ -1,0 +1,19 @@
+---
+import BlogArchivePage, { getStaticPaths as getDefaultArchivePaths } from "../../../blog/page/[page].astro";
+import { NON_DEFAULT_LOCALES } from "../../../../lib/i18n";
+
+export async function getStaticPaths() {
+  const basePaths = await getDefaultArchivePaths();
+  return NON_DEFAULT_LOCALES.flatMap((locale) =>
+    basePaths.map((entry) => ({
+      params: {
+        ...entry.params,
+        locale,
+      },
+      props: entry.props,
+    })),
+  );
+}
+---
+
+<BlogArchivePage {...Astro.props} />

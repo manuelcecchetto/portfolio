@@ -1,0 +1,21 @@
+---
+export interface Props {
+  as?: "div" | "section" | "article";
+  kind?: "fade-up" | "soft-zoom" | "slide-in";
+  delay?: number;
+  class?: string;
+}
+
+const {
+  as: Tag = "div",
+  kind = "fade-up",
+  delay = 0,
+  class: className = ""
+} = Astro.props;
+
+const delayStyle = `--motion-delay: ${Math.max(delay, 0)}ms;`;
+---
+
+<Tag class:list={["motion-reveal", `motion-reveal--${kind}`, className]} style={delayStyle}>
+  <slot />
+</Tag>

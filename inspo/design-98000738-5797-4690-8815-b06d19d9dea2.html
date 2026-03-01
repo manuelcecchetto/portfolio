@@ -1,0 +1,275 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">Oddity — The Gravity Sorter</title>
+    <style vid="5">
+        :root {
+            --bg-bone: #EAE8E4;
+            --ink-black: #111111;
+            --stroke-width: 1.5px;
+            --spacing-unit: 8px;
+            --font-main: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-bone);
+            color: var(--ink-black);
+            font-family: var(--font-main);
+            width: 400px;
+            height: 867px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--bg-bone);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--ink-black);
+        }
+
+        .nav-link {
+            font-size: 1rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--ink-black);
+        }
+
+        main {
+            padding: 24px;
+            padding-top: 20px;
+        }
+
+        .project-title {
+            font-size: 3.5rem;
+            line-height: 0.95;
+            font-weight: 500;
+            margin-bottom: 32px;
+            letter-spacing: -0.04em;
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 320px;
+            border: var(--stroke-width) solid var(--ink-black);
+            margin-bottom: 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .preview-interaction {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+        }
+
+        .preview-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--ink-black);
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .preview-box:hover .preview-dot {
+            transform: translateY(40px) rotate(45deg);
+        }
+
+        .absurdist-desc {
+            font-size: 1.35rem;
+            line-height: 1.3;
+            margin-bottom: 40px;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.6;
+        }
+
+        .process-notes {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 48px;
+            padding-left: 16px;
+            border-left: 1px solid var(--ink-black);
+        }
+
+        .cta-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: var(--stroke-width) solid var(--ink-black);
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--ink-black);
+            color: var(--bg-bone);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--ink-black);
+        }
+
+        .btn:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 4px 4px 0px var(--ink-black);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 4px 4px 0px rgba(17,17,17,0.3);
+        }
+
+        .doodle-path {
+            fill: none;
+            stroke: var(--ink-black);
+            stroke-width: var(--stroke-width);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(5px, -10px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .floating-scribble {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body vid="6">
+    <header vid="7">
+        <a href="#" class="logo" vid="8">oddity.</a>
+        <a href="#" class="nav-link" vid="9">Index</a>
+    </header>
+
+    <main vid="10">
+        <h1 class="project-title" vid="11">The<br vid="12">Gravity<br vid="13">Sorter</h1>
+        
+        <div class="preview-box" vid="14">
+            <div class="preview-interaction" vid="15">
+                
+                <div style="display:flex; align-items:center; justify-content:center;" vid="16"><div class="preview-dot" vid="17"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="18"><div class="preview-dot" vid="19"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="20"><div class="preview-dot" vid="21"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="22"><div class="preview-dot" vid="23"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="24"><div class="preview-dot" vid="25"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="26"><div class="preview-dot" vid="27"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="28"><div class="preview-dot" vid="29"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="30"><div class="preview-dot" vid="31"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="32"><div class="preview-dot" vid="33"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="34"><div class="preview-dot" vid="35"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="36"><div class="preview-dot" vid="37"></div></div>
+                <div style="display:flex; align-items:center; justify-content:center;" vid="38"><div class="preview-dot" vid="39"></div></div>
+            </div>
+            <svg class="doodle-path" width="100" height="100" viewBox="0 0 100 100" vid="40">
+                <path d="M20,80 Q50,20 80,80" vid="41"></path>
+                <path d="M30,80 L70,80" vid="42"></path>
+                <circle cx="50" cy="45" r="5" vid="43"></circle>
+            </svg>
+        </div>
+
+        <div class="absurdist-desc" vid="44">
+            A machine for organizing shadows by weight. It functions only when the observer refuses to look directly at it. If a shadow escapes, it must be bribed back with static.
+        </div>
+
+        <span class="section-label" vid="45">Process Notes</span>
+        <div class="process-notes" vid="46">
+            Built using discarded physics engines and a collection of 404 errors. We found that gravity is more of a suggestion than a rule when you code in the dark. The primary challenge was preventing the buttons from feeling too much like buttons.
+        </div>
+
+        <div class="cta-container" vid="47">
+            <a href="#" class="btn btn-primary" vid="48">Play</a>
+            <a href="#" class="btn btn-secondary" vid="49">Break It</a>
+        </div>
+
+        <div style="position: relative; height: 100px;" vid="50">
+            <div class="floating-scribble" style="top: 10px; right: 40px;" vid="51">
+                <svg viewBox="0 0 40 40" class="doodle-path" vid="52">
+                    <path d="M5,20 C5,5 35,5 35,20 C35,35 5,35 5,20" vid="53"></path>
+                    <path d="M15,20 L25,20" vid="54"></path>
+                </svg>
+            </div>
+        </div>
+    </main>
+
+    <script vid="55">
+        
+        const box = document.querySelector('.preview-box');
+        const dots = document.querySelectorAll('.preview-dot');
+        
+        box.addEventListener('mousemove', (e) => {
+            const rect = box.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            dots.forEach(dot => {
+                const dotRect = dot.getBoundingClientRect();
+                const dx = x - (dotRect.left - rect.left + dotRect.width/2);
+                const dy = y - (dotRect.top - rect.top + dotRect.height/2);
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if(dist < 80) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (80 - dist) / 5;
+                    dot.style.transform = `translate(${Math.cos(angle) * force}px, ${Math.sin(angle) * force}px)`;
+                } else {
+                    dot.style.transform = 'translate(0,0)';
+                }
+            });
+        });
+
+        box.addEventListener('mouseleave', () => {
+            dots.forEach(dot => dot.style.transform = 'translate(0,0)');
+        });
+    </script>
+</body></html>

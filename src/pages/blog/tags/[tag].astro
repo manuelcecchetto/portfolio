@@ -1,0 +1,128 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import MotionReveal from "../../../components/ui/MotionReveal.astro";
+import StaggerGroup from "../../../components/ui/StaggerGroup.astro";
+import BlogCard from "../../../components/blog/BlogCard.astro";
+import { getBlogTagSummaries, getLocalizedBlogPosts, type BlogEntry } from "../../../lib/content";
+import { DEFAULT_LOCALE, getCopy, localizePath, resolveLocale } from "../../../lib/i18n";
+
+export async function getStaticPaths() {
+  const posts = await getLocalizedBlogPosts(DEFAULT_LOCALE, { includeDrafts: !import.meta.env.PROD });
+  const tags = getBlogTagSummaries(posts, DEFAULT_LOCALE);
+  return tags.map(({ tag }) => ({ params: { tag }, props: { tag } }));
+}
+
+interface Props {
+  tag: string;
+}
+
+const { tag: tagFromProps } = Astro.props as Props;
+const tag = tagFromProps ?? Astro.params.tag;
+const locale = resolveLocale(Astro.currentLocale);
+if (!tag) {
+  throw new Error("Missing blog tag param.");
+}
+
+const allPosts = await getLocalizedBlogPosts(locale);
+const tags = getBlogTagSummaries(allPosts, locale);
+const posts = allPosts.filter((post: BlogEntry) => post.data.tags.includes(tag));
+const t = getCopy(locale);
+const siblingTags = tags.filter((summary) => summary.tag !== tag).slice(0, 8);
+---
+
+<BaseLayout title={`${tag} | ${t.seo.blogTagSuffix}`} description={`${t.blogTagPage.tagPrefix}: ${tag}.`}>
+  <MotionReveal as="section" kind="soft-zoom" class="page-hero blog-tag-hero" slot="hero">
+    <a class="blog-tag-hero__back" href={localizePath(locale, "/blog")}>{t.blogTagPage.backToAll}</a>
+    <span class="eyebrow">{t.blogTagPage.eyebrow}</span>
+    <h1>{t.blogTagPage.tagPrefix}: {tag}</h1>
+    <p>
+      {t.blogTagPage.showingPostsPrefix} {posts.length}{" "}
+      {posts.length === 1 ? t.blogTagPage.showingPostsSuffixSingle : t.blogTagPage.showingPostsSuffixPlural}
+    </p>
+
+    {
+      siblingTags.length > 0 && (
+        <div class="blog-tag-hero__siblings" role="list" aria-label={t.blogTagPage.relatedTagsAria}>
+          {siblingTags.map((summary) => (
+            <a class="pill" role="listitem" href={localizePath(locale, `/blog/tags/${encodeURIComponent(summary.tag)}/`)}>
+              {summary.tag}
+              <span>{summary.count}</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </MotionReveal>
+
+  {posts.length === 0 ? (
+    <p class="text-muted">{t.blogTagPage.noPosts}</p>
+  ) : (
+    <section class="stack blog-tag-list" aria-labelledby="blog-tag-list-title">
+      <MotionReveal as="div" kind="slide-in" delay={100}>
+        <h2 id="blog-tag-list-title">{t.blogTagPage.postsInArchive}</h2>
+      </MotionReveal>
+
+      <StaggerGroup as="ul" class="blog-tag-list__grid" step={80}>
+        {posts.map((post) => (
+          <li>
+            <BlogCard post={post} />
+          </li>
+        ))}
+      </StaggerGroup>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .blog-tag-hero__back {
+    width: fit-content;
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-strong);
+  }
+
+  .blog-tag-hero__back::before {
+    content: "<-";
+    margin-right: 0.45rem;
+    color: var(--color-accent);
+  }
+
+  .blog-tag-hero__siblings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .blog-tag-hero__siblings .pill {
+    gap: 0.45rem;
+  }
+
+  .blog-tag-hero__siblings .pill span {
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-accent-soft);
+    color: var(--color-text-strong);
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    line-height: 1.1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .blog-tag-list {
+    margin-top: var(--space-4);
+  }
+
+  .blog-tag-list__grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+</style>

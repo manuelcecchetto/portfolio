@@ -1,0 +1,204 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MotionReveal from "../../components/ui/MotionReveal.astro";
+import StaggerGroup from "../../components/ui/StaggerGroup.astro";
+import ProjectCard from "../../components/projects/ProjectCard.astro";
+import ProjectDetailsPanel from "../../components/projects/ProjectDetailsPanel.astro";
+import ImagePlaceholder from "../../components/ui/ImagePlaceholder.astro";
+import { getLocalizedProjectBySlug, getLocalizedProjects, getProjectRouteSlugs, type ProjectEntry } from "../../lib/content";
+import { getCopy, localizePath, resolveLocale } from "../../lib/i18n";
+
+export async function getStaticPaths() {
+  const slugs = await getProjectRouteSlugs({ includeDrafts: !import.meta.env.PROD });
+  return slugs.map((slug) => ({ params: { slug }, props: { slug } }));
+}
+
+interface Props {
+  slug: string;
+}
+
+const locale = resolveLocale(Astro.currentLocale);
+const { slug: slugFromProps } = Astro.props as Props;
+const slug = slugFromProps ?? Astro.params.slug;
+if (!slug) {
+  throw new Error("Missing project slug param.");
+}
+
+const project = await getLocalizedProjectBySlug(slug, locale);
+if (!project) {
+  throw new Error(`Unable to resolve localized project for slug '${slug}' in locale '${locale}'.`);
+}
+const relatedProjects = (await getLocalizedProjects(locale)).filter(
+  (entry: ProjectEntry) => entry.data.translationGroup !== project.data.translationGroup,
+).slice(0, 2);
+const { Content } = await render(project);
+const tags = project.data.tags.length > 0 ? project.data.tags : ["case-study"];
+const t = getCopy(locale);
+---
+
+<BaseLayout
+  title={`${project.data.title} | ${t.seo.projectsDetailSuffix}`}
+  description={project.data.summary}
+  ogType="article"
+  image={project.data.coverImage}
+>
+  <MotionReveal as="section" kind="soft-zoom" class="page-hero project-detail-hero" slot="hero">
+    <a class="project-detail-hero__back" href={localizePath(locale, "/projects")}>{t.projectDetail.backToAll}</a>
+    <span class="eyebrow">{t.projectDetail.eyebrow}</span>
+    <h1>{project.data.title}</h1>
+    <p>{project.data.summary}</p>
+
+    <div class="project-detail-hero__tags" role="list" aria-label={t.projectDetail.themesAria}>
+      {tags.map((tag) => (
+        <span class="pill" role="listitem">
+          {tag}
+        </span>
+      ))}
+    </div>
+  </MotionReveal>
+
+  <section class="project-detail-layout">
+    <article class="project-detail-body">
+      {
+        project.data.coverImage ? (
+          <img
+            class="project-detail-body__cover"
+            src={project.data.coverImage}
+            alt={`${t.projectDetail.coverAltPrefix} ${project.data.title}`}
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <ImagePlaceholder label={`${project.data.title} Hero Placeholder`} hint="Project hero screenshot" ratio="wide" />
+        )
+      }
+      <div class="project-detail-content">
+        <Content />
+      </div>
+    </article>
+
+    <ProjectDetailsPanel project={project} />
+  </section>
+
+  {
+    relatedProjects.length > 0 && (
+      <section class="stack project-related" aria-labelledby="project-related-title">
+        <MotionReveal as="div" kind="slide-in" delay={120}>
+          <h2 id="project-related-title">{t.projectDetail.relatedTitle}</h2>
+          <p class="text-muted">{t.projectDetail.relatedText}</p>
+        </MotionReveal>
+
+        <StaggerGroup as="ul" class="project-related__grid" step={90}>
+          {relatedProjects.map((entry) => (
+            <li>
+              <ProjectCard project={entry} />
+            </li>
+          ))}
+        </StaggerGroup>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .project-detail-hero {
+    gap: var(--space-5);
+  }
+
+  .project-detail-hero__back {
+    width: fit-content;
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-strong);
+  }
+
+  .project-detail-hero__back::before {
+    content: "<-";
+    margin-right: 0.45rem;
+    color: var(--color-accent);
+  }
+
+  .project-detail-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .project-detail-layout {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+    align-items: start;
+  }
+
+  .project-detail-body {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .project-detail-body__cover {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background: hsl(0 0% 100% / 0.72);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .project-detail-content {
+    border-radius: var(--radius-lg);
+    border: var(--line-soft);
+    background: var(--color-surface-strong);
+    box-shadow: var(--shadow-soft), var(--shadow-inset);
+    padding: clamp(var(--space-5), 4vw, var(--space-8));
+  }
+
+  .project-detail-content :global(p + p) {
+    margin-top: var(--space-4);
+  }
+
+  .project-detail-content :global(h2),
+  .project-detail-content :global(h3) {
+    margin-top: var(--space-6);
+    line-height: 1.18;
+  }
+
+  .project-detail-content :global(h2) {
+    font-size: clamp(1.5rem, 2.4vw, 2.15rem);
+  }
+
+  .project-detail-content :global(h3) {
+    font-size: clamp(1.16rem, 1.6vw, 1.45rem);
+  }
+
+  .project-detail-content :global(ul),
+  .project-detail-content :global(ol) {
+    margin-top: var(--space-4);
+    padding-left: 1.2rem;
+  }
+
+  .project-related {
+    margin-top: var(--space-5);
+  }
+
+  .project-related__grid {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+
+  @media (max-width: 56rem) {
+    .project-detail-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

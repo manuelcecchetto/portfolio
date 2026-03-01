@@ -1,0 +1,20 @@
+---
+import Nav from "./Nav.astro";
+import { getCopy, localizePath, type SiteLocale } from "../../lib/i18n";
+
+export interface Props {
+  currentPath: string;
+  locale: SiteLocale;
+}
+
+const { currentPath, locale } = Astro.props;
+const t = getCopy(locale);
+---
+
+<header class="site-header">
+  <div class="site-shell site-header__inner">
+    <a class="site-brand" href={localizePath(locale, "/")}>Manuel Cecchetto</a>
+    <p class="site-brand__tagline">{t.header.tagline}</p>
+    <Nav currentPath={currentPath} locale={locale} />
+  </div>
+</header>

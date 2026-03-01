@@ -1,0 +1,24 @@
+{
+  "name": "Manuel Cecchetto",
+  "headline": "AI Orchestrator and AI Engineer",
+  "location": "Italy (remote-first)",
+  "timezone": "Europe/Rome",
+  "aboutShort": "I build AI-native products from concept to production, with a focus on legal-tech workflows, LLM orchestration, and document intelligence.",
+  "aboutLong": "Since 2020, I have worked across startup and product teams from Qlik.me to CASUS. I started in adtech and full-stack delivery, then moved into AI-native legal products. I led work on CASUS Create and CASUS Review, including a stable in-house .docx to JSON parser that replaced Aspose dependencies and still runs in production. Today I ship fast MVPs for contract review and keep ownership from architecture through frontend and workflow reliability.",
+  "focusAreas": [
+    "AI orchestration for legal and document-heavy products",
+    "LLM application architecture from concept to MVP",
+    "OpenXML and .docx extraction and transformation pipelines",
+    "Full-stack product delivery under high constraints",
+    "Evaluation, observability, and operator-ready AI UX"
+  ],
+  "contact": {
+    "email": "manuel.cecchetto@gmail.com",
+    "website": "https://manuelcecchetto.it"
+  },
+  "social": {
+    "github": "https://github.com/manuelcecchetto",
+    "linkedin": "https://www.linkedin.com/in/manuelcecchetto"
+  },
+  "availability": "Open to selected consulting and build engagements for AI-native products."
+}

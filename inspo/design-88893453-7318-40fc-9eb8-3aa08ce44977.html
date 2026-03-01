@@ -1,0 +1,294 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">About — Oddity</title>
+    <style vid="5">
+        :root {
+            --bg-bone: #EAE8E4;
+            --ink-black: #111111;
+            --stroke-width: 1.5px;
+            --spacing-unit: 8px;
+            --font-main: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-bone);
+            color: var(--ink-black);
+            font-family: var(--font-main);
+            width: 400px;
+            height: 867px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            cursor: crosshair;
+            position: relative;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--bg-bone);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--ink-black);
+        }
+
+        .nav-link {
+            font-size: 1rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--ink-black);
+        }
+
+        main {
+            padding: 24px;
+            padding-bottom: 80px;
+        }
+
+        .philosophy-section {
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
+
+        .display-text {
+            font-size: 3.2rem;
+            line-height: 0.95;
+            font-weight: 500;
+            letter-spacing: -0.04em;
+            margin-bottom: 24px;
+        }
+
+        .sub-display {
+            font-size: 1.4rem;
+            line-height: 1.3;
+            max-width: 90%;
+            margin-top: 16px;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 32px;
+            display: block;
+            opacity: 0.6;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .team-member {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .avatar-svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 12px;
+            stroke: var(--ink-black);
+            fill: none;
+            stroke-width: 1.5px;
+        }
+
+        .member-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .member-role {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 40px;
+        }
+
+        .timeline-svg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 30px;
+            stroke: var(--ink-black);
+            fill: none;
+            stroke-width: 1.5px;
+            stroke-dasharray: 4 4;
+        }
+
+        .timeline-event {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .event-year {
+            font-size: 1.8rem;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .event-desc {
+            font-size: 1rem;
+            line-height: 1.4;
+            max-width: 240px;
+        }
+
+        .scribble {
+            position: absolute;
+            pointer-events: none;
+            stroke: var(--ink-black);
+            stroke-width: 1px;
+            fill: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .underline {
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 4px;
+        }
+    </style>
+</head>
+<body vid="6">
+    <header vid="7">
+        <a href="#" class="logo" vid="8">oddity.</a>
+        <a href="#" class="nav-link" vid="9">Close</a>
+    </header>
+
+    <main vid="10">
+        <section class="philosophy-section" vid="11">
+            <span class="section-label" vid="12">Our Core</span>
+            <h1 class="display-text" vid="13">Normal is<br vid="14">an error<br vid="15">state.</h1>
+            <p class="sub-display" vid="16">
+                We believe the most <span class="underline" vid="17">useful</span> things are often disguised as the most <span class="underline" vid="18">useless</span>. 
+                Our studio is a laboratory for digital friction.
+            </p>
+        </section>
+
+        <section vid="19">
+            <span class="section-label" vid="20">The Odd Ones</span>
+            <div class="team-grid" vid="21">
+                <div class="team-member" vid="22">
+                    <svg viewBox="0 0 100 100" class="avatar-svg animate-float" vid="23">
+                        <circle cx="50" cy="45" r="25" vid="24"></circle>
+                        <path d="M35 40 Q40 35 45 40 M55 40 Q60 35 65 40" vid="25"></path>
+                        <path d="M45 55 Q50 60 55 55" vid="26"></path>
+                        <path d="M50 20 Q55 10 65 15" vid="27"></path>
+                    </svg>
+                    <span class="member-name" vid="28">Arlo</span>
+                    <span class="member-role" vid="29">Chief Tinkerer</span>
+                </div>
+                <div class="team-member" vid="30">
+                    <svg viewBox="0 0 100 100" class="avatar-svg animate-float" style="animation-delay: -1s" vid="31">
+                        <rect x="30" y="25" width="40" height="40" rx="4" vid="32"></rect>
+                        <circle cx="42" cy="45" r="2" fill="black" vid="33"></circle>
+                        <circle cx="58" cy="45" r="2" fill="black" vid="34"></circle>
+                        <path d="M45 53 L55 53" vid="35"></path>
+                        <path d="M35 25 L35 15 M65 25 L65 15" vid="36"></path>
+                    </svg>
+                    <span class="member-name" vid="37">Maya</span>
+                    <span class="member-role" vid="38">Chaos Logic</span>
+                </div>
+                <div class="team-member" vid="39">
+                    <svg viewBox="0 0 100 100" class="avatar-svg animate-float" style="animation-delay: -2s" vid="40">
+                        <path d="M30 60 Q50 10 70 60 Z" vid="41"></path>
+                        <circle cx="45" cy="45" r="1.5" fill="black" vid="42"></circle>
+                        <circle cx="55" cy="45" r="1.5" fill="black" vid="43"></circle>
+                        <path d="M48 52 Q50 54 52 52" vid="44"></path>
+                    </svg>
+                    <span class="member-name" vid="45">Puck</span>
+                    <span class="member-role" vid="46">Ghost Designer</span>
+                </div>
+                <div class="team-member" vid="47">
+                    <svg viewBox="0 0 100 100" class="avatar-svg animate-float" style="animation-delay: -0.5s" vid="48">
+                        <circle cx="50" cy="50" r="30" vid="49"></circle>
+                        <path d="M40 45 L45 45 M55 45 L60 45" vid="50"></path>
+                        <path d="M40 60 C45 65 55 65 60 60" vid="51"></path>
+                        <path d="M50 20 L50 10" vid="52"></path>
+                    </svg>
+                    <span class="member-name" vid="53">Sola</span>
+                    <span class="member-role" vid="54">Toy Engineer</span>
+                </div>
+            </div>
+        </section>
+
+        <section vid="55">
+            <span class="section-label" vid="56">The Wrong Path</span>
+            <div class="timeline" vid="57">
+                <svg class="timeline-svg" preserveAspectRatio="none" vid="58">
+                    <path d="M15,0 Q25,100 10,200 T20,400 T5,600" vid="59"></path>
+                </svg>
+                
+                <div class="timeline-event" vid="60">
+                    <span class="event-year" vid="61">2020</span>
+                    <p class="event-desc" vid="62">Founded in a basement with only a broken printer and too much caffeine.</p>
+                </div>
+                
+                <div class="timeline-event" vid="63">
+                    <span class="event-year" vid="64">2021</span>
+                    <p class="event-desc" vid="65">Released "The Button That Does Nothing" — it was downloaded 100k times.</p>
+                    <svg width="40" height="40" class="scribble animate-float" style="right: 20px; top: 0" vid="66">
+                        <circle cx="20" cy="20" r="15" stroke-dasharray="2 2" vid="67"></circle>
+                    </svg>
+                </div>
+
+                <div class="timeline-event" vid="68">
+                    <span class="event-year" vid="69">2023</span>
+                    <p class="event-desc" vid="70">Moved to a studio with windows. Half the team still prefers the basement.</p>
+                </div>
+
+                <div class="timeline-event" vid="71">
+                    <span class="event-year" vid="72">Today</span>
+                    <p class="event-desc" vid="73">Still breaking things. Still making toys. Still Odd.</p>
+                </div>
+            </div>
+        </section>
+
+        <div style="height: 40px;" vid="74"></div>
+        <div class="logo" style="text-align: center; opacity: 0.3;" vid="75">o.</div>
+    </main>
+
+    <script vid="76">
+        
+        document.addEventListener('scroll', () => {
+            const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+            document.querySelector('.timeline-svg path').style.strokeDashoffset = 1000 - (scrollPercent * 1000);
+        });
+    </script>
+
+
+</body></html>
