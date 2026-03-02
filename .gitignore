@@ -8,6 +8,11 @@ dist/
 # Cloudflare/Wrangler local state
 .wrangler/
 
+# ATP local state/locks
+.atp.json
+.atp.json.lock
+*.atp.json.lock
+
 # environment files
 .env
 .env.*
