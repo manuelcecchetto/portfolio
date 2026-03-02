@@ -2,8 +2,11 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 
+import cloudflare from "@astrojs/cloudflare";
+
 export default defineConfig({
   site: "https://manuelcecchetto.it",
+
   i18n: {
     locales: ["en", "it", "de", "fr", "zh", "hi"],
     defaultLocale: "en",
@@ -11,5 +14,7 @@ export default defineConfig({
       prefixDefaultLocale: false,
     },
   },
+
   integrations: [mdx(), sitemap()],
+  adapter: cloudflare(),
 });
