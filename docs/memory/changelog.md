@@ -288,3 +288,13 @@ Chronological log of memory-impacting changes across ATP nodes.
 - Changed Files: `src/content.config.ts`, `evidence/atp-content-qa.md`, `docs/memory/evidence-index.md`, `docs/memory/changelog.md`
 - Summary: executed multilingual readiness validation across required locales, fixed blog collection ID-collision blocker by adding `generateId` to the blog loader, and recorded verification evidence/QA notes.
 - Related Decision/Contract/Risk/Evidence IDs: DEC-012, CON-015, none, EVD-026
+
+### [CHG-027] Portfolio Redesign, New Projects and Posts
+- NodeID: portfolio_redesign_2026_09
+- Date: 2026-09-25
+- Author: claude_code
+- Change: Redesigned home and inner pages; added English project entries (wasmspace, context-gc, aixibility, torn-cli, pi-7tv) and posts (the-browser-is-the-computer, let-the-agent-decide-when-to-forget, signposts-not-indexes) with real screenshot covers.
+- Status: approved
+- Changed Files: `src/layouts/BaseLayout.astro`, `src/components/**`, `src/pages/**`, `src/styles/{tokens,global}.css`, `src/lib/{home-copy,tones,content,i18n}.ts`, `src/data/{projects,blog}/*`, `public/images/**`, `astro.config.mjs`, `docs/content-workflow.md`
+- Summary: wasmspace is described but not linked because its repository is private. New entries are English-only and fall back to English in other locales.
+- Related Decision/Contract/Risk/Evidence IDs: DEC-013, CON-016, none, none

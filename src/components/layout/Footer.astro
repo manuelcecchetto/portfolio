@@ -1,4 +1,5 @@
 ---
+import profile from "../../data/profile.json";
 import { getCopy, type SiteLocale } from "../../lib/i18n";
 
 export interface Props {
@@ -12,11 +13,15 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="site-shell site-footer__inner">
-    <p class="site-footer__copy">© {year} Manuel Cecchetto. {t.footer.craftedWith}</p>
+    <p class="site-footer__brand">
+      <span class="site-brand__avatar"><img src="/images/characters/avatar.webp" alt="" width="96" height="96" loading="lazy" /></span>
+      © {year} Manuel Cecchetto
+    </p>
     <div class="site-footer__links">
-      <a href="mailto:manuel.cecchetto@gmail.com">{t.footer.email}</a>
-      <a href="https://github.com/manuelcecchetto">{t.footer.github}</a>
-      <a href="https://www.linkedin.com/in/manuelcecchetto">{t.footer.linkedin}</a>
+      <a href={`mailto:${profile.contact.email}`}>{t.footer.email}</a>
+      <a href={profile.social.github} rel="me">{t.footer.github}</a>
+      <a href={profile.social.linkedin} rel="me">{t.footer.linkedin}</a>
+      <a href="/rss.xml">RSS</a>
     </div>
   </div>
 </footer>

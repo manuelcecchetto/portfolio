@@ -1,0 +1,399 @@
+---
+import CasusLogo from "../ui/CasusLogo.astro";
+import type { HomeCopy } from "../../lib/home-copy";
+
+export interface Props {
+  copy: HomeCopy["hero"];
+}
+
+const { copy } = Astro.props;
+const [lineOne, lineTwo] = copy.lines;
+const wordsOne = lineOne.split(" ");
+const wordsTwo = lineTwo.split(" ");
+---
+
+<section class="band band--cream hero" aria-labelledby="hero-title">
+  <div class="site-shell hero__grid">
+    <div class="hero__copy">
+      <h1 id="hero-title" class="hero__title">
+        <span class="hero__line">
+          {wordsOne.map((word, index) => <span class="hero__word" style={`--i: ${index}`}>{word}</span>)}
+        </span>
+        <span class="hero__line">
+          {wordsTwo.map((word, index) => (
+            <span class:list={["hero__word", index === wordsTwo.length - 1 && "hero__word--accent"]} style={`--i: ${index + wordsOne.length}`}>
+              {word}
+              {index === wordsTwo.length - 1 && (
+                <svg class="hero__scribble" viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M4 16 C 70 6, 140 20, 210 11 S 330 6, 396 13" />
+                </svg>
+              )}
+            </span>
+          ))}
+        </span>
+      </h1>
+
+      <p class="hero__intro">{copy.intro}</p>
+
+      <div class="hero__actions">
+        <a class="cta cta--primary" href="#work">{copy.primary} <span class="cta__arrow" aria-hidden="true">→</span></a>
+        <a class="cta cta--secondary" href="#contact">{copy.secondary}</a>
+      </div>
+
+      <a class="hero__building" href="#casus">
+        <span class="hero__building-mark"><CasusLogo variant="mark" title="" /></span>
+        <span>
+          {copy.building} <strong>CASUS</strong>, {copy.buildingSuffix}
+        </span>
+      </a>
+    </div>
+
+    <div class="hero__stage" aria-hidden="true">
+      <div class="hero__blob"></div>
+      <div class="hero__ring"></div>
+      <img
+        class="hero__character"
+        src="/images/characters/wave.webp"
+        alt=""
+        width="760"
+        height="799"
+        fetchpriority="high"
+        decoding="async"
+      />
+
+      <p class="hero__note hand">
+        {copy.note}
+        <svg viewBox="0 0 90 60" class="hero__note-arrow">
+          <path d="M6 8 C 30 4, 64 14, 74 46" />
+          <path d="M62 38 L 74 48 L 82 34" />
+        </svg>
+      </p>
+
+      <div class="trace trace--a"><span class="trace__dot trace__dot--ok"></span>eval · 48/48 passed</div>
+      <div class="trace trace--b"><span class="trace__dot"></span>tool_call → redline()</div>
+      <div class="trace trace--c"><span class="trace__dot trace__dot--warn"></span>trace · 312 ms</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(7rem, 12vw, 9.5rem);
+    padding-bottom: clamp(2rem, 4vw, 3rem);
+    overflow: hidden;
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    align-items: center;
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+
+  .hero__copy {
+    display: grid;
+    gap: var(--space-6);
+    justify-items: start;
+  }
+
+  .hero__title {
+    font-size: clamp(3.1rem, 6.7vw, 6.3rem);
+    font-weight: 900;
+    letter-spacing: -0.065em;
+    line-height: 0.9;
+    text-wrap: initial;
+  }
+
+  .hero__line {
+    display: block;
+    position: relative;
+    width: fit-content;
+  }
+
+  .hero__word {
+    display: inline-block;
+    margin-right: 0.22em;
+    animation: word-rise 900ms var(--ease-emphasis) both;
+    animation-delay: calc(120ms + var(--i) * 90ms);
+  }
+
+  .hero__line .hero__word:last-of-type {
+    margin-right: 0;
+  }
+
+  .hero__word--accent {
+    position: relative;
+  }
+
+  .hero__scribble {
+    position: absolute;
+    left: -0.04em;
+    right: -0.04em;
+    bottom: -0.1em;
+    width: 100%;
+    height: 0.22em;
+    overflow: visible;
+    fill: none;
+    stroke: var(--color-highlight);
+    stroke-width: 9;
+    stroke-linecap: round;
+    stroke-dasharray: 420;
+    stroke-dashoffset: 420;
+    animation: scribble 900ms 900ms var(--ease-out-soft) forwards;
+  }
+
+  .hero__intro {
+    max-width: 34rem;
+    font-size: clamp(1.15rem, 1.7vw, 1.38rem);
+    line-height: 1.5;
+    color: var(--color-text-body);
+    animation: fade-in 700ms 500ms var(--ease-out-soft) both;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    animation: fade-in 700ms 650ms var(--ease-out-soft) both;
+  }
+
+  .hero__building {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: var(--space-2);
+    padding: 0.4rem 0.9rem 0.4rem 0.4rem;
+    border-radius: var(--radius-pill);
+    background: rgb(16 19 24 / 0.04);
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    text-decoration: none;
+    animation: fade-in 700ms 800ms var(--ease-out-soft) both;
+    transition: background var(--duration-fast) ease;
+  }
+
+  .hero__building:hover {
+    background: rgb(16 19 24 / 0.08);
+    color: var(--ink);
+  }
+
+  .hero__building strong {
+    color: var(--ink);
+  }
+
+  .hero__building-mark {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 0.55rem;
+    background: var(--casus-navy);
+    color: #fff;
+    flex: none;
+  }
+
+  .hero__building-mark :global(svg) {
+    width: 0.85rem;
+    height: auto;
+  }
+
+  /* ----- Character stage ----- */
+
+  .hero__stage {
+    position: relative;
+    aspect-ratio: 1 / 1.02;
+    width: min(100%, 34rem);
+    justify-self: center;
+  }
+
+  .hero__blob {
+    position: absolute;
+    inset: 9% 4% 4% 8%;
+    background: var(--lavender);
+    border-radius: 58% 42% 52% 48% / 46% 56% 44% 54%;
+    animation: blob 14s ease-in-out infinite alternate;
+  }
+
+  .hero__ring {
+    position: absolute;
+    inset: 3% 0 10% 14%;
+    border: 2px dashed rgb(16 19 24 / 0.22);
+    border-radius: 50%;
+    animation: spin 60s linear infinite;
+  }
+
+  .hero__character {
+    position: absolute;
+    left: 6%;
+    bottom: 0;
+    width: 88%;
+    height: auto;
+    filter: drop-shadow(0 22px 22px rgb(16 19 24 / 0.16));
+    transform-origin: 50% 100%;
+    animation:
+      pop-in 900ms 250ms var(--ease-spring) both,
+      bob 5.5s 1.2s ease-in-out infinite;
+  }
+
+  .hero__note {
+    position: absolute;
+    top: 1%;
+    left: -6%;
+    color: var(--ink);
+    transform: rotate(-8deg);
+    animation: fade-in 600ms 1.2s both;
+  }
+
+  .hero__note-arrow {
+    width: 4.4rem;
+    margin: 0.1rem 0 0 3.2rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 120;
+    stroke-dashoffset: 120;
+    animation: scribble 800ms 1.5s var(--ease-out-soft) forwards;
+  }
+
+  .trace {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.8rem;
+    background: var(--color-surface);
+    border: 1.5px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    animation:
+      fade-in 600ms both,
+      float 6s ease-in-out infinite;
+  }
+
+  .trace--a {
+    top: 12%;
+    right: -6%;
+    animation-delay: 1.4s, 1.4s;
+  }
+
+  .trace--b {
+    bottom: 22%;
+    left: -10%;
+    background: var(--mint);
+    animation-delay: 1.6s, 0.4s;
+  }
+
+  .trace--c {
+    bottom: 5%;
+    right: 0;
+    background: var(--peach);
+    animation-delay: 1.8s, 2.2s;
+  }
+
+  .trace__dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--color-highlight);
+    box-shadow: 0 0 0 3px rgb(79 91 213 / 0.2);
+  }
+
+  .trace__dot--ok {
+    background: #1f9d55;
+    box-shadow: 0 0 0 3px rgb(31 157 85 / 0.2);
+  }
+
+  .trace__dot--warn {
+    background: #e8912d;
+    box-shadow: 0 0 0 3px rgb(232 145 45 / 0.22);
+  }
+
+  @keyframes word-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.45em) rotate(4deg);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+  }
+
+  @keyframes scribble {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.9);
+    }
+  }
+
+  @keyframes bob {
+    50% {
+      transform: translateY(-10px) rotate(-1deg);
+    }
+  }
+
+  @keyframes float {
+    50% {
+      translate: 0 -9px;
+    }
+  }
+
+  @keyframes blob {
+    to {
+      border-radius: 44% 56% 40% 60% / 58% 42% 58% 42%;
+      transform: rotate(8deg) scale(1.03);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 56rem) {
+    .hero__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero__stage {
+      width: min(84%, 24rem);
+      margin-top: var(--space-4);
+    }
+
+    .hero__note {
+      left: -4%;
+      top: -4%;
+    }
+
+    .trace {
+      font-size: 0.7rem;
+    }
+
+    .trace--b {
+      left: -14%;
+    }
+  }
+</style>

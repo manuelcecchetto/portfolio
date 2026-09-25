@@ -1,15 +1,13 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import MotionReveal from "../../components/ui/MotionReveal.astro";
-import StaggerGroup from "../../components/ui/StaggerGroup.astro";
 import BlogCard from "../../components/blog/BlogCard.astro";
 import Callout from "../../components/prose/Callout.astro";
 import ImageFigure from "../../components/prose/ImageFigure.astro";
 import CodeNote from "../../components/prose/CodeNote.astro";
-import ImagePlaceholder from "../../components/ui/ImagePlaceholder.astro";
-import { getBlogRouteSlugs, getLocalizedBlogPostBySlug, getLocalizedBlogPosts, type BlogEntry } from "../../lib/content";
+import { getBlogRouteSlugs, getLocalizedBlogPostBySlug, getLocalizedBlogPosts } from "../../lib/content";
 import { getCopy, localizePath, resolveLocale, toIntlLocale } from "../../lib/i18n";
+import { toneAt } from "../../lib/tones";
 
 export async function getStaticPaths() {
   const slugs = await getBlogRouteSlugs({ includeDrafts: !import.meta.env.PROD });
@@ -31,24 +29,22 @@ const post = await getLocalizedBlogPostBySlug(slug, locale);
 if (!post) {
   throw new Error(`Unable to resolve localized blog post for slug '${slug}' in locale '${locale}'.`);
 }
+
+// Tones follow the index order, so the band matches the post's card.
 const localePosts = await getLocalizedBlogPosts(locale);
+const position = localePosts.findIndex((entry) => entry.data.translationGroup === post.data.translationGroup);
 const tagSet = new Set(post.data.tags);
-const relatedPosts = localePosts
-  .filter((candidate: BlogEntry) => candidate.data.translationGroup !== post.data.translationGroup)
-  .sort((a: BlogEntry, b: BlogEntry) => {
-    const overlapA = a.data.tags.filter((tag) => tagSet.has(tag)).length;
-    const overlapB = b.data.tags.filter((tag) => tagSet.has(tag)).length;
-    return overlapB - overlapA;
-  })
-  .slice(0, 2);
+const related = localePosts
+  .map((entry, index) => ({ entry, tone: toneAt(index), overlap: entry.data.tags.filter((tag) => tagSet.has(tag)).length }))
+  .filter(({ entry }) => entry.data.translationGroup !== post.data.translationGroup)
+  .sort((a, b) => b.overlap - a.overlap)
+  .slice(0, 3);
+
 const t = getCopy(locale);
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+const toc = headings.filter((heading) => heading.depth === 2);
 const proseComponents = { Callout, ImageFigure, CodeNote };
-const dateFormatter = new Intl.DateTimeFormat(toIntlLocale(locale), {
-  month: "long",
-  day: "numeric",
-  year: "numeric",
-});
+const dateFormatter = new Intl.DateTimeFormat(toIntlLocale(locale), { month: "long", day: "numeric", year: "numeric" });
 const publishedLabel = dateFormatter.format(post.data.publishedAt);
 const updatedLabel = post.data.updatedAt ? dateFormatter.format(post.data.updatedAt) : undefined;
 ---
@@ -58,182 +54,167 @@ const updatedLabel = post.data.updatedAt ? dateFormatter.format(post.data.update
   description={post.data.summary}
   ogType="article"
   image={post.data.coverImage}
+  tone={toneAt(Math.max(0, position))}
 >
-  <article class="blog-post-content">
-    <header class="blog-post-header">
-      <a class="blog-post-header__back" href={localizePath(locale, "/blog")}>{t.blogPost.backToAll}</a>
-      <h1>{post.data.title}</h1>
-
-      <p class="blog-post-header__meta">
-        <span>{t.common.publishedPrefix} {publishedLabel}</span>
-        {updatedLabel && <span>{t.common.updatedPrefix} {updatedLabel}</span>}
-        {post.data.readingTimeMinutes && <span>{post.data.readingTimeMinutes} {t.common.minReadSuffix}</span>}
-        {post.data.draft && <span class="blog-post-header__draft">{t.blogPost.draftEntry}</span>}
-      </p>
-
-      {
-        post.data.tags.length > 0 && (
-          <div class="blog-post-header__tags" role="list" aria-label={t.blogPost.tagsAria}>
-            {post.data.tags.map((tag) => (
-              <a class="pill" role="listitem" href={localizePath(locale, `/blog/tags/${encodeURIComponent(tag)}/`)}>
-                {tag}
-              </a>
-            ))}
-          </div>
-        )
-      }
-    </header>
-
+  <header class="page-hero post-hero motion-reveal" slot="hero">
+    <a class="back-link" href={localizePath(locale, "/blog")}>{t.blogPost.backToAll}</a>
+    <h1>{post.data.title}</h1>
+    <p class="page-hero__lead">{post.data.summary}</p>
+    <p class="meta-line">
+      <time datetime={post.data.publishedAt.toISOString()}>{publishedLabel}</time>
+      {updatedLabel && <span>{t.common.updatedPrefix} {updatedLabel}</span>}
+      {post.data.readingTimeMinutes && <span>{post.data.readingTimeMinutes} {t.common.minReadSuffix}</span>}
+      {post.data.draft && <span class="post-hero__draft">{t.blogPost.draftEntry}</span>}
+    </p>
     {
-      post.data.coverImage ? (
-        <img
-          class="blog-post-header__cover"
-          src={post.data.coverImage}
-          alt={`${t.blogPost.coverAltPrefix} ${post.data.title}`}
-          loading="eager"
-          decoding="async"
-        />
-      ) : (
-        <ImagePlaceholder label={`${post.data.title} Cover Placeholder`} hint="Article cover image" ratio="wide" />
-      )
-    }
-
-    <div class="blog-post-content__body">
-      <Content components={proseComponents} />
-    </div>
-  </article>
-
-  {
-    relatedPosts.length > 0 && (
-      <section class="stack blog-post-related" aria-labelledby="blog-post-related-title">
-        <MotionReveal as="div" kind="slide-in" delay={120}>
-          <h2 id="blog-post-related-title">{t.blogPost.continueReadingTitle}</h2>
-          <p class="text-muted">{t.blogPost.continueReadingText}</p>
-        </MotionReveal>
-
-        <StaggerGroup as="ul" class="blog-post-related__grid" step={90}>
-          {relatedPosts.map((relatedPost) => (
+      post.data.tags.length > 0 && (
+        <ul class="chip-list" aria-label={t.blogPost.tagsAria}>
+          {post.data.tags.map((tag) => (
             <li>
-              <BlogCard post={relatedPost} />
+              <a class="chip" href={localizePath(locale, `/blog/tags/${encodeURIComponent(tag)}/`)}>{tag}</a>
             </li>
           ))}
-        </StaggerGroup>
+        </ul>
+      )
+    }
+  </header>
+
+  {
+    post.data.coverImage && (
+      <img
+        class="post-cover motion-reveal"
+        src={post.data.coverImage}
+        alt={`${t.blogPost.coverAltPrefix} ${post.data.title}`}
+        loading="eager"
+        decoding="async"
+      />
+    )
+  }
+
+  <div class="post-layout">
+    <article class="prose">
+      <Content components={proseComponents} />
+    </article>
+    {
+      toc.length > 2 && (
+        <nav class="post-toc" aria-labelledby="post-toc-title">
+          <p id="post-toc-title" class="post-toc__title hand">{t.blogPost.onThisPage}</p>
+          <ol>
+            {toc.map((heading) => (
+              <li>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+  </div>
+
+  {
+    related.length > 0 && (
+      <section aria-labelledby="post-related-title">
+        <div class="section-head motion-reveal">
+          <h2 id="post-related-title" class="section-title">{t.blogPost.continueReadingTitle}</h2>
+          <a class="link-arrow" href={localizePath(locale, "/blog")}>{t.blogPost.backToAll}</a>
+        </div>
+        <ul class="post-related motion-stagger" role="list">
+          {related.map(({ entry, tone }) => (
+            <li>
+              <BlogCard post={entry} tone={tone} size="compact" level={3} />
+            </li>
+          ))}
+        </ul>
       </section>
     )
   }
 </BaseLayout>
 
 <style>
-  .blog-post-content {
-    display: grid;
-    gap: var(--space-5);
+  .post-hero h1 {
+    max-width: 22ch;
+    font-size: clamp(2.3rem, 5.4vw, 4.6rem);
   }
 
-  .blog-post-header {
+  .post-hero .page-hero__lead {
+    max-width: 44rem;
+  }
+
+  .post-hero__draft {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .post-cover {
+    width: 100%;
+    max-height: 36rem;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    border: 1.5px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--ink);
+    background: var(--charcoal);
+  }
+
+  .post-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 42rem) minmax(12rem, 16rem);
+    justify-content: space-between;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .post-toc {
+    position: sticky;
+    top: 6rem;
     display: grid;
     gap: var(--space-3);
+    padding-left: var(--space-5);
+    border-left: 1.5px solid var(--ink);
   }
 
-  .blog-post-header__cover {
-    width: 100%;
-    aspect-ratio: 21 / 9;
-    object-fit: cover;
-    display: block;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border-strong);
-    background: hsl(0 0% 100% / 0.72);
-    box-shadow: var(--shadow-soft);
+  .post-toc__title {
+    font-size: 1.6rem;
+    color: var(--ink);
   }
 
-  .blog-post-header h1 {
-    font-size: clamp(1.9rem, 4vw, 3.2rem);
-    max-width: 18ch;
-  }
-
-  .blog-post-header__back {
-    width: fit-content;
-    text-decoration: none;
-    font-size: 0.72rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-strong);
-  }
-
-  .blog-post-header__back::before {
-    content: "<-";
-    margin-right: 0.45rem;
-    color: var(--color-accent);
-  }
-
-  .blog-post-header__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    align-items: center;
-    font-size: 0.72rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: var(--color-text-muted);
-  }
-
-  .blog-post-header__draft {
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--color-border-strong);
-    background: var(--color-accent-soft);
-    color: var(--color-text-strong);
-    padding: 0.16rem 0.54rem;
-  }
-
-  .blog-post-header__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-
-  .blog-post-content__body {
-    border-radius: var(--radius-lg);
-    border: var(--line-soft);
-    background: var(--color-surface-strong);
-    box-shadow: var(--shadow-soft), var(--shadow-inset);
-    padding: clamp(var(--space-5), 4vw, var(--space-8));
-  }
-
-  .blog-post-content__body :global(p + p) {
-    margin-top: var(--space-4);
-  }
-
-  .blog-post-content__body :global(h2),
-  .blog-post-content__body :global(h3) {
-    margin-top: var(--space-6);
-    line-height: 1.18;
-  }
-
-  .blog-post-content__body :global(h2) {
-    font-size: clamp(1.5rem, 2.4vw, 2.15rem);
-  }
-
-  .blog-post-content__body :global(h3) {
-    font-size: clamp(1.16rem, 1.6vw, 1.45rem);
-  }
-
-  .blog-post-content__body :global(ul),
-  .blog-post-content__body :global(ol) {
-    margin-top: var(--space-4);
-    padding-left: 1.2rem;
-  }
-
-  .blog-post-related {
-    margin-top: var(--space-5);
-  }
-
-  .blog-post-related__grid {
+  .post-toc ol {
+    display: grid;
+    gap: 0.55rem;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  .post-toc a {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition:
+      color var(--duration-fast) ease,
+      transform var(--duration-base) var(--ease-spring);
+  }
+
+  .post-toc a:hover {
+    color: var(--ink);
+    transform: translateX(3px);
+  }
+
+  .post-related {
     display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+
+  @media (max-width: 60rem) {
+    .post-layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .post-toc {
+      display: none;
+    }
   }
 </style>

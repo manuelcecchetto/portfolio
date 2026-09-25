@@ -1,6 +1,8 @@
 ---
 import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
+import LiquidDivider from "../components/ui/LiquidDivider.astro";
+import type { Tone } from "../lib/tones";
 import {
   DEFAULT_LOCALE,
   SUPPORTED_LOCALES,
@@ -17,6 +19,10 @@ interface Props {
   ogType?: "website" | "article";
   image?: string | undefined;
   noindex?: boolean;
+  /** "home" renders full-bleed sections; "page" wraps content in the reading shell. */
+  variant?: "home" | "page";
+  /** Pastel band behind the `hero` slot on inner pages. */
+  tone?: Tone;
 }
 
 const {
@@ -24,6 +30,8 @@ const {
   ogType = "website",
   image,
   noindex = false,
+  variant = "page",
+  tone = "lavender",
 } = Astro.props;
 
 const locale = resolveLocale(Astro.currentLocale);
@@ -44,7 +52,7 @@ const resolvedImage = image ? new URL(image, siteOrigin).href : undefined;
 const twitterCardType = resolvedImage ? "summary_large_image" : "summary";
 const robots = noindex ? "noindex, nofollow" : "index, follow";
 const googleFontsHref =
-  "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap";
 ---
 
 <!doctype html>
@@ -55,6 +63,8 @@ const googleFontsHref =
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#faf4eb" />
+    <script is:inline>document.documentElement.classList.add("js");</script>
     <link rel="canonical" href={canonicalUrl} />
     <title>{title}</title>
     <meta property="og:title" content={title} />
@@ -81,19 +91,55 @@ const googleFontsHref =
   </head>
   <body>
     <a class="skip-link" href="#main-content">{t.layout.skipToContent}</a>
-    <div class="ambient ambient--left" aria-hidden="true"></div>
-    <div class="ambient ambient--right" aria-hidden="true"></div>
     <div class="site-frame">
       <Header currentPath={currentPath} locale={locale} />
-      <main id="main-content" class="site-main">
-        <div class="site-shell site-main__inner">
-          <slot name="hero" />
-          <section class="site-main__content">
+      {
+        variant === "home" ? (
+          <main id="main-content" class="site-main site-main--home">
+            <slot name="hero" />
             <slot />
-          </section>
-        </div>
-      </main>
+          </main>
+        ) : (
+          <>
+            <main id="main-content" class="site-main site-main--page">
+              {Astro.slots.has("hero") && (
+                <>
+                  <div class="page-band" style={`--band-bg: var(--${tone})`}>
+                    <div class="site-shell">
+                      <slot name="hero" />
+                    </div>
+                  </div>
+                  <LiquidDivider from={`var(--${tone})`} to="var(--cream)" class="page-band__divider" />
+                </>
+              )}
+              <div class="site-shell site-main__inner">
+                <slot />
+              </div>
+            </main>
+            <LiquidDivider from="var(--cream)" to="var(--charcoal)" />
+          </>
+        )
+      }
       <Footer locale={locale} />
     </div>
+    <script>
+      const targets = document.querySelectorAll(".motion-reveal, .motion-stagger");
+      if (!("IntersectionObserver" in window)) {
+        targets.forEach((el) => el.classList.add("is-in"));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-in");
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+        );
+        targets.forEach((el) => observer.observe(el));
+      }
+    </script>
   </body>
 </html>

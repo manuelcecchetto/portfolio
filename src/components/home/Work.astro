@@ -1,0 +1,563 @@
+---
+import { orderProjectsForDisplay, type BlogEntry, type ProjectEntry } from "../../lib/content";
+import type { HomeCopy } from "../../lib/home-copy";
+import { getCopy, localizePath, toIntlLocale, type SiteLocale } from "../../lib/i18n";
+
+export interface Props {
+  copy: HomeCopy["work"];
+  locale: SiteLocale;
+  projects: ProjectEntry[];
+  posts: BlogEntry[];
+}
+
+const { copy, locale, projects, posts } = Astro.props;
+// wasmspace gets its own hand-made tile; the next two featured projects follow it.
+const WASMSPACE = "wasmspace";
+const wasmspace = projects.find((entry) => entry.data.slug === WASMSPACE);
+const spotlight = orderProjectsForDisplay(projects)
+  .filter((entry) => entry.data.featured && entry.data.slug !== WASMSPACE)
+  .slice(0, 2);
+const spotlightTones = ["peach", "rose"] as const;
+const t = getCopy(locale);
+const dateFormatter = new Intl.DateTimeFormat(toIntlLocale(locale), { month: "short", year: "numeric" });
+---
+
+<section id="work" class="band band--cream work" aria-labelledby="work-title">
+  <div class="site-shell">
+    <header class="band__head band__head--split motion-reveal">
+      <div class="stack">
+        <h2 id="work-title">{copy.title}</h2>
+        <p class="band__lead">{copy.lead}</p>
+      </div>
+      <a class="link-arrow" href={localizePath(locale, "/projects")}>{copy.allProjects}</a>
+    </header>
+
+    <div class="bento motion-stagger" style="--stagger-step: 110ms">
+      <article class="tile tile--mint tile--wide">
+        <div class="tile__text">
+          <h3>{copy.wordAgent.title}</h3>
+          <p>{copy.wordAgent.text}</p>
+          <p class="tile__tags"><span>Office.js</span><span>Agents</span><span>OOXML</span></p>
+        </div>
+        <div class="doc-viz" aria-hidden="true">
+          <div class="doc-viz__page">
+            <span></span><span class="is-del"></span><span class="is-ins"></span><span></span><span class="is-short"></span>
+          </div>
+          <div class="doc-viz__chat">
+            <span class="doc-viz__msg">Tighten clause 9</span>
+            <span class="doc-viz__msg doc-viz__msg--agent">Done: 2 tracked changes ✓</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile tile--lavender">
+        <div class="tile__text">
+          <h3>{copy.harness.title}</h3>
+          <p>{copy.harness.text}</p>
+        </div>
+        <div class="eval-viz" aria-hidden="true">
+          {[42, 55, 51, 68, 74, 71, 86, 92].map((value, index) => (
+            <span style={`--h: ${value}%; --d: ${index * 70}ms`}></span>
+          ))}
+          <b>92%</b>
+        </div>
+      </article>
+
+      {
+        wasmspace && (
+          <article class="tile tile--butter tile--wasm">
+            <div class="tile__text">
+              <h3>{copy.wasmspace.title}</h3>
+              <p>{copy.wasmspace.text}</p>
+              <p class="tile__tags"><span>WebAssembly</span><span>Pyodide</span><span>OPFS</span></p>
+              <div class="tile__links">
+                <a class="link-arrow" href={localizePath(locale, `/projects/${wasmspace.data.slug}/`)}>{copy.readProject}</a>
+              </div>
+            </div>
+            <div class="wasm-viz" aria-hidden="true">
+              <div class="wasm-viz__window">
+                <div class="wasm-viz__bar"><i></i><i></i><i></i><span>localhost · no server</span></div>
+                <img src={wasmspace.data.coverImage} alt="" loading="lazy" decoding="async" />
+              </div>
+              <ol class="wasm-viz__flow">
+                {copy.wasmspace.flow.map((step, index) => (
+                  <li style={`--step: ${index}`}>{step}</li>
+                ))}
+              </ol>
+              <span class="wasm-viz__note hand">{copy.wasmspace.note}</span>
+            </div>
+          </article>
+        )
+      }
+
+      {
+        spotlight.map((project, index) => (
+          <article class="tile tile--project" style={`--tone: var(--${spotlightTones[index % spotlightTones.length]})`}>
+            {project.data.coverImage && (
+              <img class="tile__cover" src={project.data.coverImage} alt="" loading="lazy" decoding="async" />
+            )}
+            <div class="tile__text">
+              <h3>{project.data.title}</h3>
+              <p>{project.data.summary}</p>
+              <div class="tile__links">
+                <a class="link-arrow" href={localizePath(locale, `/projects/${project.data.slug}/`)}>{copy.readProject}</a>
+                {project.data.repositoryUrl && (
+                  <a class="tile__source" href={project.data.repositoryUrl} rel="noopener">
+                    {copy.source} ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    {
+      posts.length > 0 && (
+        <div class="writing">
+          <div class="writing__head motion-reveal">
+            <h3>{copy.writingTitle}</h3>
+            <a class="link-arrow" href={localizePath(locale, "/blog")}>{copy.allPosts}</a>
+          </div>
+          <ul class="writing__list motion-stagger" role="list">
+            {posts.map((post) => (
+              <li>
+                <a href={localizePath(locale, `/blog/${post.data.slug}/`)}>
+                  <time datetime={post.data.publishedAt.toISOString()}>{dateFormatter.format(post.data.publishedAt)}</time>
+                  <span class="writing__title">{post.data.title}</span>
+                  {post.data.readingTimeMinutes && (
+                    <span class="writing__meta">
+                      {post.data.readingTimeMinutes} {t.common.minReadSuffix}
+                    </span>
+                  )}
+                  <span class="writing__arrow" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .tile {
+    position: relative;
+    display: grid;
+    gap: var(--space-5);
+    align-content: space-between;
+    padding: clamp(1.4rem, 2.6vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--tone);
+    border: 1.5px solid var(--ink);
+    overflow: hidden;
+    transition:
+      transform var(--duration-base) var(--ease-spring),
+      box-shadow var(--duration-base) var(--ease-out-soft),
+      opacity var(--duration-slow) var(--ease-out-soft);
+  }
+
+  .tile:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .tile--mint { --tone: var(--mint); grid-column: span 7; }
+  .tile--lavender { --tone: var(--lavender); grid-column: span 5; }
+  .tile--butter { --tone: var(--butter); grid-column: span 12; }
+
+  .tile__text {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .tile h3 {
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+  }
+
+  .tile__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tile__tags span {
+    padding: 0.2rem 0.65rem;
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.7);
+    border: 1px solid rgb(16 19 24 / 0.15);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .tile--wide {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    align-items: center;
+  }
+
+  /* Word-agent visual */
+  .doc-viz {
+    position: relative;
+    min-height: 12rem;
+  }
+
+  .doc-viz__page {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1.1rem;
+    border-radius: 0.8rem;
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    transform: rotate(-3deg);
+  }
+
+  .doc-viz__page span {
+    height: 0.5rem;
+    border-radius: 1rem;
+    background: #e6e3dc;
+  }
+
+  .doc-viz__page .is-del {
+    width: 70%;
+    background: repeating-linear-gradient(90deg, #f1b3b3 0 100%);
+    position: relative;
+  }
+
+  .doc-viz__page .is-del::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    background: #d13438;
+  }
+
+  .doc-viz__page .is-ins {
+    width: 85%;
+    background: #b7cdfa;
+    transform-origin: left;
+    animation: grow 3.6s ease-in-out infinite;
+  }
+
+  .doc-viz__page .is-short {
+    width: 40%;
+  }
+
+  .doc-viz__chat {
+    position: absolute;
+    right: -0.4rem;
+    bottom: -0.2rem;
+    display: grid;
+    gap: 0.35rem;
+    justify-items: end;
+  }
+
+  .doc-viz__msg {
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.9rem 0.9rem 0.2rem 0.9rem;
+    background: var(--ink);
+    color: var(--cream);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .doc-viz__msg--agent {
+    border-radius: 0.9rem 0.9rem 0.9rem 0.2rem;
+    background: #fff;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+
+  /* Harness visual */
+  .eval-viz {
+    position: relative;
+    display: flex;
+    align-items: end;
+    gap: 0.4rem;
+    height: 7.5rem;
+    padding: 0.8rem;
+    border-radius: 0.9rem;
+    background: rgb(255 255 255 / 0.65);
+    border: 1.5px solid var(--ink);
+  }
+
+  .eval-viz span {
+    flex: 1;
+    height: var(--h);
+    border-radius: 0.35rem 0.35rem 0.15rem 0.15rem;
+    background: var(--ink);
+    transform-origin: bottom;
+    animation: bar 1.1s var(--d) var(--ease-spring) both;
+  }
+
+  .eval-viz span:last-of-type {
+    background: #4f5bd5;
+  }
+
+  .eval-viz b {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  /* wasmspace tile */
+  .tile--wasm {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .wasm-viz {
+    position: relative;
+    padding-block: 2.4rem 1.6rem;
+  }
+
+  .wasm-viz__window {
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1.5px solid var(--ink);
+    background: var(--charcoal);
+    box-shadow: 6px 6px 0 var(--ink);
+    transform: rotate(1.2deg);
+  }
+
+  .wasm-viz__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.8rem;
+    background: var(--cream);
+    border-bottom: 1.5px solid var(--ink);
+  }
+
+  .wasm-viz__bar i {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+  }
+
+  .wasm-viz__bar span {
+    margin-left: 0.6rem;
+    padding: 0.05rem 0.7rem;
+    border-radius: 1rem;
+    background: #fff;
+    border: 1px solid rgb(16 19 24 / 0.15);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  .wasm-viz__window img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  /* The three roles light up in turn: plan, work, keep. */
+  .wasm-viz__flow {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    display: flex;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .wasm-viz__flow li {
+    padding: 0.35rem 0.8rem;
+    border-radius: 1rem;
+    border: 1.5px solid var(--ink);
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    animation: flow-step 3.6s calc(var(--step) * 1.2s) infinite;
+  }
+
+  .wasm-viz__flow li + li::before {
+    content: "→ ";
+  }
+
+  .wasm-viz__note {
+    position: absolute;
+    top: 0;
+    right: 0.5rem;
+    transform: rotate(-4deg);
+    font-size: 1.6rem;
+    color: var(--ink);
+  }
+
+  @keyframes flow-step {
+    0%, 30% { background: var(--ink); color: var(--cream); }
+    34%, 100% { background: #fff; color: var(--ink); }
+  }
+
+  /* Project tiles */
+  .tile--project {
+    grid-column: span 6;
+    align-content: start;
+  }
+
+  .tile__cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 1rem;
+    border: 1.5px solid var(--ink);
+    background: var(--charcoal);
+  }
+
+  .tile__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    align-items: center;
+    margin-top: var(--space-2);
+  }
+
+  .tile__source {
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  /* Writing list */
+  .writing {
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+
+  .writing__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: 1.5px solid var(--ink);
+  }
+
+  .writing__head h3 {
+    font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    letter-spacing: -0.045em;
+  }
+
+  .writing__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .writing__list a {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr) auto auto;
+    gap: var(--space-4);
+    align-items: center;
+    padding: 1.15rem 0.4rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    text-decoration: none;
+    transition:
+      background var(--duration-fast) ease,
+      padding var(--duration-base) var(--ease-spring);
+  }
+
+  .writing__list a:hover {
+    background: var(--cream-deep);
+    padding-left: 1rem;
+  }
+
+  .writing__list time,
+  .writing__meta {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
+  .writing__title {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    letter-spacing: -0.02em;
+  }
+
+  .writing__arrow {
+    font-weight: 700;
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .writing__list a:hover .writing__arrow {
+    transform: translateX(4px);
+  }
+
+  @keyframes grow {
+    0%, 15% { transform: scaleX(0); }
+    55%, 100% { transform: scaleX(1); }
+  }
+
+  @keyframes bar {
+    from { transform: scaleY(0); }
+  }
+
+  @media (max-width: 60rem) {
+    .tile--mint,
+    .tile--lavender,
+    .tile--project {
+      grid-column: span 12;
+    }
+
+    .tile--wide,
+    .tile--wasm {
+      grid-template-columns: 1fr;
+    }
+
+    .wasm-viz {
+      padding-bottom: 0;
+    }
+
+    .wasm-viz__note {
+      right: auto;
+      left: 0.25rem;
+    }
+
+    .wasm-viz__flow {
+      position: static;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1.1rem;
+      transform: none;
+      white-space: normal;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .writing__list a {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.2rem var(--space-3);
+    }
+
+    .writing__list time {
+      grid-column: 1 / -1;
+    }
+
+    .writing__meta {
+      display: none;
+    }
+  }
+</style>

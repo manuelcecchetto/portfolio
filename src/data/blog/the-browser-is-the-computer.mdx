@@ -1,0 +1,130 @@
+---
+title: "The browser is the computer"
+slug: "the-browser-is-the-computer"
+locale: "en"
+translationGroup: "blog:the-browser-is-the-computer"
+summary: "Building wasmspace, a zero-backend AI code interpreter: why the tab can be the whole machine, why stock Pyodide is not a sandbox, and what it takes to make that claim literal."
+publishedAt: 2026-08-06
+tags:
+  - AI
+  - Agentic Systems
+  - WebAssembly
+  - Browser Security
+  - Harness Engineering
+coverImage: "/images/projects/wasmspace-cover.webp"
+draft: false
+readingTimeMinutes: 9
+---
+
+Every AI code interpreter I have used works the same way. You upload a file, it lands in somebody's container, a model writes Python against `/mnt/data`, and a chart comes back. It works well. It also means the product operator is renting you a computer, keeping your files on it, and paying for it while you think.
+
+Meanwhile the machine you are typing on can run CPython compiled to WebAssembly, has a private file system built into the browser, and sits idle.
+
+So this summer I spent a week on a question: can the browser tab be the entire computer?
+
+> The browser is not a thin client for someone else's computer. It is the computer.
+
+## Four parts, and nothing else
+
+The project is called wasmspace. The architecture fits in one list:
+
+- a **static web app**, served from one origin;
+- a **remote frontier model**, reached directly from the browser with the user's own OpenRouter key;
+- **CPython 3.14** compiled to WebAssembly (Pyodide) in a dedicated worker;
+- an **OPFS workspace** for files, chats and generated artifacts.
+
+No application server. No per-user container. No server-side `/mnt`. No account database. Not even a local WebGPU model: the planning happens in a frontier model, the work happens on your machine.
+
+I wrote one sentence at the top of the design doc and kept coming back to it:
+
+> The model is the planner. Browser Python is the worker. OPFS is the desk. The user remains the authority.
+
+<Callout title="Why literal matters" tone="cool">
+  "Zero-backend" is an easy thing to put on a landing page and a hard thing to mean. A
+  zero-backend claim is only valuable if it is literal, so every "just add a small proxy"
+  idea had to be rejected or proven unnecessary.
+</Callout>
+
+## Surprise: stock Pyodide is not a sandbox
+
+My first mental model was simple: Python runs in WebAssembly, WebAssembly is sandboxed, done. Before building anything, I wrote probes with synthetic canaries and tried to break it.
+
+In a normal same-origin worker, generated Python could import `fetch`, `XMLHttpRequest`, `WebSocket`, `indexedDB` and `navigator` from JavaScript. It could call `navigator.storage.getDirectory()`, read the workspace canary, read *another project's* canary and the provider-state canary, and send them out through `js.fetch` or `pyfetch`, including to the allowlisted Pyodide CDN.
+
+WebAssembly sandboxes memory. It does nothing about the ambient authority of the page it runs in.
+
+The experiments that followed, all in Chromium and Firefox:
+
+- **Same-origin worker + CSP:** the collector request was blocked, but Python still read unrelated same-origin OPFS state, and the CDN was still an exit.
+- **Separate origin, no CSP:** storage isolation held, but the canary walked out over the network.
+- **Separate origin + CSP:** storage isolated *and* egress blocked. That's the one.
+
+Storage isolation and network containment turned out to be two independent requirements. You need both.
+
+The design that shipped keeps a single deployed app but puts Python behind a browser-enforced opaque sandbox: a frame with `allow-scripts` but no `allow-same-origin`, a blob worker under `connect-src 'none'`, an empty `jsglobals` object, and a schema-validated `MessageChannel` as the only door. The trusted app owns OPFS, the writer lock, asset verification and the final commit. Python gets a bounded snapshot and a protocol.
+
+WebKit refused to create the first OPFS file at all, so on WebKit the app fails closed rather than pretending.
+
+## Startup is a checklist, not a splash screen
+
+The composer stays disabled until every one of these passes:
+
+1. acquire the workspace writer lock;
+2. validate or recover OPFS metadata;
+3. hash-verify the 12,255,372-byte runtime;
+4. start real Python 3.14 inside the sandbox;
+5. pass storage, DOM, bridge and network containment probes;
+6. commit a Python canary back to OPFS.
+
+A second tab is denied the writer lock and stays locked instead of getting a quietly diverging workspace. A hard timeout or a user stop destroys the worker and waits for a verified restart. Asking Python for 5 GiB fails cleanly at the 4 GiB Wasm32 ceiling, without committing a partial write.
+
+## A harness the model can actually use
+
+The agent loop speaks Responses function calls and dispatches to a local harness:
+
+<CodeNote
+  title="The wasmspace tool surface"
+  language="txt"
+  code={`read / search    bounded reads and search over the OPFS workspace
+apply_patch      one V4A envelope, validated, one journaled OPFS transaction
+python           bounded snapshot in; commit back only on success
+artifact         typed validation, checksum-bound copy, provenance
+view_image       let the model look at what it just rendered
+disclose         one visible approval before new local content leaves
+skill            load one reusable skill from the local OPFS catalog
+install_skill    install a validated remote SKILL.md (Brokered mode)
+network_request  one-shot, host-mediated (Brokered mode only)
+web_search       hosted search, an explicit per-chat toggle`}
+/>
+
+Two choices mattered more than the rest. Python never writes the workspace directly: it gets a snapshot, and changes commit only if the run succeeds, so a crash can't leave half a file behind. And `view_image` exists because models are much better when they check the chart before calling it done.
+
+<ImageFigure
+  src="/images/blog/wasmspace-view-image.webp"
+  alt="wasmspace chat where the agent generates a chart, views the image and confirms it before answering."
+  caption="The agent renders a chart, looks at the pixels with view_image, then answers. Fixture data from the browser test suite."
+/>
+
+Five pinned, lazily loaded package profiles cover data and charts, XLSX, DOCX, PDF and PPTX. The tests don't stop at "a file exists": they reopen every generated file and check it semantically.
+
+## Permissions you can explain in one line each
+
+Instead of flags inside one worker, each profile is a different worker with different authority:
+
+- **Guarded** (default): Python gets no network at all. Small, bounded read results still go to the model; anything larger needs an explicit, one-shot disclosure.
+- **Brokered network**: one-shot requests, mediated by the host, from a disposable frame.
+- **YOLO**: session-only direct fetch in a separate CSP worker, still without credentials, DOM or trusted storage.
+
+A remote model still sees whatever the conversation and tool results send it. The privacy value comes from making every disclosure small and explicit, not from pretending remote reasoning is local.
+
+## The dead end I'm glad I hit early
+
+My first idea for auth was to reuse a local Codex `auth.json` from the browser. Header-capable clients got a clean HTTP 101 upgrade, but a browser WebSocket can't attach the headers, and HTTP streaming from a third-party origin was rejected by CORS. Mechanically blocked.
+
+The replacement is boring and correct: bring your own OpenRouter key, sent straight from the tab, kept out of transcripts, OPFS, Python, URLs and model context. "Remember this device" is an explicit choice, not a default.
+
+## Where it stands
+
+wasmspace runs as a private, owner-only deployment. Chromium, Firefox and mobile Chromium reach the full ready state in production. Real Safari, live-key acceptance and broader adversarial testing are still open, and I'm not calling it done until they pass.
+
+The part I keep thinking about is the economics. When the browser is the computer, the product operator hosts software, not users' computers. That changes what a small team can afford to give away.

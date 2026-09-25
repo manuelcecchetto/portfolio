@@ -1,0 +1,347 @@
+---
+import type { HomeCopy } from "../../lib/home-copy";
+
+export interface Props {
+  copy: HomeCopy["what"];
+}
+
+const { copy } = Astro.props;
+const tones = ["lavender", "mint", "peach"] as const;
+const workflowIcons = ["gauge", "loop", "rocket", "share"] as const;
+---
+
+<section class="band band--charcoal what" aria-labelledby="what-title">
+  <div class="site-shell">
+    <header class="band__head motion-reveal">
+      <h2 id="what-title">{copy.title}</h2>
+      <p class="band__lead">{copy.lead}</p>
+    </header>
+
+    <ul class="what__cards motion-stagger" role="list" style="--stagger-step: 120ms">
+      {
+        copy.cards.map((card, index) => (
+          <li class={`what-card what-card--${tones[index]}`}>
+            <p class="what-card__bubble">{card.bubble}</p>
+            <div class="what-card__icon" aria-hidden="true">
+              {index === 0 && (
+                <svg viewBox="0 0 48 48">
+                  <path d="M8 34a16 16 0 1 1 32 0" />
+                  <path d="M24 34l9-11" class="what-card__needle" />
+                  <circle cx="24" cy="34" r="3.2" />
+                  <path d="M12 34h3M33 34h3M24 18v3" />
+                </svg>
+              )}
+              {index === 1 && (
+                <svg viewBox="0 0 48 48">
+                  <rect x="10" y="15" width="28" height="22" rx="7" />
+                  <path d="M24 15V9" />
+                  <circle cx="24" cy="7.5" r="2.4" />
+                  <circle cx="19" cy="25" r="2.4" class="what-card__eye" />
+                  <circle cx="29" cy="25" r="2.4" class="what-card__eye" />
+                  <path d="M20 31.5h8M6 24v6M42 24v6" />
+                </svg>
+              )}
+              {index === 2 && (
+                <svg viewBox="0 0 48 48" class="what-card__rocket">
+                  <path d="M24 6c7 5 10 13 8 24H16C14 19 17 11 24 6z" />
+                  <circle cx="24" cy="18" r="3.2" />
+                  <path d="M16 30l-5 6 7-1M32 30l5 6-7-1" />
+                  <path d="M21 35c0 3 1.5 5 3 7 1.5-2 3-4 3-7" class="what-card__flame" />
+                </svg>
+              )}
+            </div>
+            <h3>{card.title}</h3>
+            <p>{card.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flow motion-reveal">
+      <span class="flow__rail" aria-hidden="true"><span class="flow__pulse"></span></span>
+      <ol class="flow__list" role="list">
+      {
+        copy.workflow.map((step, index) => (
+          <li class="flow__step">
+            <span class={`flow__icon flow__icon--${workflowIcons[index]}`} aria-hidden="true">
+              {index === 0 && (
+                <svg viewBox="0 0 24 24"><path d="M4 18a8 8 0 1 1 16 0" /><path d="M12 18l4-5" /></svg>
+              )}
+              {index === 1 && (
+                <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6" /><path d="M20 4v5h-5" /></svg>
+              )}
+              {index === 2 && (
+                <svg viewBox="0 0 24 24"><path d="M12 3c3.5 2.5 5 6.5 4 12H8C7 9.5 8.5 5.5 12 3z" /><path d="M10 19c0 1 1 2 2 3 1-1 2-2 2-3" /></svg>
+              )}
+              {index === 3 && (
+                <svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5" /><circle cx="18" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8" /></svg>
+              )}
+            </span>
+            <span class="flow__title">{step.title}</span>
+            <span class="flow__text">{step.text}</span>
+          </li>
+        ))
+      }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .what__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .what-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    min-height: 19rem;
+    padding: clamp(1.5rem, 2.6vw, 2.2rem);
+    border-radius: var(--radius-xl);
+    background: var(--tone);
+    color: #3a3e45;
+    transition:
+      transform var(--duration-base) var(--ease-spring),
+      opacity var(--duration-slow) var(--ease-out-soft);
+  }
+
+  .what-card:hover {
+    transform: translateY(-6px) rotate(-0.6deg);
+  }
+
+  .what-card--lavender {
+    --tone: var(--lavender);
+    --tone-deep: #4f5bd5;
+  }
+
+  .what-card--mint {
+    --tone: var(--mint);
+    --tone-deep: #2f8a4c;
+  }
+
+  .what-card--peach {
+    --tone: var(--peach);
+    --tone-deep: #d9772b;
+  }
+
+  .what-card h3 {
+    color: var(--ink);
+    font-size: clamp(1.45rem, 2.2vw, 1.85rem);
+    margin-top: var(--space-4);
+  }
+
+  .what-card p:not(.what-card__bubble) {
+    font-size: 1.02rem;
+    line-height: 1.55;
+  }
+
+  .what-card__icon {
+    width: 4rem;
+    height: 4rem;
+    display: grid;
+    place-items: center;
+    border-radius: 1.2rem;
+    background: var(--color-surface);
+    border: 1.5px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .what-card__icon svg {
+    width: 2.4rem;
+    height: 2.4rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+
+  .what-card__needle {
+    stroke: var(--tone-deep);
+    transform-origin: 24px 34px;
+    animation: needle 3.2s ease-in-out infinite;
+  }
+
+  .what-card__eye {
+    fill: var(--ink);
+    stroke: none;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: blink 4s infinite;
+  }
+
+  .what-card__rocket {
+    animation: hover-rocket 2.4s ease-in-out infinite;
+  }
+
+  .what-card__flame {
+    stroke: var(--tone-deep);
+    animation: flicker 0.5s ease-in-out infinite alternate;
+    transform-origin: 24px 35px;
+  }
+
+  .what-card__bubble {
+    position: absolute;
+    top: -1.1rem;
+    right: 1.4rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 1rem 1rem 1rem 0.2rem;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transform: rotate(2deg);
+    box-shadow: 0 10px 20px -10px rgb(0 0 0 / 0.6);
+  }
+
+  .what-card__bubble::after {
+    content: "";
+    position: absolute;
+    left: 0.9rem;
+    bottom: -0.45rem;
+    border: 0.5rem solid transparent;
+    border-top-color: var(--ink);
+    border-bottom: 0;
+    border-left: 0;
+  }
+
+  /* ----- Workflow strip ----- */
+
+  .flow {
+    position: relative;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(1.4rem, 2.6vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--charcoal-soft);
+    border: 1px solid var(--line-dark);
+  }
+
+  .flow__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .flow__rail {
+    position: absolute;
+    left: calc(clamp(1.4rem, 2.6vw, 2rem) + 1.4rem);
+    right: calc(clamp(1.4rem, 2.6vw, 2rem) + 1.4rem);
+    top: calc(clamp(1.4rem, 2.6vw, 2rem) + 1.4rem);
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #4a4e55 0 8px, transparent 8px 14px);
+  }
+
+  .flow__pulse {
+    position: absolute;
+    top: 50%;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-top: -0.375rem;
+    border-radius: 50%;
+    background: var(--lavender);
+    box-shadow: 0 0 0 5px rgb(220 226 254 / 0.18), 0 0 18px 4px rgb(220 226 254 / 0.5);
+    animation: pulse-run 5s ease-in-out infinite;
+  }
+
+  .flow__step {
+    position: relative;
+    display: grid;
+    gap: 0.35rem;
+    justify-items: start;
+  }
+
+  .flow__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background: var(--cream);
+    margin-bottom: var(--space-2);
+  }
+
+  .flow__icon svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .flow__icon--loop { background: var(--mint); }
+  .flow__icon--rocket { background: var(--peach); }
+  .flow__icon--gauge { background: var(--lavender); }
+  .flow__icon--share { background: var(--butter); }
+
+  .flow__title {
+    color: var(--cream);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .flow__text {
+    font-size: 0.95rem;
+    color: #9ea3ab;
+  }
+
+  @keyframes pulse-run {
+    0% { left: 0; }
+    100% { left: calc(100% - 0.75rem); }
+  }
+
+  @keyframes needle {
+    0%, 100% { transform: rotate(-70deg); }
+    60% { transform: rotate(8deg); }
+    70% { transform: rotate(-4deg); }
+  }
+
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  @keyframes hover-rocket {
+    50% { transform: translateY(-3px); }
+  }
+
+  @keyframes flicker {
+    to { transform: scaleY(1.35); }
+  }
+
+  @media (max-width: 60rem) {
+    .what__cards {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .what-card {
+      min-height: 0;
+    }
+
+    .flow__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--space-6);
+    }
+
+    .flow__rail {
+      display: none;
+    }
+  }
+</style>

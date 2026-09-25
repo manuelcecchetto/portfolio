@@ -1,0 +1,91 @@
+---
+title: "Signposts, not indexes"
+slug: "signposts-not-indexes"
+locale: "en"
+translationGroup: "blog:signposts-not-indexes"
+summary: "Coding agents search text well, but codebases rarely say where behavior lives. Aixibility adds a few @aix: annotations at the boundaries that matter, and plain rg does the rest."
+publishedAt: 2026-07-19
+tags:
+  - AI
+  - Coding Agents
+  - Developer Experience
+  - Conventions
+draft: false
+coverImage: "/images/projects/aixibility-cover.webp"
+readingTimeMinutes: 6
+---
+
+Watch a coding agent work on a codebase it doesn't know and you'll see a familiar dance. It greps for the obvious word. It finds six files. It opens the wrapper, then the legacy handler, then a persistence helper with a promising name, and eventually it edits something that *looks* right.
+
+The agent isn't bad at searching. The codebase just never says where the behavior lives.
+
+"Change what happens when a finding is resolved" can mean `resolveFlag`, `markFindingResolved`, `onFindingResolved`, the API route, or the job that syncs the audit log. Names drift. Legacy code sticks around. The canonical path isn't written down anywhere except in the head of whoever built it.
+
+## The usual answers are heavy
+
+The standard fix is an index: embeddings, a code graph, a generated sidecar, a search service. They work, and they are one more system to build, run, keep in sync and trust. When the index goes stale, it's wrong with total confidence.
+
+I wanted the smallest thing that could possibly help. Ideally something that is just text, lives next to the code, and uses the search tool every agent already has.
+
+## A few tags in a doc comment
+
+That's [Aixibility](https://github.com/manuelcecchetto/aixibility): a convention for sparse `@aix:` annotations, plus a skill that teaches agents to use and maintain them.
+
+<CodeNote
+  title="src/review/findings.ts"
+  language="ts"
+  code={`/**
+ * @aix:id review.finding.resolve
+ * @aix:intent Resolve a review finding and persist its audit event
+ * @aix:kind workflow
+ * @aix:effects database-write audit-log
+ * @aix:requires resolvable-finding
+ * @aix:canonical
+ */
+export async function resolveFinding(...) {}`}
+/>
+
+Only `id` and `intent` are required. The ID names the domain capability, not the file or the function, so `review.finding.resolve` survives the day `resolveFlag` becomes `markFindingResolved`. Every field sits on one line, so line-oriented search stays useful.
+
+Retrieval is plain `rg`:
+
+<CodeNote
+  title="Search by intent, effect or precondition"
+  language="bash"
+  code={`rg -n -i '@aix:.*(review|finding|resolve)'
+rg -n '@aix:effects .*database-write'
+rg -n -B8 -A20 '@aix:id review\\.finding\\.resolve'`}
+/>
+
+No runtime, no parser, no generated sidecar, no search service. The source comments *are* the index.
+
+## Trust, but verify
+
+The failure mode of any index is believing it. So the skill doesn't let the agent trust a hit. It runs one loop:
+
+1. **Search semantics.** Translate the task into domain intent, effects and preconditions.
+2. **Inspect candidates.** Read the matching annotations before opening a dozen loosely related files.
+3. **Verify reality.** Check the implementation, callers, types, tests and wiring.
+4. **Act at the boundary.** Edit the canonical capability, not the first lookalike.
+5. **Maintain semantics.** Update, move or delete annotations when the code changes.
+
+<Callout title="The rule I care most about" tone="cool">
+  The implementation remains the source of truth. An annotation is a signpost, not a fact
+  database. When it's stale, trust the code, and fix the signpost if the change is in scope.
+</Callout>
+
+## Sparse, or it's noise
+
+The quickest way to ruin this is to annotate everything. A hundred tags on trivial helpers make search worse, and each one is a small maintenance cost that nobody pays.
+
+Annotations belong at semantic boundaries: commands, workflows, handlers, mutations, integrations, security decisions, and anything easily confused with a legacy alternative. For everything else, one question decides:
+
+> Would an agent plausibly need to discover this capability by intent rather than by its symbol name or type signature?
+
+If the name and the type already say everything, leave it alone.
+
+## Try it
+
+The skill installs into Codex with a copy, and any other agent can take the Markdown as repository guidance. It's an experiment with a deliberately modest hypothesis: a few verified signposts cut search entropy and get agents to the right boundary sooner.
+
+Use it incrementally. Verify it relentlessly. Keep the signal rare enough to matter.

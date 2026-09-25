@@ -231,3 +231,16 @@ Canonical register of API, schema, and interface contracts.
 - Consumers: content schemas, content query helpers, project/blog routes, and editorial migration workflows.
 - Validation Evidence: `docs/atp-content/atp-content-localization-plan.md` plus acceptance regex verification command for required localization terms.
 - Notes: File layout recommendation is grouped locale files per slug under `src/data/projects/<slug>/<locale>.md|mdx` and `src/data/blog/<slug>/<locale>.md|mdx`.
+
+### [CON-016] Redesigned Shell, Band Pages and Content Presentation Contract
+- NodeID: portfolio_redesign_2026_09
+- Date: 2026-09-25
+- Author: claude_code
+- Change: New layout props and presentation helpers; removed `PaperCard`, `PaperDeck`, `MotionReveal`, `StaggerGroup`, `src/components/pages/*` and the about/contact/style-playground routes.
+- Status: approved
+- Surface: internal interface
+- Contract: `BaseLayout` accepts `variant` (`home` renders full-bleed sections; `page`, the default, renders the `hero` slot inside a pastel `.page-band` followed by a `LiquidDivider` into cream) and `tone` (`mint|peach|butter|rose|lavender`). Reveal motion uses the `.motion-reveal` / `.motion-stagger` classes with an IntersectionObserver that adds `.is-in`; content stays visible without JS. Lists assign tones by position with `toneAt(index)`; detail pages reuse the same index so a card and its page share a color. `orderProjectsForDisplay()` puts featured projects first. Long-form bodies use the global `.prose` class. Prose components keep the `prose-callout`, `prose-figure` and `prose-code-note` class names required by the quality gate.
+- Compatibility: breaking for removed primitives and routes (redirects keep old URLs working)
+- Consumers: all routes in `src/pages/`, content authors
+- Validation Evidence: `npx astro check` (0 errors), `npm run build`, `npm run quality:test`, screenshots at 1440 and 390 with no horizontal overflow or console errors
+- Notes: Supersedes CON-001; the nav links in CON-004 now point to `/#work`, `/blog`, `/#about`, `/#contact`.

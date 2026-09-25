@@ -1,133 +1,119 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import MotionReveal from "../../components/ui/MotionReveal.astro";
-import StaggerGroup from "../../components/ui/StaggerGroup.astro";
-import PaperCard from "../../components/ui/PaperCard.astro";
 import BlogCard from "../../components/blog/BlogCard.astro";
 import BlogPagination from "../../components/blog/BlogPagination.astro";
 import { BLOG_PAGE_SIZE, getBlogTagSummaries, getLocalizedBlogPosts, paginateEntries } from "../../lib/content";
 import { getCopy, resolveLocale } from "../../lib/i18n";
+import { toneAt } from "../../lib/tones";
 
 const locale = resolveLocale(Astro.currentLocale);
 const posts = await getLocalizedBlogPosts(locale);
 const t = getCopy(locale);
-const tagSummaries = getBlogTagSummaries(posts, locale);
-const draftCount = posts.filter((post) => post.data.draft).length;
+const tagSummaries = getBlogTagSummaries(posts, locale).slice(0, 12);
 const pagination = paginateEntries(posts, 1, BLOG_PAGE_SIZE, "/blog", locale);
+const [lead, ...rest] = pagination.items;
 ---
 
-<BaseLayout
-  title={t.seo.blogTitle}
-  description={t.seo.blogDescription}
->
-  <MotionReveal as="section" kind="soft-zoom" class="page-hero blog-hero" slot="hero">
-    <span class="eyebrow">{t.blogPage.eyebrow}</span>
-    <h1>{t.blogPage.heroTitle}</h1>
-    <p>{t.blogPage.heroText}</p>
-
-    <div class="blog-hero__meta" role="list" aria-label={t.blogPage.archiveSummaryAria}>
-      <span class="pill" role="listitem">{posts.length} {t.blogPage.entriesLabel}</span>
-      <span class="pill" role="listitem">{tagSummaries.length} {t.blogPage.activeTagsLabel}</span>
-      <span class="pill" role="listitem">{BLOG_PAGE_SIZE} {t.blogPage.postsPerPageLabel}</span>
-      {draftCount > 0 && <span class="pill" role="listitem">{draftCount} {t.blogPage.draftsVisibleLabel}</span>}
+<BaseLayout title={t.seo.blogTitle} description={t.seo.blogDescription} tone="butter">
+  <section class="page-hero blog-hero" slot="hero">
+    <div class="blog-hero__text motion-reveal">
+      <h1>{t.blogPage.heroTitle}</h1>
+      <p class="page-hero__lead">{t.blogPage.heroText}</p>
+      {
+        tagSummaries.length > 0 && (
+          <ul class="chip-list" aria-label={t.blogPage.tagsAria}>
+            {tagSummaries.map((summary) => (
+              <li>
+                <a class="chip" href={summary.href}>
+                  {summary.tag} <span class="chip__count">{summary.count}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </div>
-  </MotionReveal>
+    <img class="blog-hero__character" src="/images/characters/coffee.webp" alt="" width="640" height="640" decoding="async" />
+  </section>
 
   {
     posts.length === 0 ? (
-      <PaperCard as="section" variant="outline" padded="md" lift={false}>
-        <p class="text-muted">{t.blogPage.emptyState}</p>
-      </PaperCard>
+      <p class="text-muted">{t.blogPage.emptyState}</p>
     ) : (
-      <>
-        {tagSummaries.length > 0 && (
-          <section class="stack blog-tags" aria-labelledby="blog-tags-title">
-            <MotionReveal as="div" kind="slide-in" delay={100}>
-              <h2 id="blog-tags-title">{t.blogPage.browseByTagTitle}</h2>
-              <p class="text-muted">{t.blogPage.browseByTagText}</p>
-            </MotionReveal>
-
-            <div class="blog-tags__list" role="list" aria-label={t.blogPage.tagsAria}>
-              {tagSummaries.map((tagSummary) => (
-                <a class="pill blog-tags__pill" role="listitem" href={tagSummary.href}>
-                  {tagSummary.tag}
-                  <span>{tagSummary.count}</span>
-                </a>
-              ))}
-            </div>
-          </section>
+      <section class="blog-list" aria-label={t.blogPage.latestPostsTitle}>
+        {lead && (
+          <div class="motion-reveal">
+            <BlogCard post={lead} tone={toneAt(0)} size="feature" />
+          </div>
         )}
-
-        <section class="stack blog-list" aria-labelledby="blog-list-title">
-          <MotionReveal as="div" kind="slide-in" delay={120}>
-            <h2 id="blog-list-title">{t.blogPage.latestPostsTitle}</h2>
-            <p class="text-muted">{t.blogPage.latestPostsText}</p>
-          </MotionReveal>
-
-          <StaggerGroup as="ul" class="blog-list__grid" step={80}>
-            {pagination.items.map((post) => (
+        {rest.length > 0 && (
+          <ul class="blog-list__rows motion-stagger" role="list">
+            {rest.map((post, index) => (
               <li>
-                <BlogCard post={post} />
+                <BlogCard post={post} tone={toneAt(index + 1)} />
               </li>
             ))}
-          </StaggerGroup>
-
-          <BlogPagination
-            currentPage={pagination.page}
-            totalPages={pagination.totalPages}
-            previousPageHref={pagination.previousPageHref}
-            nextPageHref={pagination.nextPageHref}
-          />
-        </section>
-      </>
+          </ul>
+        )}
+        <BlogPagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          previousPageHref={pagination.previousPageHref}
+          nextPageHref={pagination.nextPageHref}
+        />
+      </section>
     )
   }
 </BaseLayout>
 
 <style>
-  .blog-hero__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
+  .blog-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
   }
 
-  .blog-tags {
-    margin-top: var(--space-3);
+  .blog-hero__text {
+    display: grid;
+    gap: var(--space-5);
   }
 
-  .blog-tags__list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
+  .blog-hero__text .chip-list {
+    max-width: 44rem;
+    margin-top: var(--space-2);
   }
 
-  .blog-tags__pill {
-    gap: 0.45rem;
-  }
-
-  .blog-tags__pill span {
-    border-radius: var(--radius-pill);
-    padding: 0.2rem 0.5rem;
-    border: 1px solid var(--color-border-strong);
-    background: var(--color-accent-soft);
-    color: var(--color-text-strong);
-    font-size: 0.72rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    line-height: 1.1;
+  .blog-hero__character {
+    width: clamp(12rem, 20vw, 17rem);
+    height: auto;
+    margin-bottom: calc(-1 * clamp(1rem, 3vw, 2.5rem));
   }
 
   .blog-list {
-    margin-top: var(--space-4);
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
   }
 
-  .blog-list__grid {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  .blog-list__rows {
     display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+
+  .blog-list__rows > li + li {
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  @media (max-width: 40rem) {
+    .blog-hero__text .chip-list > :nth-child(n + 7) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 52rem) {
+    .blog-hero {
+      grid-template-columns: 1fr;
+    }
+
+    .blog-hero__character {
+      display: none;
+    }
   }
 </style>

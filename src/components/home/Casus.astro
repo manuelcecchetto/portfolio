@@ -1,0 +1,483 @@
+---
+import CasusLogo from "../ui/CasusLogo.astro";
+import type { HomeCopy } from "../../lib/home-copy";
+
+export interface Props {
+  copy: HomeCopy["casus"];
+}
+
+const { copy } = Astro.props;
+---
+
+<section id="casus" class="band band--navy casus" aria-labelledby="casus-title">
+  <div class="site-shell casus__grid">
+    <div class="casus__copy motion-reveal">
+      <span class="casus__wordmark"><CasusLogo /></span>
+      <h2 id="casus-title">{copy.title}</h2>
+      <p class="band__lead">{copy.lead}</p>
+
+      <ul class="casus__list" role="list">
+        {
+          copy.highlights.map((item) => (
+            <li>
+              <span class="casus__tick" aria-hidden="true">
+                <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" /></svg>
+              </span>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a class="casus__link" href="https://getcasus.com" rel="noopener">getcasus.com ↗</a>
+    </div>
+
+    <div class="casus__mock-wrap motion-reveal motion-reveal--soft-zoom" style="--motion-delay: 150ms">
+      <p class="casus__note hand" aria-hidden="true">{copy.note}</p>
+      <figure class="word" aria-label="Illustration of CASUS Review running inside Microsoft Word">
+        <div class="word__bar" aria-hidden="true">
+          <span class="word__dots"><i></i><i></i><i></i></span>
+          <span class="word__name">Master Services Agreement.docx</span>
+        </div>
+        <div class="word__ribbon" aria-hidden="true">
+          <span>Home</span><span>Insert</span><span>Review</span><span class="is-on">CASUS</span>
+        </div>
+        <div class="word__body" aria-hidden="true">
+          <div class="word__page">
+            <p class="word__h">9. Limitation of liability</p>
+            <p class="word__p">
+              9.1 The Supplier's total liability arising out of or in connection with this Agreement shall be
+              <del>unlimited</del>
+              <ins>limited to the fees paid in the twelve (12) months preceding the claim</ins>.
+            </p>
+            <span class="word__line"></span>
+            <span class="word__line word__line--short"></span>
+            <p class="word__h">10. Term and renewal</p>
+            <span class="word__line"></span>
+            <span class="word__line"></span>
+            <span class="word__line word__line--mid"></span>
+            <span class="word__cursor"></span>
+          </div>
+
+          <aside class="pane">
+            <div class="pane__head">
+              <span class="pane__logo"><CasusLogo variant="mark" title="" /></span>
+              <strong>Review</strong>
+              <span class="pane__status"><i></i>3 findings</span>
+            </div>
+            <div class="finding finding--active">
+              <span class="finding__sev finding__sev--high">High</span>
+              <strong>Uncapped liability</strong>
+              <p>Supplier liability has no cap. Limit to 12 months of fees.</p>
+              <span class="finding__actions"><b>Accept</b><em>Reject</em></span>
+            </div>
+            <div class="finding">
+              <span class="finding__sev finding__sev--mid">Medium</span>
+              <strong>Silent auto-renewal</strong>
+            </div>
+            <div class="finding">
+              <span class="finding__sev finding__sev--low">Low</span>
+              <strong>Governing law missing</strong>
+            </div>
+          </aside>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .casus {
+    overflow: hidden;
+  }
+
+  .casus::before {
+    content: "";
+    position: absolute;
+    width: 46rem;
+    height: 46rem;
+    right: -12rem;
+    top: -6rem;
+    border-radius: 50%;
+    background: radial-gradient(circle closest-side, rgb(37 99 235 / 0.3), transparent);
+    pointer-events: none;
+  }
+
+  .casus__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .casus__copy {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .casus__wordmark {
+    display: block;
+    width: 8.5rem;
+    color: #fff;
+    margin-bottom: var(--space-2);
+  }
+
+  .casus__wordmark :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+
+  .casus__list {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .casus__list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-3);
+    align-items: start;
+  }
+
+  .casus__list h3 {
+    font-size: 1.08rem;
+    letter-spacing: -0.015em;
+  }
+
+  .casus__list p {
+    font-size: 0.98rem;
+  }
+
+  .casus__tick {
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-top: 0.05rem;
+    border-radius: 0.5rem;
+    background: var(--casus-blue);
+  }
+
+  .casus__tick svg {
+    width: 0.95rem;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .casus__link {
+    margin-top: var(--space-2);
+    color: #9fb6ff;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .casus__link:hover {
+    color: #fff;
+  }
+
+  /* ----- Word mock ----- */
+
+  .casus__mock-wrap {
+    position: relative;
+  }
+
+  .casus__note {
+    position: absolute;
+    top: -2.4rem;
+    right: 1rem;
+    color: #9fb6ff;
+    transform: rotate(4deg);
+  }
+
+  .word {
+    border-radius: 1.1rem;
+    overflow: hidden;
+    background: #f3f4f7;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 40px 80px -30px rgb(0 0 0 / 0.7);
+    transform: perspective(1400px) rotateY(-5deg) rotateX(2deg);
+    transition: transform 700ms var(--ease-out-soft);
+    color: #1f263a;
+  }
+
+  .word:hover {
+    transform: none;
+  }
+
+  .word__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 0.9rem;
+    background: #185abd;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .word__dots {
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+
+  .word__dots i {
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.45);
+  }
+
+  .word__ribbon {
+    display: flex;
+    gap: 1.1rem;
+    padding: 0.45rem 0.9rem;
+    background: #fff;
+    border-bottom: 1px solid #e3e6ec;
+    font-size: 0.74rem;
+    color: #5c6475;
+  }
+
+  .word__ribbon .is-on {
+    color: var(--casus-blue);
+    font-weight: 700;
+    box-shadow: inset 0 -2px 0 var(--casus-blue);
+  }
+
+  .word__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13.5rem;
+    min-height: 21rem;
+  }
+
+  .word__page {
+    position: relative;
+    margin: 1rem;
+    padding: 1.4rem 1.4rem 1.6rem;
+    background: #fff;
+    border-radius: 0.3rem;
+    box-shadow: 0 1px 3px rgb(31 38 58 / 0.12);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+  }
+
+  .word__h {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .word__p del {
+    color: #d13438;
+    text-decoration-thickness: 1.5px;
+    animation: redline-del 9s infinite;
+  }
+
+  .word__p ins {
+    color: #185abd;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    border-radius: 0.2rem;
+    animation: redline-ins 9s infinite;
+  }
+
+  .word__line {
+    display: block;
+    height: 0.45rem;
+    border-radius: 1rem;
+    background: #e7e9ee;
+  }
+
+  .word__line--short { width: 45%; }
+  .word__line--mid { width: 70%; }
+
+  .word__cursor {
+    width: 1.5px;
+    height: 0.9rem;
+    background: #1f263a;
+    animation: caret 1s steps(1) infinite;
+  }
+
+  .pane {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    padding: 0.9rem 0.8rem;
+    background: #fff;
+    border-left: 1px solid #e3e6ec;
+    font-size: 0.74rem;
+  }
+
+  .pane__head {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid #eef0f4;
+    font-size: 0.85rem;
+  }
+
+  .pane__logo {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.4rem;
+    background: var(--casus-ink);
+    color: #fff;
+  }
+
+  .pane__logo :global(svg) {
+    width: 0.65rem;
+    height: auto;
+  }
+
+  .pane__status {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--casus-slate);
+    font-size: 0.68rem;
+  }
+
+  .pane__status i {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: ping 2s infinite;
+  }
+
+  .finding {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.6rem 0.65rem;
+    border-radius: 0.6rem;
+    border: 1px solid #e3e6ec;
+    justify-items: start;
+  }
+
+  .finding strong {
+    font-size: 0.78rem;
+  }
+
+  .finding p {
+    color: var(--casus-slate);
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .finding--active {
+    border-color: var(--casus-blue);
+    box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+  }
+
+  .finding__sev {
+    padding: 0.08rem 0.45rem;
+    border-radius: 1rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .finding__sev--high { background: #fde2e2; color: #b42318; }
+  .finding__sev--mid { background: #fff1d6; color: #9a5b00; }
+  .finding__sev--low { background: #e5edff; color: #1d4ed8; }
+
+  .finding__actions {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+  }
+
+  .finding__actions b,
+  .finding__actions em {
+    padding: 0.22rem 0.6rem;
+    border-radius: 0.4rem;
+    font-style: normal;
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .finding__actions b {
+    background: var(--casus-blue);
+    color: #fff;
+    animation: press 9s infinite;
+  }
+
+  .finding__actions em {
+    border: 1px solid #d5d9e2;
+    color: #1f263a;
+  }
+
+  @keyframes redline-del {
+    0%, 30% { opacity: 1; text-decoration-color: transparent; color: #1f263a; }
+    36%, 100% { opacity: 1; text-decoration-color: currentColor; color: #d13438; }
+  }
+
+  @keyframes redline-ins {
+    0%, 34% { opacity: 0; background: transparent; }
+    42% { opacity: 1; background: rgb(37 99 235 / 0.22); }
+    70%, 94% { opacity: 1; background: rgb(37 99 235 / 0.06); }
+    100% { opacity: 0; }
+  }
+
+  @keyframes press {
+    0%, 24%, 34%, 100% { transform: none; box-shadow: none; }
+    28% { transform: scale(0.92); box-shadow: 0 0 0 4px rgb(37 99 235 / 0.25); }
+  }
+
+  @keyframes caret {
+    50% { opacity: 0; }
+  }
+
+  @keyframes ping {
+    50% { box-shadow: 0 0 0 4px rgb(34 197 94 / 0.25); }
+  }
+
+  @media (max-width: 60rem) {
+    .casus__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .casus__mock-wrap {
+      margin-top: var(--space-8);
+    }
+
+    .word {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 34rem) {
+    .word__body {
+      grid-template-columns: 1fr;
+    }
+
+    .pane {
+      border-left: 0;
+      border-top: 1px solid #e3e6ec;
+    }
+
+    .finding:not(.finding--active) {
+      display: none;
+    }
+  }
+</style>

@@ -23,26 +23,32 @@ const { src, alt, caption } = Astro.props as Props;
 
 <style>
   .prose-figure {
-    margin: var(--space-6) 0;
     display: grid;
-    gap: var(--space-2);
+    gap: 0.8rem;
+    margin-block: 2em;
   }
 
   .prose-figure img {
     width: 100%;
     height: auto;
-    display: block;
-    border-radius: var(--radius-md);
-    border: var(--line-soft);
-    box-shadow: var(--shadow-soft);
-    background: hsl(0 0% 100% / 0.78);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    background: var(--charcoal);
   }
 
   .prose-figure figcaption {
-    font-size: 0.78rem;
+    display: flex;
+    gap: 0.5rem;
+    padding-left: 0.2rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
     color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  }
+
+  .prose-figure figcaption::before {
+    content: "↑";
+    font-weight: 700;
+    color: var(--ink);
   }
 </style>

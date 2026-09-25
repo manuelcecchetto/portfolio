@@ -17,48 +17,49 @@ if (totalPages < 1) {
 }
 ---
 
-<nav class="blog-pagination" aria-label={t.blogPagination.aria}>
-  {previousPageHref ? <a href={previousPageHref}>{t.blogPagination.newerPosts}</a> : <span aria-hidden="true">{t.blogPagination.newerPosts}</span>}
-
-  <p class="blog-pagination__status">{t.blogPagination.pageLabel} {currentPage} / {totalPages}</p>
-
-  {nextPageHref ? <a href={nextPageHref}>{t.blogPagination.olderPosts}</a> : <span aria-hidden="true">{t.blogPagination.olderPosts}</span>}
-</nav>
+{
+  totalPages > 1 && (
+    <nav class="blog-pagination" aria-label={t.blogPagination.aria}>
+      {previousPageHref ? (
+        <a class="cta cta--secondary" href={previousPageHref}>
+          <span aria-hidden="true">←</span> {t.blogPagination.newerPosts}
+        </a>
+      ) : (
+        <span />
+      )}
+      <p class="blog-pagination__status">
+        {t.blogPagination.pageLabel} {currentPage} / {totalPages}
+      </p>
+      {nextPageHref ? (
+        <a class="cta cta--secondary" href={nextPageHref}>
+          {t.blogPagination.olderPosts} <span class="cta__arrow" aria-hidden="true">→</span>
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  )
+}
 
 <style>
   .blog-pagination {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    border-radius: var(--radius-md);
-    border: var(--line-soft);
-    padding: var(--space-3) var(--space-4);
-    background: hsl(0 0% 100% / 0.72);
-    box-shadow: var(--shadow-soft), var(--shadow-inset);
+    gap: var(--space-4);
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
 
-  .blog-pagination a,
-  .blog-pagination span {
-    font-size: 0.73rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    text-decoration: none;
-    color: var(--color-text-muted);
+  .blog-pagination > :last-child {
+    justify-self: end;
   }
 
-  .blog-pagination a {
-    color: var(--color-accent);
-    font-weight: 700;
+  .blog-pagination > :first-child {
+    justify-self: start;
   }
 
   .blog-pagination__status {
-    font-size: 0.72rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
+    font-weight: 600;
     color: var(--color-text-muted);
   }
 </style>

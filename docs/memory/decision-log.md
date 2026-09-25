@@ -206,3 +206,17 @@ Source of truth for architecture and policy decisions.
 - Impact: `src/content/schemas.ts`, `src/lib/content.ts`, `src/pages/projects/**/*`, `src/pages/blog/**/*`, and editorial content under `src/data/{projects,blog}/**`.
 - Supersedes: none
 - Superseded By: none
+
+### [DEC-013] Single-Page Home, Pastel Band Pages, No Eyebrow Labels
+- NodeID: portfolio_redesign_2026_09
+- Date: 2026-09-25
+- Author: claude_code
+- Change: Replaced the scrapbook/paper design with a cream/charcoal/pastel system joined by animated liquid dividers; folded About and Contact into home sections.
+- Status: approved
+- Scope: architecture
+- Context: The owner rejected the previous look and asked for a bold redesign without eyebrow labels, section numbers or an aggressive CASUS call to action.
+- Decision: `/` is one page of full-bleed sections (`#work`, `#about`, `#contact`); `/about` and `/contact` (all locales) are 301 redirects to those anchors via `astro.config.mjs` `redirects`. Inner pages use a pastel hero band that melts into cream through `LiquidDivider`. No uppercase mono labels or eyebrows anywhere. CASUS gets a quiet text mention and a getcasus.com link only.
+- Rationale: A personal portfolio reads better as one story; shared band/divider/tone primitives keep inner pages visually continuous with the home page.
+- Impact: `src/layouts/BaseLayout.astro`, `src/components/home/*`, `src/components/{projects,blog,prose}/*`, `src/styles/*`, `src/lib/{home-copy,tones}.ts`, `astro.config.mjs`.
+- Supersedes: layout/primitive parts of CON-001, CON-004, CON-005
+- Superseded By: none

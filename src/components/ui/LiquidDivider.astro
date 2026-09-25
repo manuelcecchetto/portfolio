@@ -1,0 +1,201 @@
+---
+/**
+ * A seamless, animated liquid boundary between two full-bleed sections.
+ * The top edge is `from`, the bottom edge is `to`. Back layers blend the two
+ * colors with gradients; the front layer is a goo-filtered (metaball) surface
+ * whose droplets bulge out, detach and fall back in.
+ */
+export interface Props {
+  from: string;
+  to: string;
+  class?: string;
+}
+
+const { from, to, class: className = "" } = Astro.props;
+
+// Deterministic per-pair randomness so every divider differs but builds stay stable.
+let seed = [...`${from}|${to}`].reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) >>> 0, 7);
+const rand = () => {
+  seed = (seed * 1664525 + 1013904223) >>> 0;
+  return seed / 2 ** 32;
+};
+
+// The track is two periods wide; translating it by -50% loops seamlessly.
+const WIDTH = 2880;
+const PERIOD = 1440;
+const HEIGHT = 200;
+
+function waveFn(base: number, amp: number) {
+  const harmonics = [1, 2, 3].map((k) => ({ k, a: amp / k ** 0.9, p: rand() * Math.PI * 2 }));
+  return (x: number) => harmonics.reduce((acc, h) => acc + h.a * Math.sin((2 * Math.PI * h.k * x) / PERIOD + h.p), base);
+}
+
+function wavePath(fn: (x: number) => number): string {
+  const points: string[] = [];
+  // Overshoot both ends so the goo blur never erodes the visible edges.
+  for (let x = -48; x <= WIDTH + 48; x += 16) {
+    points.push(`${x},${fn(x).toFixed(1)}`);
+  }
+  return `M-48,${HEIGHT + 30} L${points.join(" L")} L${WIDTH + 48},${HEIGHT + 30} Z`;
+}
+
+const back = wavePath(waveFn(62, 30));
+const mid = wavePath(waveFn(96, 26));
+const frontFn = waveFn(128, 22);
+const front = wavePath(frontFn);
+
+// Droplets sit on the front surface; each is duplicated one period later so the loop is seamless.
+const droplets = Array.from({ length: 7 }, (_, index) => {
+  const cx = Math.round((index + 0.2 + rand() * 0.6) * (PERIOD / 7));
+  return {
+    cx,
+    cy: Math.round(frontFn(cx) + 10),
+    r: Math.round(11 + rand() * 11),
+    rise: Math.round(22 + rand() * 26),
+    delay: (rand() * -8).toFixed(2),
+    duration: (5.5 + rand() * 4).toFixed(2),
+  };
+}).flatMap((drop) => [drop, { ...drop, cx: drop.cx + PERIOD }]);
+
+const uid = `liquid-${Math.round(rand() * 1e9).toString(36)}`;
+const style = `--liquid-from: ${from}; --liquid-to: ${to};`;
+---
+
+<div class:list={["liquid", className]} style={style} aria-hidden="true" data-liquid>
+  <svg class="liquid__track liquid__track--back" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none">
+    <defs>
+      <linearGradient id={`${uid}-back`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" class="liquid__stop liquid__stop--18" />
+        <stop offset="1" class="liquid__stop liquid__stop--42" />
+      </linearGradient>
+      <linearGradient id={`${uid}-mid`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" class="liquid__stop liquid__stop--48" />
+        <stop offset="1" class="liquid__stop liquid__stop--76" />
+      </linearGradient>
+    </defs>
+    <path d={back} fill={`url(#${uid}-back)`} />
+  </svg>
+
+  <svg class="liquid__track liquid__track--mid" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none">
+    <path d={mid} fill={`url(#${uid}-mid)`} />
+  </svg>
+
+  <svg class="liquid__track liquid__track--front" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none">
+    <defs>
+      <filter id={`${uid}-goo`} x="-3%" y="-50%" width="106%" height="200%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+        <feColorMatrix in="blur" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" />
+      </filter>
+    </defs>
+    <g filter={`url(#${uid}-goo)`}>
+      <path d={front} />
+      {
+        droplets.map((drop) => (
+          <circle
+            class="liquid__drop"
+            cx={drop.cx}
+            cy={drop.cy}
+            r={drop.r}
+            style={`--rise: ${-drop.rise}px; animation-delay: ${drop.delay}s; animation-duration: ${drop.duration}s;`}
+          />
+        ))
+      }
+    </g>
+  </svg>
+</div>
+
+<script>
+  // Only animate dividers that are on screen; the goo filter is not free.
+  const dividers = document.querySelectorAll<HTMLElement>("[data-liquid]");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        entry.target.classList.toggle("is-live", entry.isIntersecting);
+      }
+    });
+    dividers.forEach((divider) => observer.observe(divider));
+  } else {
+    dividers.forEach((divider) => divider.classList.add("is-live"));
+  }
+</script>
+
+<style>
+  .liquid {
+    --liquid-h: clamp(104px, 12vw, 190px);
+    position: relative;
+    height: var(--liquid-h);
+    background: var(--liquid-from);
+    overflow: hidden;
+    /* Overlap by a hair so sub-pixel rounding never shows a seam. */
+    margin-block: -1px;
+    isolation: isolate;
+  }
+
+  .liquid__track {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    /* Two periods wide, but never narrower than the width that keeps droplets round. */
+    width: max(200%, var(--liquid-h) * 14.4);
+    max-width: none;
+    height: calc(100% + 1px);
+    overflow: visible;
+    animation: liquid-flow var(--flow, 20s) linear infinite paused;
+    will-change: transform;
+  }
+
+  .liquid__track--back {
+    --flow: 34s;
+  }
+
+  .liquid__track--mid {
+    --flow: 23s;
+    animation-direction: reverse;
+  }
+
+  .liquid__track--front {
+    --flow: 15s;
+    fill: var(--liquid-to);
+  }
+
+  .liquid__stop--18 { stop-color: color-mix(in oklab, var(--liquid-to) 18%, var(--liquid-from)); }
+  .liquid__stop--42 { stop-color: color-mix(in oklab, var(--liquid-to) 42%, var(--liquid-from)); }
+  .liquid__stop--48 { stop-color: color-mix(in oklab, var(--liquid-to) 48%, var(--liquid-from)); }
+  .liquid__stop--76 { stop-color: color-mix(in oklab, var(--liquid-to) 76%, var(--liquid-from)); }
+
+  .liquid__drop {
+    animation: liquid-drop 7s ease-in-out infinite paused;
+  }
+
+  .liquid.is-live .liquid__track,
+  .liquid.is-live .liquid__drop {
+    animation-play-state: running;
+  }
+
+  @keyframes liquid-flow {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Bulge out of the surface, pinch off, hang, and fall back in. */
+  @keyframes liquid-drop {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    45% {
+      transform: translateY(var(--rise));
+    }
+    60% {
+      transform: translateY(calc(var(--rise) * 1.08));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid__track,
+    .liquid__drop {
+      animation: none;
+    }
+  }
+</style>

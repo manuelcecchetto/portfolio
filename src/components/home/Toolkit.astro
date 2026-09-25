@@ -1,0 +1,187 @@
+---
+import type { HomeCopy } from "../../lib/home-copy";
+
+export interface Props {
+  copy: HomeCopy["toolkit"];
+}
+
+const { copy } = Astro.props;
+
+// Logos: Lobe Icons (MIT) and Font Awesome Free (CC BY 4.0).
+const tools = [
+  { name: "OpenAI", file: "openai" },
+  { name: "Claude", file: "claude" },
+  { name: "Azure", file: "azure" },
+  { name: "LlamaIndex", file: "llamaindex" },
+  { name: "React", file: "react" },
+  { name: "Node.js", file: "nodejs" },
+  { name: "Python", file: "python" },
+  { name: "Google Cloud", file: "gcloud" },
+];
+
+const extras = ["TypeScript", "Office.js", "LangChain", "Langfuse", "OpenTelemetry", "Qdrant", "Playwright", "Astro"];
+---
+
+<section class="band band--charcoal toolkit" aria-labelledby="toolkit-title">
+  <div class="site-shell toolkit__grid">
+    <div>
+      <header class="band__head motion-reveal">
+        <h2 id="toolkit-title">{copy.title}</h2>
+        <p class="band__lead">{copy.lead}</p>
+      </header>
+
+      <ul class="tools motion-stagger" role="list" style="--stagger-step: 60ms">
+        {
+          tools.map((tool) => (
+            <li class="tool">
+              <img src={`/images/tools/${tool.file}.svg`} alt="" width="40" height="40" loading="lazy" />
+              <span>{tool.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="extras-label">{copy.alsoUsing}</p>
+      <ul class="extras" role="list">
+        {extras.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+
+    <figure class="quote motion-reveal motion-reveal--soft-zoom">
+      <svg class="quote__mark" viewBox="0 0 48 36" aria-hidden="true">
+        <path d="M0 36V20C0 8 6 1.5 18 0l2 5C13 7 10 11 10 17h9v19H0zm28 0V20C28 8 34 1.5 46 0l2 5c-7 2-10 6-10 12h9v19H28z" />
+      </svg>
+      <blockquote>{copy.quote}</blockquote>
+      <figcaption class="hand">— {copy.quoteBy}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .toolkit__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: center;
+  }
+
+  .tools {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tool {
+    display: grid;
+    justify-items: center;
+    gap: 0.7rem;
+    padding: 1.3rem 0.6rem 1rem;
+    border-radius: 1.3rem;
+    background: var(--cream);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    transition:
+      transform var(--duration-base) var(--ease-spring),
+      opacity var(--duration-slow) var(--ease-out-soft);
+  }
+
+  .tool img {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: contain;
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .tool:hover {
+    transform: translateY(-4px) rotate(-2deg);
+  }
+
+  .tool:hover img {
+    transform: scale(1.15) rotate(6deg);
+  }
+
+  .tool:nth-child(4n + 1) { background: var(--lavender); }
+  .tool:nth-child(4n + 2) { background: var(--peach); }
+  .tool:nth-child(4n + 3) { background: var(--mint); }
+  .tool:nth-child(4n + 4) { background: var(--cream); }
+  .tool:nth-child(n + 5):nth-child(4n + 1) { background: var(--mint); }
+  .tool:nth-child(n + 5):nth-child(4n + 3) { background: var(--lavender); }
+
+  .extras-label {
+    margin-top: var(--space-8);
+    font-weight: 700;
+    color: var(--cream);
+  }
+
+  .extras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .extras li {
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-dark);
+    background: var(--charcoal-soft);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #d6d9de;
+  }
+
+  .quote {
+    position: relative;
+    display: grid;
+    gap: var(--space-5);
+    padding: clamp(1.8rem, 3vw, 2.6rem);
+    border-radius: var(--radius-xl);
+    background: var(--butter);
+    color: var(--ink);
+    transform: rotate(2deg);
+    box-shadow: 8px 8px 0 #000;
+  }
+
+  .quote__mark {
+    width: 3rem;
+    fill: var(--ink);
+  }
+
+  .quote blockquote {
+    margin: 0;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+  }
+
+  .quote figcaption {
+    font-size: 1.6rem;
+    justify-self: end;
+    transform: rotate(-4deg);
+  }
+
+  @media (max-width: 60rem) {
+    .toolkit__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .quote {
+      max-width: 26rem;
+      justify-self: center;
+    }
+  }
+
+  @media (max-width: 34rem) {
+    .tools {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

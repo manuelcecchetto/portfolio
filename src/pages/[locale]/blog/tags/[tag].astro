@@ -1,19 +1,18 @@
 ---
-import BlogTagPage, { getStaticPaths as getDefaultTagPaths } from "../../../blog/tags/[tag].astro";
+import BlogTagPage from "../../../blog/tags/[tag].astro";
+import { getBlogTagSummaries, getLocalizedBlogPosts } from "../../../../lib/content";
 import { NON_DEFAULT_LOCALES } from "../../../../lib/i18n";
 
+// Tags come from each locale's own posts: translated entries carry translated tags.
 export async function getStaticPaths() {
-  const basePaths = await getDefaultTagPaths();
-
-  return NON_DEFAULT_LOCALES.flatMap((locale) =>
-    basePaths.map((entry) => ({
-      params: {
-        ...entry.params,
-        locale,
-      },
-      props: entry.props,
-    })),
+  const includeDrafts = !import.meta.env.PROD;
+  const perLocale = await Promise.all(
+    NON_DEFAULT_LOCALES.map(async (locale) => {
+      const posts = await getLocalizedBlogPosts(locale, { includeDrafts });
+      return getBlogTagSummaries(posts, locale).map(({ tag }) => ({ params: { locale, tag }, props: { tag } }));
+    }),
   );
+  return perLocale.flat();
 }
 ---
 

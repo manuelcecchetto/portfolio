@@ -1,13 +1,16 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import MotionReveal from "../../components/ui/MotionReveal.astro";
-import StaggerGroup from "../../components/ui/StaggerGroup.astro";
 import ProjectCard from "../../components/projects/ProjectCard.astro";
 import ProjectDetailsPanel from "../../components/projects/ProjectDetailsPanel.astro";
-import ImagePlaceholder from "../../components/ui/ImagePlaceholder.astro";
-import { getLocalizedProjectBySlug, getLocalizedProjects, getProjectRouteSlugs, type ProjectEntry } from "../../lib/content";
+import {
+  getLocalizedProjectBySlug,
+  getLocalizedProjects,
+  getProjectRouteSlugs,
+  orderProjectsForDisplay,
+} from "../../lib/content";
 import { getCopy, localizePath, resolveLocale } from "../../lib/i18n";
+import { toneAt } from "../../lib/tones";
 
 export async function getStaticPaths() {
   const slugs = await getProjectRouteSlugs({ includeDrafts: !import.meta.env.PROD });
@@ -29,11 +32,15 @@ const project = await getLocalizedProjectBySlug(slug, locale);
 if (!project) {
   throw new Error(`Unable to resolve localized project for slug '${slug}' in locale '${locale}'.`);
 }
-const relatedProjects = (await getLocalizedProjects(locale)).filter(
-  (entry: ProjectEntry) => entry.data.translationGroup !== project.data.translationGroup,
-).slice(0, 2);
+
+// Same order as the index, so the hero band matches the card color.
+const ordered = orderProjectsForDisplay(await getLocalizedProjects(locale));
+const position = ordered.findIndex((entry) => entry.data.translationGroup === project.data.translationGroup);
+const related = ordered
+  .map((entry, index) => ({ entry, tone: toneAt(index) }))
+  .filter(({ entry }) => entry.data.translationGroup !== project.data.translationGroup)
+  .slice(0, 3);
 const { Content } = await render(project);
-const tags = project.data.tags.length > 0 ? project.data.tags : ["case-study"];
 const t = getCopy(locale);
 ---
 
@@ -42,163 +49,96 @@ const t = getCopy(locale);
   description={project.data.summary}
   ogType="article"
   image={project.data.coverImage}
+  tone={toneAt(Math.max(0, position))}
 >
-  <MotionReveal as="section" kind="soft-zoom" class="page-hero project-detail-hero" slot="hero">
-    <a class="project-detail-hero__back" href={localizePath(locale, "/projects")}>{t.projectDetail.backToAll}</a>
-    <span class="eyebrow">{t.projectDetail.eyebrow}</span>
+  <header class="page-hero project-hero motion-reveal" slot="hero">
+    <a class="back-link" href={localizePath(locale, "/projects")}>{t.projectDetail.backToAll}</a>
     <h1>{project.data.title}</h1>
-    <p>{project.data.summary}</p>
-
-    <div class="project-detail-hero__tags" role="list" aria-label={t.projectDetail.themesAria}>
-      {tags.map((tag) => (
-        <span class="pill" role="listitem">
-          {tag}
-        </span>
-      ))}
-    </div>
-  </MotionReveal>
-
-  <section class="project-detail-layout">
-    <article class="project-detail-body">
-      {
-        project.data.coverImage ? (
-          <img
-            class="project-detail-body__cover"
-            src={project.data.coverImage}
-            alt={`${t.projectDetail.coverAltPrefix} ${project.data.title}`}
-            loading="eager"
-            decoding="async"
-          />
-        ) : (
-          <ImagePlaceholder label={`${project.data.title} Hero Placeholder`} hint="Project hero screenshot" ratio="wide" />
-        )
-      }
-      <div class="project-detail-content">
-        <Content />
-      </div>
-    </article>
-
-    <ProjectDetailsPanel project={project} />
-  </section>
+    <p class="page-hero__lead">{project.data.summary}</p>
+  </header>
 
   {
-    relatedProjects.length > 0 && (
-      <section class="stack project-related" aria-labelledby="project-related-title">
-        <MotionReveal as="div" kind="slide-in" delay={120}>
-          <h2 id="project-related-title">{t.projectDetail.relatedTitle}</h2>
-          <p class="text-muted">{t.projectDetail.relatedText}</p>
-        </MotionReveal>
+    project.data.coverImage && (
+      <img
+        class="project-cover motion-reveal"
+        src={project.data.coverImage}
+        alt={`${t.projectDetail.coverAltPrefix} ${project.data.title}`}
+        loading="eager"
+        decoding="async"
+      />
+    )
+  }
 
-        <StaggerGroup as="ul" class="project-related__grid" step={90}>
-          {relatedProjects.map((entry) => (
+  <div class="project-layout">
+    <article class="prose">
+      <Content />
+    </article>
+    <div class="project-layout__aside">
+      <ProjectDetailsPanel project={project} />
+    </div>
+  </div>
+
+  {
+    related.length > 0 && (
+      <section aria-labelledby="project-related-title">
+        <div class="section-head motion-reveal">
+          <h2 id="project-related-title" class="section-title">{t.projectDetail.relatedTitle}</h2>
+          <a class="link-arrow" href={localizePath(locale, "/projects")}>{t.projectDetail.backToAll}</a>
+        </div>
+        <ul class="project-related motion-stagger" role="list">
+          {related.map(({ entry, tone }) => (
             <li>
-              <ProjectCard project={entry} />
+              <ProjectCard project={entry} tone={tone} />
             </li>
           ))}
-        </StaggerGroup>
+        </ul>
       </section>
     )
   }
 </BaseLayout>
 
 <style>
-  .project-detail-hero {
-    gap: var(--space-5);
+  .project-hero h1 {
+    max-width: 20ch;
+    font-size: clamp(2.4rem, 5.6vw, 4.8rem);
   }
 
-  .project-detail-hero__back {
-    width: fit-content;
-    text-decoration: none;
-    font-size: 0.72rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-strong);
+  .project-cover {
+    width: 100%;
+    max-height: 40rem;
+    object-fit: cover;
+    object-position: top;
+    border-radius: var(--radius-xl);
+    border: 1.5px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--ink);
+    background: var(--charcoal);
   }
 
-  .project-detail-hero__back::before {
-    content: "<-";
-    margin-right: 0.45rem;
-    color: var(--color-accent);
-  }
-
-  .project-detail-hero__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-
-  .project-detail-layout {
+  .project-layout {
     display: grid;
-    gap: var(--space-5);
-    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+    gap: clamp(2rem, 5vw, 4.5rem);
     align-items: start;
   }
 
-  .project-detail-body {
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  .project-detail-body__cover {
-    width: 100%;
-    aspect-ratio: 21 / 9;
-    object-fit: cover;
-    display: block;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border-strong);
-    background: hsl(0 0% 100% / 0.72);
-    box-shadow: var(--shadow-soft);
-  }
-
-  .project-detail-content {
-    border-radius: var(--radius-lg);
-    border: var(--line-soft);
-    background: var(--color-surface-strong);
-    box-shadow: var(--shadow-soft), var(--shadow-inset);
-    padding: clamp(var(--space-5), 4vw, var(--space-8));
-  }
-
-  .project-detail-content :global(p + p) {
-    margin-top: var(--space-4);
-  }
-
-  .project-detail-content :global(h2),
-  .project-detail-content :global(h3) {
-    margin-top: var(--space-6);
-    line-height: 1.18;
-  }
-
-  .project-detail-content :global(h2) {
-    font-size: clamp(1.5rem, 2.4vw, 2.15rem);
-  }
-
-  .project-detail-content :global(h3) {
-    font-size: clamp(1.16rem, 1.6vw, 1.45rem);
-  }
-
-  .project-detail-content :global(ul),
-  .project-detail-content :global(ol) {
-    margin-top: var(--space-4);
-    padding-left: 1.2rem;
+  .project-layout__aside {
+    position: sticky;
+    top: 6rem;
   }
 
   .project-related {
-    margin-top: var(--space-5);
-  }
-
-  .project-related__grid {
-    margin: 0;
-    padding: 0;
-    list-style: none;
     display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
   }
 
-  @media (max-width: 56rem) {
-    .project-detail-layout {
+  @media (max-width: 60rem) {
+    .project-layout {
       grid-template-columns: 1fr;
+    }
+
+    .project-layout__aside {
+      position: static;
     }
   }
 </style>

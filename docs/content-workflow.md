@@ -16,30 +16,26 @@ Collections are defined in `src/content.config.ts` and validated by schemas in `
 
 ## Required Frontmatter
 
-Both collections require:
+The schemas in `src/content/schemas.ts` are the source of truth. Both collections require:
 
-- `title` (string)
-- `slug` (string; URL segment)
-- `summary` (string)
+- `title` (3–120 chars)
+- `slug` (kebab-case URL segment, shared by every translation)
+- `locale` (`en`, `it`, `de`, `fr`, `zh`, `hi`) and `translationGroup` (`projects:<slug>` or `blog:<slug>`)
+- `summary` (24–240 chars; shown on cards and as the hero lead)
 - `publishedAt` (date)
-- `tags` (array of strings)
+- `tags` (array; lowercased and kebab-cased by the schema, so write them however reads best)
 - `draft` (boolean)
 
-Optional fields:
+Optional: `updatedAt`, `coverImage`. Blog posts may set `readingTimeMinutes`; projects may set `featured`, `repositoryUrl` and `demoUrl`.
 
-- `updatedAt` (date)
-- `coverImage` (string path)
+Missing locales fall back to the `en` entry, so an English-only entry is valid everywhere.
 
-Projects additionally require:
+## Projects and the home page
 
-- `role` (string)
-- `stack` (array of strings)
-- `duration` (string)
-
-Projects optional links:
-
-- `repositoryUrl` (string URL)
-- `demoUrl` (string URL)
+- `featured: true` projects lead `/projects` as wide cards; the rest appear under "Smaller things". Within each group, order is newest `updatedAt ?? publishedAt` first.
+- Card and hero-band colors are assigned by list position (`src/lib/tones.ts`), not by frontmatter.
+- The home Work bento has a hand-made wasmspace tile (copy in `src/lib/home-copy.ts` → `work.wasmspace`, all six locales) followed by the next two featured projects.
+- Do not add `repositoryUrl` for private repositories; the detail page then shows "The source is private for now."
 
 ## Draft and Publish Rules
 
@@ -49,12 +45,14 @@ Projects optional links:
 
 ## Media Contract
 
-Per current project contract, any content-referenced image path must map to a committed file under `public/images/**`.
+Any content-referenced image path must map to a committed file under `public/images/**` and match `/images/...(avif|webp|png|jpg|svg)`.
 
-Examples:
+Prefer real screenshots over illustrations. Convert them to WebP (about 1200–1400 px wide) before committing, for example:
 
-- `/images/blog/<slug>.svg`
-- `/images/projects/<slug>-cover.svg`
+- `/images/projects/<slug>-cover.webp`
+- `/images/blog/<slug>-<figure>.webp`
+
+Only use screenshots that show fixture or demo data, never private content. Covers are cropped to 16:10 on cards, so keep the subject near the center.
 
 Do not merge content changes that introduce non-existent media paths.
 

@@ -137,6 +137,11 @@ export async function getLocalizedProjects(locale: SiteLocale, options?: Localiz
   return resolveLocalizedEntries(entries, locale, options);
 }
 
+/** Display order for project lists: featured first, then the rest, each newest-first. */
+export function orderProjectsForDisplay(projects: ProjectEntry[]): ProjectEntry[] {
+  return [...projects.filter((project) => project.data.featured), ...projects.filter((project) => !project.data.featured)];
+}
+
 export async function getLocalizedBlogPosts(locale: SiteLocale, options?: LocalizedQueryOptions): Promise<BlogEntry[]> {
   const entries = await getCollection("blog");
   return resolveLocalizedEntries(entries, locale, options);

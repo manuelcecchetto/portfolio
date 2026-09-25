@@ -4,56 +4,36 @@ import {
   SUPPORTED_LOCALES,
   getCopy,
   localizePath,
+  stripLocaleFromPath,
   switchLocalePath,
   type SiteLocale,
 } from "../../lib/i18n";
 
-export interface NavItem {
-  href: string;
-  label: string;
-  matchPrefix?: boolean;
-}
-
 export interface Props {
   currentPath: string;
   locale: SiteLocale;
-  items?: NavItem[];
 }
 
-const { currentPath, locale, items } = Astro.props;
+interface NavItem {
+  href: string;
+  label: string;
+  /** Locale-free path prefix that marks the item active on inner pages. */
+  activePrefix?: string;
+}
+
+const { currentPath, locale } = Astro.props;
 const t = getCopy(locale);
-const defaultItems: NavItem[] = [
-  { href: localizePath(locale, "/"), label: t.nav.home, matchPrefix: false },
-  { href: localizePath(locale, "/about"), label: t.nav.about },
-  { href: localizePath(locale, "/projects"), label: t.nav.projects },
-  { href: localizePath(locale, "/blog"), label: t.nav.blog },
-  { href: localizePath(locale, "/contact"), label: t.nav.contact },
+const home = localizePath(locale, "/");
+const navItems: NavItem[] = [
+  { href: `${home}#work`, label: t.nav.projects, activePrefix: "/projects" },
+  { href: localizePath(locale, "/blog"), label: t.nav.blog, activePrefix: "/blog" },
+  { href: `${home}#about`, label: t.nav.about },
+  { href: `${home}#contact`, label: t.nav.contact },
 ];
-const navItems = items ?? defaultItems;
 
-const normalizePath = (path: string): string => {
-  if (!path) {
-    return "/";
-  }
-
-  const normalized = path.replace(/\/+$/, "");
-  return normalized === "" ? "/" : normalized;
-};
-
-const pathname = normalizePath(currentPath);
-const isItemActive = (item: NavItem): boolean => {
-  const href = normalizePath(item.href);
-
-  if (href === "/") {
-    return pathname === "/";
-  }
-
-  if (item.matchPrefix === false) {
-    return pathname === href;
-  }
-
-  return pathname === href || pathname.startsWith(`${href}/`);
-};
+const basePath = stripLocaleFromPath(currentPath);
+const isActive = (item: NavItem) =>
+  Boolean(item.activePrefix) && (basePath === item.activePrefix || basePath.startsWith(`${item.activePrefix}/`));
 
 const localeLinks = SUPPORTED_LOCALES.map((targetLocale) => ({
   locale: targetLocale,
@@ -65,70 +45,65 @@ const localeLinks = SUPPORTED_LOCALES.map((targetLocale) => ({
 
 <nav class="site-nav" aria-label={t.nav.primaryAria}>
   <ul class="site-nav__list site-nav__list--desktop" role="list">
-    {navItems.map((item) => {
-      const active = isItemActive(item);
-      return (
-        <li>
-          <a
-            href={item.href}
-            class:list={["site-nav__link", active && "is-active"]}
-            aria-current={active ? "page" : undefined}
-          >
-            {item.label}
-          </a>
-        </li>
-      );
-    })}
-  </ul>
-
-  <details class="site-nav__menu">
-    <summary class="site-nav__toggle" aria-label={t.nav.menu}>
-      <span class="site-nav__toggle-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false">
-          <path d="M4 7h16" />
-          <path d="M4 12h16" />
-          <path d="M4 17h16" />
-        </svg>
-      </span>
-      <span class="site-nav__sr-only">{t.nav.menu}</span>
-    </summary>
-    <div class="site-nav__panel">
-      <ul class="site-nav__list site-nav__list--mobile" role="list">
-        {navItems.map((item) => {
-          const active = isItemActive(item);
-          return (
-            <li>
-              <a
-                href={item.href}
-                class:list={["site-nav__link", active && "is-active"]}
-                aria-current={active ? "page" : undefined}
-              >
-                {item.label}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
-
-      <ul class="site-nav__locales site-nav__locales--mobile" role="list" aria-label={t.nav.languageAria}>
-        {localeLinks.map((item) => (
-          <li>
-            <a href={item.href} class:list={["site-nav__locale-link", item.active && "is-active"]} aria-current={item.active ? "true" : undefined}>
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </details>
-
-  <ul class="site-nav__locales site-nav__locales--desktop" role="list" aria-label={t.nav.languageAria}>
-    {localeLinks.map((item) => (
+    {navItems.map((item) => (
       <li>
-        <a href={item.href} class:list={["site-nav__locale-link", item.active && "is-active"]} aria-current={item.active ? "true" : undefined}>
+        <a href={item.href} class:list={["site-nav__link", isActive(item) && "is-active"]} aria-current={isActive(item) ? "page" : undefined}>
           {item.label}
         </a>
       </li>
     ))}
   </ul>
+
+  <details class="lang-switch">
+    <summary aria-label={t.nav.languageAria}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z" />
+      </svg>
+      {locale}
+    </summary>
+    <ul class="lang-switch__panel" role="list">
+      {localeLinks.map((item) => (
+        <li>
+          <a href={item.href} class:list={[item.active && "is-active"]} hreflang={item.locale} aria-current={item.active ? "true" : undefined}>
+            {item.label}<span>{item.locale}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </details>
+
+  <details class="site-nav__menu">
+    <summary class="site-nav__toggle" aria-label={t.nav.menu}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg>
+    </summary>
+    <div class="site-nav__panel">
+      <ul class="site-nav__list" role="list">
+        {navItems.map((item) => (
+          <li>
+            <a href={item.href} class:list={["site-nav__link", isActive(item) && "is-active"]}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+      <ul class="site-nav__locales" role="list" aria-label={t.nav.languageAria}>
+        {localeLinks.map((item) => (
+          <li>
+            <a href={item.href} hreflang={item.locale} class:list={["site-nav__locale-link", item.active && "is-active"]}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </details>
 </nav>
+
+<script>
+  // Close open menus after in-page navigation or an outside click.
+  const menus = document.querySelectorAll<HTMLDetailsElement>(".site-nav details");
+  document.addEventListener("click", (event) => {
+    menus.forEach((menu) => {
+      const target = event.target as Node;
+      if (menu.open && (!menu.contains(target) || (target instanceof Element && target.closest("a")))) {
+        menu.open = false;
+      }
+    });
+  });
+</script>

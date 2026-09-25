@@ -1,0 +1,199 @@
+---
+import profile from "../../data/profile.json";
+import type { HomeCopy } from "../../lib/home-copy";
+
+export interface Props {
+  copy: HomeCopy["contact"];
+}
+
+const { copy } = Astro.props;
+const email = profile.contact.email;
+---
+
+<section id="contact" class="band band--charcoal contact" aria-labelledby="contact-title">
+  <div class="site-shell contact__grid">
+    <div class="contact__art motion-reveal" aria-hidden="true">
+      <img src="/images/characters/coffee.webp" alt="" width="640" height="643" loading="lazy" decoding="async" />
+      <p class="contact__note hand">{copy.note}</p>
+    </div>
+
+    <div class="contact__copy motion-reveal" style="--motion-delay: 120ms">
+      <h2 id="contact-title">{copy.title}</h2>
+      <p class="band__lead">{copy.lead}</p>
+
+      <a class="contact__email" href={`mailto:${email}`}>
+        <span class="contact__email-label">{copy.emailLabel}</span>
+        <span class="contact__email-address">{email}</span>
+        <span class="contact__email-arrow" aria-hidden="true">↗</span>
+      </a>
+
+      <div class="contact__social">
+        <a href={profile.social.linkedin} rel="me noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 448 512" aria-hidden="true"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z" /></svg>
+          LinkedIn
+        </a>
+        <a href={profile.social.github} rel="me noopener" aria-label="GitHub">
+          <svg viewBox="0 0 496 512" aria-hidden="true"><path d="M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8z" /></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .contact__art {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 22rem);
+  }
+
+  .contact__art img {
+    position: relative;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 20px 30px rgb(0 0 0 / 0.45));
+  }
+
+  .contact__art::before {
+    content: "";
+    position: absolute;
+    inset: 8% 6% 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 240 226 / 0.2), transparent 68%);
+  }
+
+  .contact__note {
+    position: absolute;
+    top: 4%;
+    right: -12%;
+    color: var(--peach);
+    transform: rotate(8deg);
+  }
+
+  .contact__copy {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .contact__copy h2 {
+    font-size: clamp(2.6rem, 6.2vw, 5.4rem);
+    letter-spacing: -0.06em;
+    line-height: 0.92;
+  }
+
+  .contact__email {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.1rem 1.5rem;
+    align-items: center;
+    width: min(100%, 36rem);
+    margin-top: var(--space-3);
+    padding: 1.1rem 1.4rem;
+    border-radius: 1.4rem;
+    background: var(--cream);
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      transform var(--duration-base) var(--ease-spring),
+      box-shadow var(--duration-base) var(--ease-out-soft);
+  }
+
+  .contact__email:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--lavender);
+  }
+
+  .contact__email-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .contact__email-address {
+    grid-row: 2;
+    font-size: clamp(0.95rem, 4.2vw, 1.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+  }
+
+  .contact__email-arrow {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--cream);
+    font-size: 1.2rem;
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .contact__email:hover .contact__email-arrow {
+    transform: rotate(45deg);
+  }
+
+  .contact__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .contact__social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-dark);
+    color: var(--cream);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background var(--duration-fast) ease;
+  }
+
+  .contact__social a:hover {
+    background: var(--charcoal-soft);
+  }
+
+  .contact__social svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: currentColor;
+  }
+
+  @media (max-width: 56rem) {
+    .contact__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact__art {
+      width: min(70%, 16rem);
+    }
+
+    .contact__email {
+      gap: 0.1rem 0.8rem;
+      padding: 1rem 1.1rem;
+    }
+
+    .contact__email-arrow {
+      width: 2.4rem;
+      height: 2.4rem;
+    }
+  }
+</style>

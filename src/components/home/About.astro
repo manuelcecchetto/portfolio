@@ -1,0 +1,164 @@
+---
+import type { HomeCopy } from "../../lib/home-copy";
+
+export interface Props {
+  copy: HomeCopy["about"];
+  story: string;
+}
+
+const { copy, story } = Astro.props;
+---
+
+<section id="about" class="band band--lavender about" aria-labelledby="about-title">
+  <div class="site-shell about__grid">
+    <div class="about__copy motion-reveal">
+      <h2 id="about-title">{copy.title}</h2>
+      <p class="band__lead">{story}</p>
+      <p>{copy.personal}</p>
+    </div>
+
+    <div class="about__side motion-reveal" style="--motion-delay: 150ms">
+      <img class="about__peek" src="/images/characters/peek.webp" alt="" width="900" height="522" loading="lazy" decoding="async" />
+      <dl class="facts">
+        {
+          copy.facts.map((fact) => (
+            <div class="facts__item">
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <p class="about__note hand" aria-hidden="true">
+        {copy.note}
+        <svg viewBox="0 0 60 70"><path d="M10 4 C 40 10, 50 34, 36 62" /><path d="M26 52 L 36 64 L 46 52" /></svg>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+  }
+
+  .about__copy {
+    display: grid;
+    gap: var(--space-5);
+    color: #2f3440;
+  }
+
+  .about__copy h2 {
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    letter-spacing: -0.06em;
+  }
+
+  .about__copy .band__lead {
+    color: var(--ink);
+  }
+
+  .about__side {
+    position: relative;
+    padding-top: 2rem;
+  }
+
+  .about__peek {
+    position: relative;
+    z-index: 1;
+    width: 78%;
+    height: auto;
+    margin: 0 auto -1.1rem;
+    transform-origin: 50% 100%;
+    animation: peek 7s ease-in-out infinite;
+  }
+
+  .facts {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    border: 1.5px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .facts__item {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1.1rem 1.2rem;
+  }
+
+  .facts__item + .facts__item {
+    border-left: 1px solid var(--color-border-soft);
+  }
+
+  .facts dt {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .facts dd {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .about__note {
+    position: absolute;
+    right: -1rem;
+    bottom: -5.2rem;
+    color: var(--ink);
+    transform: rotate(-5deg);
+    display: flex;
+    align-items: start;
+    gap: 0.2rem;
+  }
+
+  .about__note svg {
+    width: 2.4rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @keyframes peek {
+    0%, 100% { transform: translateY(0); }
+    45% { transform: translateY(0); }
+    55% { transform: translateY(14px); }
+    70% { transform: translateY(0) rotate(-2deg); }
+    80% { transform: rotate(1deg); }
+  }
+
+  @media (max-width: 60rem) {
+    .about__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about__note {
+      position: static;
+      margin-top: var(--space-6);
+      justify-content: end;
+    }
+  }
+
+  @media (max-width: 34rem) {
+    .facts {
+      grid-template-columns: 1fr;
+    }
+
+    .facts__item + .facts__item {
+      border-left: 0;
+      border-top: 1px solid var(--color-border-soft);
+    }
+  }
+</style>

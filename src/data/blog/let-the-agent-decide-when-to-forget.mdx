@@ -1,0 +1,100 @@
+---
+title: "Let the agent decide when to forget"
+slug: "let-the-agent-decide-when-to-forget"
+locale: "en"
+translationGroup: "blog:let-the-agent-decide-when-to-forget"
+summary: "Why I gave coding agents a compact_context tool: compaction at real phase boundaries, with a checkpoint the model writes itself, instead of a summary triggered by token pressure."
+publishedAt: 2026-09-20
+tags:
+  - AI
+  - Agentic Systems
+  - Context Engineering
+  - Harness Engineering
+coverImage: "/images/projects/context-gc-cover.webp"
+draft: false
+readingTimeMinutes: 7
+---
+
+My longest agent sessions don't fail because the model gets dumb. They fail because the model is carrying three phases of stale grep output, superseded file snapshots and a test log from an hour ago, and all of it competes with the thing it should be doing now.
+
+Every harness has an answer for this: when the context passes a threshold, summarize it. That answer has two problems.
+
+**It fires at the wrong moment.** Token pressure has nothing to do with the task. Compaction lands in the middle of a debugging hypothesis just as often as at a clean boundary.
+
+**The summarizer doesn't know what matters.** It sees a transcript, not a plan. It can't tell the one identifier the next phase depends on from the forty that were ruled out.
+
+The model in the loop knows both things. So I asked it.
+
+## One tool
+
+[pi-context-gc](https://github.com/manuelcecchetto/pi-context-gc) gives the agent a single tool, `compact_context`. The agent calls it when a coherent phase is finished and verified, and the next phase needs a different working set. The call carries a checkpoint the model writes itself:
+
+<CodeNote
+  title="A compact_context checkpoint"
+  language="json"
+  code={`{
+  "completed_phase": "Reproduced the bug; root cause is the stale cache key",
+  "next_focus": "Implement the fix and run the regression test",
+  "keep": ["cache key built in src/cache.ts:buildKey", "don't touch the public API"],
+  "verification": ["Regression test fails for the intended reason"],
+  "open_loops": ["Check whether the CLI path shares the key builder"],
+  "ruled_out": ["Clock skew: timestamps match in both traces"]
+}`}
+/>
+
+`verification` is required, and that turned out to be the quiet superpower. To compact, the model has to say *why* the phase is done. It's a small nudge against declaring victory early.
+
+## Who owns what
+
+The design fits in three lines, and most of the work was keeping them separate:
+
+<CodeNote
+  title="Separation of concerns"
+  language="txt"
+  code={`scheduler owns WHEN
+backend owns HOW
+Pi owns persistence, threshold and overflow safety`}
+/>
+
+- **When** is the model's call, through the tool. The harness waits for the whole tool batch to finish, so compaction never cuts a parallel batch in half.
+- **How** belongs to the backend. On supported OpenAI models, compaction uses the native `/responses/compact` endpoint and keeps OpenAI's opaque compacted state; ChatGPT-authenticated Codex models fall back to Codex remote compaction. If neither can run, it fails open to Pi's normal text compaction. (The native path comes from the vendored `pi-better-compaction` package, with a small local patch.)
+- **Safety** stays where it was. Pi's own threshold and overflow compaction are untouched. The tool is additive.
+
+It is deliberately *not* a token threshold, not a hook that silently deletes messages, and not another summarizer.
+
+## One run, three models
+
+In September I ran one long, sequential task through Pi with the tool available the whole time. The active model changed along the way.
+
+<ImageFigure
+  src="/images/projects/context-gc-cover.webp"
+  alt="Chart of context size and estimated cost across 5,977 tool calls. Astra stays between roughly 50k and 100k tokens; Terra and Luna sawtooth up to 300-400k."
+  caption="Context size per tool call and cumulative estimated cost. The chart is an illustrative annotation of the underlying logs, not a pixel-exact export."
+/>
+
+- **GPT-6 Astra** (tool calls 1–2,224) called `compact_context` 50 times. Its context mostly stayed between 50k and 100k tokens.
+- **GPT-5.6 Terra** (2,225–2,730) and **GPT-5.6 Luna** (2,731–5,977) called it zero times, with the same instructions and no model-specific restrictions. Their context sawtoothed up to 300–400k before automatic compaction kicked in.
+
+5,977 tool calls, 75 compactions, about $222 at estimated standard API prices.
+
+<Callout title="What this is not" tone="caution">
+  This is one sequential task, not a benchmark. The models worked on different phases,
+  and the compaction backends differed (mostly native for Astra, text for Terra and Luna).
+  It shows a difference in observed tool use. It doesn't rank models or prove a saving.
+</Callout>
+
+What it did convince me of: the tool is worth having, and whether a model *reaches* for it varies a lot. Instructions help. Some models need a much firmer nudge than others.
+
+## Porting it to Codex
+
+I wanted the same behavior in the Codex desktop app, so I built [codex-context-gc](https://github.com/manuelcecchetto/codex-context-gc).
+
+The first version patched the Rust binary. It worked, and it broke code signing: the desktop app's in-app browser and app-tools bridges refused the unsigned runtime. The current version leaves OpenAI's signed runtime alone and wraps it in a small Python adapter. No re-signing, no app-bundle changes, and a version guard that refuses to run against a CLI it wasn't tested with.
+
+It passed a live desktop test on 19 September: native compaction, the full checkpoint preserved, automatic continuation, and shell plus in-app browser access afterwards. The 29-test suite runs the real bundled runtime against a local fixture provider, including a run with 27 compactions. It's unofficial and still experimental.
+
+## When to call it
+
+The instruction that works best for me is short. Compact after a verified phase, before materially different work, when the old context is no longer needed. Carry forward the exact commands, paths, decisions and evidence, not the raw logs. Don't compact in the middle of an unresolved investigation, or right before the final answer.
+
+The agent decides when it's done with something. It turns out that's the same skill as knowing what to remember.

@@ -12,7 +12,7 @@ tags:
   - MCP
   - Workflow
   - Orchestrazione
-coverImage: /images/blog/astro-content-layer-in-practice.svg
+coverImage: /images/projects/atp-protocol-cover.jpg
 draft: false
 readingTimeMinutes: 14
 ---

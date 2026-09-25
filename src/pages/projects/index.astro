@@ -1,75 +1,134 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import MotionReveal from "../../components/ui/MotionReveal.astro";
-import StaggerGroup from "../../components/ui/StaggerGroup.astro";
-import PaperCard from "../../components/ui/PaperCard.astro";
 import ProjectCard from "../../components/projects/ProjectCard.astro";
-import { getLocalizedProjects } from "../../lib/content";
+import { getLocalizedProjects, orderProjectsForDisplay } from "../../lib/content";
 import { getCopy, resolveLocale } from "../../lib/i18n";
+import { toneAt } from "../../lib/tones";
 
 const locale = resolveLocale(Astro.currentLocale);
-const projects = await getLocalizedProjects(locale);
-const featuredCount = projects.filter((project) => project.data.featured).length;
+const projects = orderProjectsForDisplay(await getLocalizedProjects(locale));
+const featured = projects.filter((project) => project.data.featured);
+const others = projects.filter((project) => !project.data.featured);
+const covers = featured.flatMap((project) => (project.data.coverImage ? [project.data.coverImage] : [])).slice(0, 3);
 const t = getCopy(locale);
 ---
 
-<BaseLayout
-  title={t.seo.projectsTitle}
-  description={t.seo.projectsDescription}
->
-  <MotionReveal as="section" kind="soft-zoom" class="page-hero projects-hero" slot="hero">
-    <span class="eyebrow">{t.projectsPage.eyebrow}</span>
-    <h1>{t.projectsPage.heroTitle}</h1>
-    <p>{t.projectsPage.heroText}</p>
-
-    <div class="projects-hero__meta" role="list" aria-label={t.projectsPage.archiveSummaryAria}>
-      <span class="pill" role="listitem">{projects.length} {t.projectsPage.publishedLabel}</span>
-      <span class="pill" role="listitem">{featuredCount} {t.projectsPage.featuredLabel}</span>
-      <span class="pill" role="listitem">{t.projectsPage.narrativeLabel}</span>
+<BaseLayout title={t.seo.projectsTitle} description={t.seo.projectsDescription} tone="lavender">
+  <section class="page-hero projects-hero" slot="hero">
+    <div class="projects-hero__text motion-reveal">
+      <h1>{t.projectsPage.heroTitle}</h1>
+      <p class="page-hero__lead">{t.projectsPage.heroText}</p>
     </div>
-  </MotionReveal>
+    {
+      covers.length > 0 && (
+        <div class="projects-hero__fan" aria-hidden="true">
+          {covers.map((cover, index) => (
+            <img src={cover} alt="" style={`--i: ${index}`} decoding="async" />
+          ))}
+        </div>
+      )
+    }
+  </section>
 
   {
-    projects.length === 0 ? (
-      <PaperCard as="section" variant="outline" padded="md" lift={false}>
-        <p class="text-muted">{t.projectsPage.emptyState}</p>
-      </PaperCard>
-    ) : (
-      <section class="stack projects-list" aria-labelledby="projects-list-title">
-        <MotionReveal as="div" kind="slide-in" delay={100}>
-          <h2 id="projects-list-title">{t.projectsPage.listTitle}</h2>
-          <p class="text-muted">{t.projectsPage.listText}</p>
-        </MotionReveal>
+    projects.length === 0 && <p class="text-muted">{t.projectsPage.emptyState}</p>
+  }
 
-        <StaggerGroup as="ul" class="projects-list__grid" step={80}>
-          {projects.map((project) => (
+  {
+    featured.length > 0 && (
+      <ul class="projects-featured motion-stagger" role="list" style="--stagger-step: 120ms">
+        {featured.map((project, index) => (
+          <li>
+            <ProjectCard project={project} tone={toneAt(index)} size="feature" flip={index % 2 === 1} level={2} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    others.length > 0 && (
+      <section aria-labelledby="projects-more-title">
+        <div class="section-head motion-reveal">
+          <h2 id="projects-more-title" class="section-title">{t.projectsPage.listTitle}</h2>
+        </div>
+        <ul class="projects-grid motion-stagger" role="list">
+          {others.map((project, index) => (
             <li>
-              <ProjectCard project={project} />
+              <ProjectCard project={project} tone={toneAt(featured.length + index)} />
             </li>
           ))}
-        </StaggerGroup>
+        </ul>
       </section>
     )
   }
 </BaseLayout>
 
 <style>
-  .projects-hero__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
+  .projects-hero {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: center;
+    gap: var(--space-8);
   }
 
-  .projects-list {
-    margin-top: var(--space-4);
-  }
-
-  .projects-list__grid {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  .projects-hero__text {
     display: grid;
-    gap: var(--space-4);
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: var(--space-5);
+  }
+
+  /* A loose fan of the featured covers, like screenshots dropped on a desk. */
+  .projects-hero__fan {
+    position: relative;
+    height: clamp(15rem, 24vw, 20rem);
+  }
+
+  .projects-hero__fan img {
+    --rot: calc(-7deg + var(--i) * 6deg);
+    position: absolute;
+    top: calc(var(--i) * 2.2rem);
+    left: calc(var(--i) * 11%);
+    width: 68%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 1rem;
+    border: 1.5px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    background: var(--charcoal);
+    transform: rotate(var(--rot));
+    animation: fan-in 900ms calc(var(--i) * 140ms + 150ms) var(--ease-spring) both;
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .projects-hero__fan img:hover {
+    transform: rotate(0deg) translateY(-8px) scale(1.03);
+    z-index: 3;
+  }
+
+  @keyframes fan-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) rotate(0deg);
+    }
+  }
+
+  .projects-featured {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .projects-grid {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+
+  @media (max-width: 52rem) {
+    .projects-hero {
+      grid-template-columns: 1fr;
+    }
+
+    .projects-hero__fan {
+      display: none;
+    }
   }
 </style>
