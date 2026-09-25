@@ -17,6 +17,13 @@ export default defineConfig({
     },
   },
 
+  // Never inline scripts: public/_headers sets a CSP with script-src 'self'.
+  vite: {
+    build: {
+      assetsInlineLimit: 0,
+    },
+  },
+
   integrations: [mdx(), sitemap()],
   adapter: cloudflare(),
 });

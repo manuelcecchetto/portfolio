@@ -243,4 +243,4 @@ Canonical register of API, schema, and interface contracts.
 - Compatibility: breaking for removed primitives and routes (redirects keep old URLs working)
 - Consumers: all routes in `src/pages/`, content authors
 - Validation Evidence: `npx astro check` (0 errors), `npm run build`, `npm run quality:test`, screenshots at 1440 and 390 with no horizontal overflow or console errors
-- Notes: Supersedes CON-001; the nav links in CON-004 now point to `/#work`, `/blog`, `/#about`, `/#contact`.
+- Notes: Supersedes CON-001; the nav links in CON-004 now point to `/#work`, `/blog`, `/#about`, `/#contact`. `public/_headers` sets a CSP with `script-src 'self'`, so no executable script may be inline: `astro.config.mjs` sets `vite.build.assetsInlineLimit: 0` and the early `js` class flag lives in `public/scripts/js-flag.js`. A plain static server ignores `_headers`; check for CSP console errors with `npm run preview` (wrangler) or on the deployed site.
