@@ -1,0 +1,10 @@
+# About and contact are sections of the home page. Cloudflare matches sources
+# exactly, so the old trailing-slash URLs need their own rules.
+/about /#about 301
+/about/ /#about 301
+/contact /#contact 301
+/contact/ /#contact 301
+/:locale/about /:locale/#about 301
+/:locale/about/ /:locale/#about 301
+/:locale/contact /:locale/#contact 301
+/:locale/contact/ /:locale/#contact 301
