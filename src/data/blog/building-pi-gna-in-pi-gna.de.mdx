@@ -1,0 +1,114 @@
+---
+title: "pi-gna in pi-gna bauen"
+slug: "building-pi-gna-in-pi-gna"
+locale: "de"
+translationGroup: "blog:building-pi-gna-in-pi-gna"
+summary: "Neun Tage, 528 Commits und 44 Releases einer Mac-App für den pi Coding Agent, größtenteils geschrieben von Agenten, die in der App selbst laufen. Wie es anfing, was funktioniert hat und was nicht."
+publishedAt: 2026-10-10
+tags:
+  - KI
+  - Coding Agents
+  - Developer Experience
+  - Agentic Systems
+  - Entwicklungstagebuch
+draft: false
+coverImage: "/images/blog/pi-gna-app.webp"
+readingTimeMinutes: 8
+---
+
+Am 2. Oktober habe ich den ersten Commit einer Desktop-App für [pi](https://pi.dev) geschrieben, dem Coding Agent, den ich jeden Tag benutze. Neun Tage später hat sie 528 Commits, 44 Releases und etwa 88.000 Zeilen TypeScript, Swift und CSS. Sie heißt [pi-gna](https://pi-gna.com), und ab dem zweiten Tag wurde das meiste davon von Agenten gebaut, die in der App selbst laufen.
+
+Das hier ist das Protokoll dieser neun Tage.
+
+<ImageFigure
+  src="/images/blog/pi-gna-app.webp"
+  alt="Das Fenster von pi-gna: Projekte und Chats in der Seitenleiste, und ein neuer Chat mit Pigna, die in einem Ruderboot durch Monets Impression, Sonnenaufgang rudert."
+  caption="pi-gna mit einem neuen Chat. Pigna, die 🤌-Hand, rudert durch Monet."
+/>
+
+## Warum ich angefangen habe
+
+Zwei Dinge haben mich gleichzeitig genervt.
+
+Das erste war pi 1.0. Ich mag pi sehr: Es ist klein, zuverlässig, und ich habe ziemlich viele Erweiterungen dafür gebaut, von [Garbage Collection für den Kontext](/de/blog/let-the-agent-decide-when-to-forget) über einen ATP-Orchestrator bis zu 7TV-Emotes im Terminal. Aber die 1.0-Version fühlte sich im Terminal langsam an, und ich schaue den größten Teil des Tages dort hinein. Das habe ich wirklich gehasst.
+
+Das zweite war das, was ich online immer wieder lese. Leute schreiben so etwas wie: „Ich müsste eigentlich Opus ausprobieren, aber ich bleibe bei Codex, weil Computer Use so gut ist.“ Agent-Harnesses wurden also wegen ihrer UI-Features gewählt, und das Modell kam erst an zweiter Stelle. Die naheliegende Alternative, Claude Code, ist ein Tool, bei dem man mich schon zwingen müsste, es zu benutzen.
+
+pi hatte bereits, was mir wichtig war: die Zuverlässigkeit, keinen Ballast und die Erweiterungen, die ich selbst geschrieben hatte. Es fehlte nur ein Fenster. Also habe ich pi im Terminal geöffnet und es gebeten, eins zu bauen.
+
+Der erste Commit hieß „pi studio“. Um 00:18 Uhr am 3. Oktober wurde daraus pi-gna, nach dem italienischen *mano a pigna*, der 🤌-Geste. Das Maskottchen, Pigna, ist diese Hand, die in Monets, van Goghs und Hokusais Bilder gemalt wurde.
+
+## Wie es funktioniert
+
+Jeder Chat in pi-gna ist ein `pi --mode rpc`-Prozess, der das pi ausführt, das ich ohnehin schon installiert habe. Die App spricht über stdin und stdout mit ihm und zeigt an, was zurückkommt: Nachrichten, Tool-Aufrufe, Diffs, Denkschritte und die Kontextanzeige. Die Sessions sind die normalen Session-Dateien von pi. Deshalb kann ich etwas im Terminal anfangen, in der App weitermachen und wieder zurückwechseln. Meine Modelle, Logins, Skills, Erweiterungen und MCP-Server sind dieselben, die ich in pi eingerichtet habe.
+
+Diese Entscheidung hat das Projekt überschaubar gehalten. pi-gna braucht keine eigene Agent-Schleife, kein eigenes Plugin-System und keine eigene Konfiguration. Wenn eine Erweiterung bei pi eine Bestätigung oder eine Eingabe anfragt, zeigt pi-gna eine Karte über dem Eingabefeld statt eines Terminal-Prompts. Alles, was die App dem Agenten neu hinzufügt, etwa den Browser, Computer Use oder das Kanban-Board, erreicht pi als Tools aus einer pi-Erweiterung, so wie jede andere Erweiterung auch.
+
+<CodeNote
+  title="Was pi bekommt, wenn es in pi-gna läuft"
+  language="text"
+  code={`browser_open, browser_click, browser_type, browser_screenshot, ...
+computer_get_app_state, computer_click, computer_type_text, ...
+kanban_list, kanban_claim, kanban_update
+threads_list, thread_read, thread_send`}
+/>
+
+## Von pi zu pi-gna, gebaut in pi-gna
+
+Am ersten Tag habe ich alles im Terminal gemacht: die RPC-Bridge, das Transkript, das Eingabefeld, die Session-Liste und dann einen Browser-Bereich, den pi steuern konnte. Sobald die App gut genug war, um darin zu arbeiten, bin ich umgezogen, und ab da wurde pi-gna in pi-gna gebaut.
+
+Der Commit-Graph zeigt den Wechsel. Tag eins und zwei haben 22 und 15 Commits, das Tempo, das man hat, wenn man alles selbst tippt und liest. Tag drei hat 94, Tag vier 102.
+
+Verändert hat sich, wie ich Arbeit verteilt habe. Dafür habe ich zwei Werkzeuge benutzt, je nach Größe der Idee.
+
+### Kanban für kleine Ideen
+
+Jedes Projekt in pi-gna hat ein Kanban-Board. Ich beschreibe eine Aufgabe in meinen eigenen Worten, ein günstiges Modell gibt ihr im Hintergrund einen Titel und Tags, und über das Menü der Karte kann ich einem neuen Chat sagen, dass er sie erledigen soll. Dieser Chat bekommt seinen eigenen Git-Worktree auf einem eigenen Branch, damit mein Checkout unberührt bleibt. Wenn er fertig ist, wandert die Karte nach „In Review“ und ich schaue mir das Ergebnis an.
+
+Ich habe es so benutzt, wie ich denke: Ich erfinde ein Feature, schreibe eine Karte und schicke sie los. Dann die nächste. Die App hat am Ende 89 Merges, viele davon aus `pigna/...`-Branches, die ein Karten-Chat geöffnet, bearbeitet und zurückgegeben hat. Die meisten kleinen Dinge, die man in pi-gna sieht, etwa Rechtsklick-Menüs, die Leiste neben langen Chats oder das tok/s-Diagramm beim Hovern, haben als ein Satz auf einer Karte angefangen.
+
+### ATP für große Ideen
+
+Für alles Große habe ich ATP benutzt, das [Agent Task Protocol](/de/blog/how-atp-works). Ich habe es vor etwa einem Jahr entworfen: Ein Plan ist ein Graph aus Knoten, jeder mit einer Anweisung, Abhängigkeiten, einem Lebenszyklus-Status und einem Abschlussbericht. Agenten beanspruchen Knoten und führen sie parallel aus. Ein Jahr ist in diesem Feld eine lange Zeit, und trotzdem habe ich noch keinen besseren Weg gefunden, einem Agenten ein großes Stück Arbeit zu übergeben. Das ist das Einzige in diesem Projekt, das ich bis zum Schluss verteidigen würde.
+
+pi-gna hat eine ATP-Seite mit dem Graphen des Plans und einen Architekten-Chat, in dem man zusammen Pläne entwirft. Die größten Features der App sind so entstanden. Der Computer-Use-Plan hatte 18 Knoten, von einem Design-Spike über einen Swift-Helper, einen Policy-Store, die Einstellungsseite und das Transkript-Rendering bis zu CI-Paketierung und zwei Runden Live-Verifikation auf meinem echten Desktop. Der Zugriff vom iPhone war ein anderer Plan, und der größte Teil davon lief über Nacht zwischen dem 4. und 5. Oktober.
+
+## Computer Use
+
+Computer Use ist der Grund, warum sich die App für mich fertig anfühlt. Mit eingeschaltetem Computer Use kann pi in nativen Mac-Apps arbeiten, während du deinen Computer weiter benutzt. Es liest den Accessibility-Baum einer App und einen Screenshot ihres Fensters und klickt und tippt dann mit einem eigenen Cursor. Es bewegt nie deine Maus und nimmt dir nie den Tastaturfokus weg. Du bestätigst jede App einmal oder dauerhaft, und mit Esc stoppst du alles.
+
+Die erste Version funktionierte nicht so. Der Design-Spike hat ergeben, dass der naheliegende Weg, Events an eine Hintergrund-App zu schicken, indem man sie an ihren Prozess sendet, von TextEdit ignoriert wurde. Also fiel der Plan zurück auf: die App in den Vordergrund holen und den echten Cursor bewegen. Damit hätte es meinen Desktop übernommen, und genau das wollte ich nicht.
+
+Ich bin überzeugt, dass Software, sobald sie veröffentlicht ist, praktisch frei ist. Jeder kann sich anschauen, wie sie sich verhält, daraus lernen und etwas Besseres bauen. Codex' Computer Use macht, was ich wollte. Also habe ich dem Plan einen Knoten hinzugefügt: herausfinden, wie Codex Hintergrund-Apps steuert, ohne den Fokus zu klauen, und das in Swift nachweisen. Der Orchestrator hat sich die Symbolnamen im Helper-Binary von Codex mit `nm` und `strings` angeschaut. Namen wie `SystemFocusStealPreventer`, `SyntheticAppFocusEnforcer` und `VirtualCursor` reichten, um eine Hypothese zu bilden. Ein Worker hat einen Spike gebaut, der sie bestätigt hat, und das Design-Dokument wurde angepasst, bevor der Input-Knoten begann.
+
+Der ganze Computer-Use-Plan, vom Design-Spike bis zur Live-End-to-End-Prüfung, hat ungefähr einen Vormittag gedauert. Danach kamen die Details, die länger dauern als das Feature selbst: den Helper mit einem stabilen Zertifikat signieren, damit die macOS-Berechtigungen Updates überstehen, und ein Ablauf für die Bildschirmaufnahme, wenn macOS seinen eigenen Dialog nicht anzeigen will.
+
+## Laments, das Feature, das nicht funktioniert hat
+
+Nicht alles hat funktioniert. Meine Lieblingsidee auf dem Papier waren die Laments. Wenn pi ein Tool braucht, das fehlt, nicht verfügbar ist oder fehlschlägt, legt es auf dem Lamenting-Board des Projekts eine Lament an, bewertet als 😒 nervig, 😠 teuer oder 🤬 blockierend, und macht dann mit einem Workaround weiter. Ich hatte mir vorgestellt, sie jeden Morgen zu lesen und mein Setup Beschwerde für Beschwerde zu reparieren.
+
+In der Praxis war es mittelmäßig. Es ist nie zu der Feedback-Schleife geworden, die ich mir vorgestellt hatte. Das ist die deutlichste Lehre dieser neun Tage: Etwas zu bauen ist inzwischen so billig, dass es gebaut werden kann, bevor jemand geprüft hat, ob es sich überhaupt lohnt.
+
+## 44-mal in 9 Tagen ausgeliefert
+
+Releases sind ein einziger Befehl. `pnpm release` verschiebt die Unreleased-Zeilen des Changelogs unter eine neue Version, setzt einen Tag, und CI baut die DMGs für Apple Silicon und Intel. Die App prüft auf GitHub nach Updates und installiert sie, wenn man sie beendet. Am letzten dieser neun Tage habe ich v0.12 bis v0.15.1 ausgeliefert: den Import von Codex- und Claude-Code-Chats, ein Nutzungs-Dashboard, einen Fast Mode für GPT-Modelle und einen experimentellen Weg, damit Chats einen Neustart der App überleben.
+
+Inzwischen hat pi-gna außerdem einen Browser-Bereich, den ich mit pi teile, Dateivorschauen, GitHub-Issues und PRs pro Projekt, Chat-Import, Plugins und Zugriff von meinem iPhone über Tailscale. Das Telefon ist eine Web-App, die vom Mac ausgeliefert wird. pi, die Repositories und Computer Use bleiben alle auf dem Mac.
+
+## Wie es wirklich lief
+
+Ich habe ADHS, und zwar ziemlich ausgeprägt, und dieses Projekt lief parallel zu meinem echten Job. Bei [Casus](https://getcasus.com) habe ich in derselben Woche rund 300 Commits gemacht. Die Commit-Zeiten von pi-gna decken jede Stunde ab, außer ungefähr 3 bis 5 Uhr morgens, und die aktivste Stunde ist Mitternacht.
+
+Das klingt anstrengend, hat sich aber nicht so angefühlt. So zu arbeiten passt zu der Art, wie mein Kopf funktioniert. Eine Idee kommt, ich schreibe eine Karte, und ein Agent fängt an, während ich schon an die nächste denke. Eine große Idee wird zu einem Plan, und der Plan läuft, während ich etwas anderes mache. Meine Aufgabe ist zu entscheiden, was es geben soll, zu prüfen, was zurückkommt, und dafür zu sorgen, dass alles zusammenpasst. Ich lese Diffs, ich öffne die App, und ich schicke Arbeit zurück, wenn sie falsch ist.
+
+pi-gna ist vor allem für mich gemacht. Es bündelt alles, wie ich arbeite: pi als Rückgrat, ATP für große Pläne, ein Board für kleine, den Browser und Computer Use als Hände und mein Telefon für die Momente, in denen ich nicht am Schreibtisch sitze. Ein paar Freunde nutzen es schon.
+
+Am nächsten komme ich einer Beschreibung dieser neun Tage, wenn ich sage: Ich habe mich die ganze Zeit mächtig und in Kontrolle gefühlt. Zum ersten Mal arbeiten meine Werkzeuge so, wie ich arbeite.
+
+pi-gna ist kostenlos und Open Source, vorerst nur für macOS. Du bekommst es auf [pi-gna.com](https://pi-gna.com), oder du fügst das hier in pi ein:
+
+<CodeNote
+  title="Mit deinem Agenten installieren"
+  language="text"
+  code={`Install pi-gna for me by following the "For agents" steps in https://github.com/manuelcecchetto/pi-gna`}
+/>

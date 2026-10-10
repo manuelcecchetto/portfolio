@@ -1,0 +1,114 @@
+---
+title: "pi-gna को pi-gna में बनाना"
+slug: "building-pi-gna-in-pi-gna"
+locale: "hi"
+translationGroup: "blog:building-pi-gna-in-pi-gna"
+summary: "pi कोडिंग एजेंट के लिए एक Mac ऐप के नौ दिन, 528 कमिट्स और 44 रिलीज़। ज़्यादातर कोड ऐप के अंदर चल रहे एजेंट्स ने लिखा। शुरुआत कैसे हुई, क्या चला और क्या नहीं चला।"
+publishedAt: 2026-10-10
+tags:
+  - AI
+  - कोडिंग एजेंट्स
+  - डेवलपर अनुभव
+  - एजेंटिक सिस्टम्स
+  - डेव लॉग
+draft: false
+coverImage: "/images/blog/pi-gna-app.webp"
+readingTimeMinutes: 8
+---
+
+2 अक्टूबर को मैंने [pi](https://pi.dev) के लिए एक डेस्कटॉप ऐप का पहला कमिट किया। pi वह कोडिंग एजेंट है जिसे मैं रोज़ इस्तेमाल करता हूँ। नौ दिन बाद उसमें 528 कमिट्स, 44 रिलीज़ और लगभग 88,000 लाइन TypeScript, Swift और CSS है। इसका नाम [pi-gna](https://pi-gna.com) है, और दूसरे दिन से ज़्यादातर काम उसी के अंदर चल रहे एजेंट्स ने किया।
+
+यह उन नौ दिनों का लॉग है।
+
+<ImageFigure
+  src="/images/blog/pi-gna-app.webp"
+  alt="pi-gna की विंडो: साइडबार में प्रोजेक्ट और चैट, और Monet की Impression, Sunrise में एक नौका चलाते Pigna पर नई चैट।"
+  caption="pi-gna पर एक नई चैट। Pigna, 🤌 वाला हाथ, Monet के बीच से नाव खेता हुआ।"
+/>
+
+## मैंने शुरुआत क्यों की
+
+दो चीज़ें एक साथ परेशान कर रही थीं।
+
+पहली थी pi 1.0। मुझे pi बहुत पसंद है: यह छोटा है, भरोसेमंद है, और मैंने इसके लिए काफ़ी एक्सटेंशन बनाए हैं, [context garbage collection](/hi/blog/let-the-agent-decide-when-to-forget) से लेकर ATP orchestrator और टर्मिनल में 7TV emotes तक। लेकिन 1.0 रिलीज़ टर्मिनल में धीमी लगने लगी, और मेरा ज़्यादातर दिन उसी को देखते बीतता है। मुझे यह बिल्कुल पसंद नहीं था।
+
+दूसरी बात वह थी जो मैं ऑनलाइन पढ़ता रहता था। लोग लिखते थे, "मुझे Opus आज़माना तो है, पर मैं Codex पर अटका हूँ क्योंकि Computer Use बहुत अच्छा है।" एजेंट हार्नेस उनके UI फ़ीचर्स की वजह से चुने जा रहे थे, और मॉडल दूसरे नंबर पर था। इसी बीच जो साफ़ विकल्प था, Claude Code, उसे इस्तेमाल करवाने के लिए तो आपको मेरी जान लेनी पड़ती।
+
+pi के पास वह सब था जो मुझे चाहिए था: भरोसेमंदी, कोई फ़ालतू भार नहीं, और मेरे लिखे एक्सटेंशन। बस विंडो नहीं थी। तो मैंने टर्मिनल में pi खोला और उससे एक विंडो बनाने को कहा।
+
+पहले कमिट का नाम "pi studio" था। 3 अक्टूबर को 00:18 पर यह pi-gna बना, इतालवी कहावत *mano a pigna* के नाम पर, यानी 🤌 वाला इशारा। इसका मैस्कॉट, Pigna, वही हाथ है, जो Monet, Van Gogh और Hokusai की पेंटिंग्स में बना दिया गया है।
+
+## यह कैसे काम करता है
+
+pi-gna की हर चैट एक `pi --mode rpc` प्रोसेस है, जो आपके पहले से इंस्टॉल pi को ही चलाती है। ऐप stdin और stdout के ज़रिए उससे बात करता है और जो वापस आता है उसे दिखाता है: मैसेज, टूल कॉल्स, diffs, thinking और context meter। सेशन pi की अपनी सेशन फ़ाइलें हैं, इसलिए मैं टर्मिनल में कुछ शुरू करके ऐप में जारी कर सकता हूँ और फिर वापस जा सकता हूँ। मेरे models, logins, skills, extensions और MCP servers वही हैं जो मैंने pi में सेट किए थे।
+
+इस फ़ैसले से प्रोजेक्ट संभालने लायक रहा। pi-gna को अपना agent loop, अपना plugin system या अपना config नहीं चाहिए। जब कोई extension pi से confirmation या input माँगता है, तो pi-gna composer के ऊपर एक card दिखाता है, टर्मिनल prompt नहीं। ऐप एजेंट में जो भी नया जोड़ता है, जैसे browser, Computer Use या Kanban board, वह pi को pi extension के ज़रिए tools के रूप में पहुँचता है, ठीक वैसे ही जैसे कोई और extension पहुँचता।
+
+<CodeNote
+  title="pi-gna के अंदर चलने पर pi को क्या मिलता है"
+  language="text"
+  code={`browser_open, browser_click, browser_type, browser_screenshot, ...
+computer_get_app_state, computer_click, computer_type_text, ...
+kanban_list, kanban_claim, kanban_update
+threads_list, thread_read, thread_send`}
+/>
+
+## pi से pi-gna तक, pi-gna के अंदर
+
+पहला दिन टर्मिनल में बीता: RPC bridge, transcript, composer, session list, फिर एक browser pane जिसे pi चला सके। जैसे ही ऐप काम करने लायक हुआ, मैं उसमें शिफ़्ट हो गया, और उसके बाद pi-gna को pi-gna के अंदर ही बनाया गया।
+
+commit graph यह बदलाव साफ़ दिखाता है। पहले दो दिनों में 22 और 15 कमिट्स हैं, उस रफ़्तार से जब आप खुद टाइप करते हैं और हर चीज़ खुद पढ़ते हैं। तीसरे दिन 94 हैं, चौथे दिन 102।
+
+बदला यह था कि मैं काम कैसे बाँटता था। idea के साइज़ के हिसाब से मैं दो tools इस्तेमाल करता था।
+
+### छोटे आइडियाज़ के लिए Kanban
+
+pi-gna में हर प्रोजेक्ट का एक Kanban board होता है। मैं अपने शब्दों में एक task लिखता हूँ, एक सस्ता model बैकग्राउंड में उसका title और tags तय कर देता है, और card के menu से मैं एक नई चैट को उसे हल करने को कह सकता हूँ। उस चैट को अपना git worktree और अपनी branch मिलती है, इसलिए मेरा checkout अछूता रहता है। काम पूरा होने पर card In review में चला जाता है और मैं उसे देखता हूँ।
+
+मैं इसे उसी तरह इस्तेमाल करता था जैसे मैं सोचता हूँ: एक फ़ीचर सोचता हूँ, card लिखता हूँ, और उसे push कर देता हूँ। फिर एक और। ऐप में 89 merges हुए, जिनमें से कई `pigna/...` branches से आए, जिन्हें एक card chat ने खोला, उस पर काम किया और वापस सौंप दिया। pi-gna में आप जो छोटी-छोटी चीज़ें देखते हैं, जैसे right-click menus, लंबी चैट के बगल वाली rail, या hover पर tok/s chart, वे सब card पर लिखे एक वाक्य से शुरू हुईं।
+
+### बड़े आइडियाज़ के लिए ATP
+
+बड़े काम के लिए मैंने [Agent Task Protocol](/hi/blog/how-atp-works) यानी ATP इस्तेमाल किया। इसे मैंने लगभग एक साल पहले सोचा था: एक plan nodes का graph होता है, हर node में एक instruction, dependencies, lifecycle state और completion report होती है, और agents nodes claim करके उन्हें parallel में चलाते हैं। इस field में एक साल लंबा समय है, और अब भी मुझे बड़े काम को agents को सौंपने का इससे बेहतर तरीका नहीं मिला। इस project की यही एक चीज़ है जिसे मैं आख़िर तक बचाव कर सकता हूँ।
+
+pi-gna में ATP का एक page है, जिसमें plan का graph है और एक architect chat है जो आपके साथ plan का draft बनाती है। ऐप के सबसे बड़े फ़ीचर्स इसी तरह बने। Computer Use plan में 18 nodes थे: design spike से लेकर Swift helper, policy store, settings page, transcript rendering, CI packaging, और मेरे असली desktop पर दो दौर की live verification। iPhone remote access एक और plan था, और उसका ज़्यादातर हिस्सा 4 और 5 अक्टूबर की रात को अपने-आप चला।
+
+## Computer Use
+
+Computer Use ही इस ऐप को मेरे लिए पूरा महसूस कराता है। इसके चालू होने पर pi native Mac apps में काम कर सकता है, और आप अपना कंप्यूटर इस्तेमाल करते रह सकते हैं। यह किसी app का accessibility tree और उसकी window का screenshot पढ़ता है, फिर अपने ख़ुद के cursor से click और type करता है। यह आपका mouse नहीं हिलाता और आपका keyboard focus नहीं लेता। आप हर app को एक बार या हमेशा के लिए approve करते हैं, और Esc से इसे रोक देते हैं।
+
+पहला version ऐसे काम नहीं करता था। design spike में पता चला कि background app को events भेजने का स्पष्ट तरीका, यानी उसके process को post करना, TextEdit ने ignore कर दिया। तो plan ने fallback लिया: app को सामने लाओ और असली cursor हिलाओ। इसका मतलब था मेरा desktop अपने हाथ में ले लेना, और यही वह चीज़ थी जो मैं नहीं चाहता था।
+
+मेरा मानना है कि जब software release हो जाता है, तो व्यावहारिक रूप से वह मुफ़्त हो जाता है। कोई भी देख सकता है कि वह कैसे व्यवहार करता है, उससे सीख सकता है, और उससे बेहतर कुछ बना सकता है। Codex का Computer Use वही करता है जो मुझे चाहिए था, तो मैंने plan में एक node जोड़ा: पता करो कि Codex बिना focus चुराए background apps को कैसे चलाता है, और Swift में वही साबित करो। Orchestrator ने Codex के helper binary के symbol names को `nm` और `strings` से देखा। `SystemFocusStealPreventer`, `SyntheticAppFocusEnforcer` और `VirtualCursor` जैसे नाम एक hypothesis बनाने के लिए काफ़ी थे। एक worker ने spike बनाया जिसने इसे साबित किया, और input node शुरू होने से पहले design doc अपडेट हुआ।
+
+design spike से लेकर live end-to-end check तक पूरा Computer Use plan लगभग एक सुबह में हो गया। उसके बाद वे हिस्से आए जिन्हें फ़ीचर से ज़्यादा समय लगा: helper को एक stable certificate से sign करना ताकि macOS की permissions updates के बाद भी बनी रहें, और Screen Recording का flow, जब macOS अपना prompt दिखाने से इनकार कर दे।
+
+## Laments, वह फ़ीचर जो नहीं चला
+
+सब कुछ नहीं चला। कागज़ पर मेरा सबसे पसंदीदा आइडिया था laments। जब pi को कोई tool चाहिए जो नहीं है, काम नहीं कर रहा या fail हो रहा है, तो वह project के Lamenting board पर एक lament दर्ज करता है, जिसे 😒 annoying, 😠 costly या 🤬 blocking रेट किया जाता है, फिर वह workaround के साथ आगे बढ़ जाता है। मैंने सोचा था कि मैं हर सुबह इन्हें पढ़ूँगा और एक-एक शिकायत करके अपना setup ठीक करूँगा।
+
+व्यवहार में यह बस ठीक-ठाक रहा। यह कभी वह feedback loop नहीं बना जो मैंने सोचा था। इन नौ दिनों का यह सबसे साफ़ सबक है: अब कुछ बनाना इतना सस्ता है कि लोग यह जाँचने से पहले ही उसे बना देते हैं कि वह बनाने लायक है भी या नहीं।
+
+## नौ दिनों में 44 बार रिलीज़
+
+रिलीज़ एक command है। `pnpm release` changelog की Unreleased lines को एक नए version के नीचे ले जाता है, उसे tag करता है, और CI Apple silicon और Intel के लिए DMGs बनाता है। ऐप GitHub पर updates चेक करता है और आपके quit करने पर उन्हें इंस्टॉल कर देता है। इन नौ दिनों में से आख़िरी दिन मैंने v0.12 से v0.15.1 तक रिलीज़ किए: Codex और Claude Code चैट्स का import, एक usage dashboard, GPT models के लिए Fast mode, और एक experimental तरीका जिससे app restart के बाद भी चैट्स बची रहें।
+
+अब pi-gna में एक browser pane भी है जिसे आप pi के साथ share करते हैं, file previews, हर प्रोजेक्ट के लिए GitHub issues और PRs, chat import, plugins, और Tailscale के ज़रिए मेरे iPhone से remote access। फ़ोन एक web app है जिसे Mac serve करता है। pi, repositories और Computer Use, सब Mac पर ही रहते हैं।
+
+## असल में कैसा रहा
+
+मुझे ADHD है, और यह project मेरी असली नौकरी के साथ-साथ चला। [Casus](https://getcasus.com) में उसी हफ़्ते मैंने लगभग 300 कमिट्स किए। pi-gna के कमिट्स लगभग हर घंटे में मिलते हैं, सुबह के लगभग 3 से 5 बजे के बीच को छोड़कर, और सबसे व्यस्त घंटा आधी रात का है।
+
+यह थकाने वाला लगता है, पर महसूस ऐसा नहीं हुआ। इस तरह काम करना मेरे दिमाग़ के तरीके से मेल खाता है। कोई idea आता है, मैं card लिखता हूँ, और अगला idea सोचते हुए ही एजेंट उस पर काम शुरू कर देता है। बड़ा idea plan बन जाता है, और plan तब चलता है जब मैं कुछ और कर रहा होता हूँ। मेरा काम है यह तय करना कि क्या होना चाहिए, जो वापस आए उसे review करना, और पूरे को सुसंगत रखना। मैं diffs पढ़ता हूँ, ऐप खोलता हूँ, और जब कुछ गलत हो तो काम वापस भेजता हूँ।
+
+pi-gna मुख्य रूप से मेरे लिए है। यह मेरे काम करने के तरीके की हर चीज़ को एक जगह लाता है: pi रीढ़ की तरह, बड़े plans के लिए ATP, छोटे कामों के लिए board, हाथों की तरह browser और Computer Use, और जब मैं डेस्क से दूर हूँ तब फ़ोन। कुछ दोस्तों ने इसे इस्तेमाल करना शुरू भी कर दिया है।
+
+इन नौ दिनों को मैं सबसे नज़दीकी शब्दों में ऐसे बता सकता हूँ कि मैं पूरे समय शक्तिशाली और नियंत्रण में महसूस करता रहा। पहली बार मेरे tools उसी तरह काम कर रहे हैं जैसे मैं करता हूँ।
+
+pi-gna मुफ़्त और open source है, फ़िलहाल सिर्फ़ macOS पर। आप इसे [pi-gna.com](https://pi-gna.com) से ले सकते हैं, या यह pi में paste कर सकते हैं:
+
+<CodeNote
+  title="अपने agent से इंस्टॉल करें"
+  language="text"
+  code={`Install pi-gna for me by following the "For agents" steps in https://github.com/manuelcecchetto/pi-gna`}
+/>

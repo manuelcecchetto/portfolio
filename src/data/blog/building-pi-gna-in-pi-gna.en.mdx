@@ -1,0 +1,114 @@
+---
+title: "Building pi-gna in pi-gna"
+slug: "building-pi-gna-in-pi-gna"
+locale: "en"
+translationGroup: "blog:building-pi-gna-in-pi-gna"
+summary: "Nine days, 528 commits and 44 releases of a Mac app for the pi coding agent, most of them written by agents running inside the app itself. How it started, what worked, and what didn't."
+publishedAt: 2026-10-10
+tags:
+  - AI
+  - Coding Agents
+  - Developer Experience
+  - Agentic Systems
+  - Dev Log
+draft: false
+coverImage: "/images/blog/pi-gna-app.webp"
+readingTimeMinutes: 8
+---
+
+On October 2 I made the first commit of a desktop app for [pi](https://pi.dev), the coding agent I use every day. Nine days later it has 528 commits, 44 releases and about 88,000 lines of TypeScript, Swift and CSS. It's called [pi-gna](https://pi-gna.com), and from the second day on most of it was built by agents running inside it.
+
+This is the log of those nine days.
+
+<ImageFigure
+  src="/images/blog/pi-gna-app.webp"
+  alt="pi-gna's window: projects and chats in the sidebar, and a new chat over Pigna in a rowing boat in Monet's Impression, Sunrise."
+  caption="pi-gna on a new chat. Pigna, the 🤌 hand, rows through Monet."
+/>
+
+## Why I started
+
+Two things annoyed me at the same time.
+
+The first was pi 1.0. I like pi a lot: it's small, it's reliable, and I have built a fair number of extensions for it, from [context garbage collection](/blog/let-the-agent-decide-when-to-forget) to an ATP orchestrator to 7TV emotes in the terminal. But the 1.0 release felt slow in the terminal, and I spend most of my day looking at it. I very much hated that.
+
+The second was what I kept reading online. People would write "I really need to try Opus, but I'm sold on Codex because Computer Use is so good." Agent harnesses were being chosen for their UI features, and the model came second. Meanwhile the obvious alternative, Claude Code, is a tool you would have to kill me to make me use.
+
+pi already had what I cared about: the reliability, the lack of bloat, the extensions I had written. It just didn't have a window. So I opened pi in a terminal and asked it to build one.
+
+The first commit was called "pi studio". At 00:18 on October 3 it became pi-gna, after the Italian *mano a pigna*, the 🤌 gesture. The mascot, Pigna, is that hand, painted into Monet, Van Gogh and Hokusai.
+
+## How it works
+
+Every chat in pi-gna is a `pi --mode rpc` process running the pi you already have installed. The app talks to it over stdin and stdout and draws what comes back: messages, tool calls, diffs, thinking, the context meter. Sessions are pi's own session files, so I can start something in the terminal, continue it in the app and go back. My models, logins, skills, extensions and MCP servers are the same ones I set up in pi.
+
+That decision kept the project manageable. pi-gna doesn't need its own agent loop, its own plugin system or its own config. When an extension asks pi for a confirmation or an input, pi-gna draws a card above the composer instead of a terminal prompt. Everything new the app adds to the agent, like the browser, Computer Use or the Kanban board, reaches pi as tools from a pi extension, the same way any other extension would.
+
+<CodeNote
+  title="What pi gets when it runs inside pi-gna"
+  language="text"
+  code={`browser_open, browser_click, browser_type, browser_screenshot, ...
+computer_get_app_state, computer_click, computer_type_text, ...
+kanban_list, kanban_claim, kanban_update
+threads_list, thread_read, thread_send`}
+/>
+
+## From pi to pi-gna in pi-gna
+
+Day one was in the terminal: the RPC bridge, the transcript, the composer, the session list, then a browser pane that pi could drive. As soon as the app was good enough to work in, I moved in, and from then on pi-gna was built in pi-gna.
+
+The commit graph shows the shift. Days one and two have 22 and 15 commits, the kind of pace you get when you are typing and reading everything yourself. Day three has 94. Day four has 102.
+
+What changed was how I gave out work. I used two tools for that, depending on the size of the idea.
+
+### Kanban for small ideas
+
+Every project in pi-gna has a Kanban board. I describe a task in my own words, a cheap model titles and tags it in the background, and from the card's menu I can tell a new chat to resolve it. That chat gets its own git worktree on its own branch, so my checkout stays untouched. When it's done, the card moves to In review and I look at it.
+
+I used it the way I think: I invent a feature, write a card, and push it. Then another one. The app ended up with 89 merges, many of them from `pigna/...` branches that a card chat opened, worked on and handed back. Most of the small things you see in pi-gna, like right-click menus, the rail beside long chats or the tok/s chart on hover, started as a sentence on a card.
+
+### ATP for big ideas
+
+For anything big I used ATP, the [Agent Task Protocol](/blog/how-atp-works). I came up with it about a year ago: a plan is a graph of nodes, each with an instruction, dependencies, a lifecycle state and a completion report, and agents claim nodes and execute them in parallel. A year is a long time in this field, and I still haven't found a better way to hand a large piece of work to agents. It's the one thing in this project I would defend to the end.
+
+pi-gna has an ATP page with the plan's graph and an architect chat that drafts plans with you. The biggest features in the app were built that way. The Computer Use plan had 18 nodes, from a design spike to a Swift helper, a policy store, the settings page, the transcript rendering, CI packaging and two rounds of live verification on my real desktop. The iPhone remote access was another plan, and most of it ran overnight between October 4 and 5.
+
+## Computer Use
+
+Computer Use is what makes the app feel finished to me. With it on, pi can work in native Mac apps while you keep using your computer. It reads an app's accessibility tree and a screenshot of its window, then clicks and types with a cursor of its own. It never moves your mouse or takes your keyboard focus. You approve each app once or always, and Esc stops it.
+
+The first version didn't work like that. The design spike found that the obvious way to send events to a background app, posting them to its process, got ignored by TextEdit. So the plan fell back to bringing the app to the front and moving the real cursor. That meant taking over my desktop, which was the one thing I didn't want.
+
+I'm convinced that once software is released, it's free in a practical sense. Anyone can look at how it behaves, learn from it, and build something better. Codex's Computer Use does what I wanted, so I added a node to the plan: find out how Codex drives background apps without stealing focus, and prove the same in Swift. The orchestrator looked at the symbol names in Codex's helper binary with `nm` and `strings`. Names like `SystemFocusStealPreventer`, `SyntheticAppFocusEnforcer` and `VirtualCursor` were enough to form a hypothesis. A worker built a spike that proved it, and the design doc was amended before the input node started.
+
+The whole Computer Use plan, from the design spike to a live end-to-end check, took about a morning. Then came the details that take longer than the feature: signing the helper with a stable certificate so the macOS permissions survive updates, and a Screen Recording flow for when macOS refuses to show its own prompt.
+
+## Laments, the feature that didn't work
+
+Not everything worked. My favourite idea on paper was laments. When pi needs a tool that is missing, unavailable or failing, it files a lament on the project's Lamenting board, rated 😒 annoying, 😠 costly or 🤬 blocking, then carries on with a workaround. I imagined reading them every morning and fixing my setup one complaint at a time.
+
+In practice it was meh. It never became the feedback loop I had in mind. It's the clearest lesson of these nine days: building something is now so cheap that it can be built before anyone has checked that it's worth building.
+
+## Shipping 44 times in 9 days
+
+Releases are one command. `pnpm release` moves the changelog's Unreleased lines under a new version, tags it, and CI builds the DMGs for Apple silicon and Intel. The app checks GitHub for updates and installs them when you quit. On the last of these nine days I shipped v0.12 through v0.15.1: importing Codex and Claude Code chats, a usage dashboard, a Fast mode for GPT models, and an experimental way for chats to survive an app restart.
+
+By now pi-gna also has a browser pane you share with pi, file previews, GitHub issues and PRs per project, chat import, plugins, and remote access from my iPhone over Tailscale. The phone is a web app served by the Mac. pi, the repositories and Computer Use all stay on the Mac.
+
+## How it actually went
+
+I'm very ADHD, and this project happened at the same time as my real job. At [Casus](https://getcasus.com) I made around 300 commits the same week. The commit times for pi-gna cover every hour except roughly 3 to 5 in the morning, and the busiest hour is midnight.
+
+That sounds exhausting, but it didn't feel that way. Working like this suits how my head works. An idea comes up, I write a card, and an agent starts on it while I'm still thinking about the next one. A big idea becomes a plan, and the plan runs while I do something else. My job is to decide what should exist, review what comes back, and keep the whole thing coherent. I read diffs, I open the app, and I send work back when it's wrong.
+
+pi-gna is mainly for me. It puts together everything about how I work: pi as the backbone, ATP for big plans, a board for small ones, the browser and Computer Use as hands, and my phone for when I'm away from the desk. A few friends have already started using it.
+
+The closest I can get to describing these nine days is that I felt powerful and in control the whole time. For the first time, my tools work the way I do.
+
+pi-gna is free and open source, on macOS for now. You can get it at [pi-gna.com](https://pi-gna.com), or paste this into pi:
+
+<CodeNote
+  title="Install with your agent"
+  language="text"
+  code={`Install pi-gna for me by following the "For agents" steps in https://github.com/manuelcecchetto/pi-gna`}
+/>
